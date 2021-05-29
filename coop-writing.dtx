@@ -31,10 +31,6 @@
 \usepackage{graphicx}
 \setlist{noitemsep}
 \setlength{\parskip}{0.5em}
-\usepackage{tocbasic} % for the next 3 commands
-\DeclareTOCStyleEntry[numwidth=35pt]{tocline}{figure}
-\DeclareTOCStyleEntry[numwidth=35pt]{tocline}{section}
-\DeclareTOCStyleEntry[numwidth=35pt]{tocline}{subsection}
 \usepackage{marvosym}
 \usepackage[backend=biber,style=alphabetic,natbib]{biblatex}
 \addbibresource{coop-writing.bib}
@@ -126,7 +122,7 @@
 %
 % \section{How to use coop-writing}
 %
-% |coop-writing| is available as open source at \url{https://github.com/xexeo/coop-writing}. 
+% |coop-writing| is available as open source at \url{https://github.com/xexeo/coop-writing}. The stable distribution is in the folder |dist|, while the lastest, and unstable, will be in the root folder.
 %
 % The only file you really need, besides this manual, is
 % |coop-writing.sty|. This should be in your \LaTeX\   path, such as in the same folder that your main |.tex| file. 
@@ -1135,8 +1131,8 @@
 \fi%
 %    \end{macrocode}
 % \subsection{Draft}
-% \begin{environment}{draft}
-% This macro creates a boxed text, with title used as a first parameter
+% \begin{environment}{cwdraft}
+% This enviroment creates a boxed text, with title used as a first parameter
 % It uses package |mdframed| to create the frame.
 % If draft is turned off as an option, it supress everything inside the body.
 % Due to problems with soul accepting |\cwdrafttitle| we use
