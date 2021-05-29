@@ -1,0 +1,448 @@
+%%
+%% This is file `coop-writing.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% coop-writing.dtx  (with options: `package')
+%% 
+%% This is a generated file.
+%% 
+%% Copyright (C) 2021 by Geraldo Xexéo (xexeo@ufrj.br)
+%% 
+%% This file may be distributed and/or modified under the conditions of
+%% the LaTeX Project Public License, either version 1.3 of this license
+%% or (at your option) any later version.  The latest version of this
+%% license is in:
+%% 
+%% http://www.latex-project.org/lppl.txt
+%% 
+%% and version 1.3 or later is part of all distributions of LaTeX version
+%% 2005/12/01 or later.
+\NeedsTeXFormat{LaTeX2e}
+\def\cw@version{v4.4.0}
+\ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
+    %based on other implementations of to do in different packages.}
+\newcommand{\coopwritingversion}{\cw@version}%
+\newcommand{\printcoopwritingversion}{coop-writing v. \coopwritingversion}%
+%%
+%%
+\newif\ifshowednotes\showednotestrue%
+\newif\ifmargins\marginstrue%
+\newif\ifmarginnote\marginnotefalse%
+\newif\ifednotebookmarks\ednotebookmarksfalse%
+\newif\if@showcomentario\@showcomentariofalse%
+\newif\if@naoanonimizar\@naoanonimizarfalse%
+\newif\if@showdraft\@showdraftfalse%
+\newif\if@showsubjects\@showsubjectsfalse%
+\newif\if@showsugestao\@showsugestaofalse%
+\newif\if@beanonymous\@beanonymousfalse%
+\newif\if@showtodo\@showtodofalse%
+\newif\if@modoedicao\@modoedicaofalse%
+\newif\if@modosubmeter\@modosubmeterfalse%
+\newif\if@modopublicar\@modopublicarfalse%
+\newif\if@modopublicaraceitando\@modopublicaraceitandofalse%
+\DeclareOption{rascunhos}{\@showdrafttrue}
+\DeclareOption{comentarios}{\@showcomentariotrue}
+\DeclareOption{anonimizar}{\@beanonymoustrue}
+\DeclareOption{naoanonimizar}{\@naoanonimizartrue}
+\DeclareOption{sugestoes}{\@showsugestaotrue}
+\DeclareOption{assuntos}{\@showsubjectstrue}
+\DeclareOption{edicao}{\@modoedicaotrue}
+\DeclareOption{submeter}{\@modosubmetertrue}
+\DeclareOption{publicar}{\@modopublicartrue}
+\DeclareOption{publicaraceitando}{
+    \@modopublicartrue
+    \@modopublicaraceitandotrue
+}
+\DeclareOption{show}{\showednotestrue\message{ed.sty: showing ednotes}}
+\DeclareOption{hide}{\showednotesfalse\message{ed.sty: hiding ednotes}}
+\DeclareOption{draft}{\showednotestrue\message{ed.sty: showing ednotes}}
+\DeclareOption{final}{\showednotesfalse\message{ed.sty: hiding ednotes}}
+\DeclareOption{nomargins}{\marginsfalse}
+\DeclareOption{marginnote}{\marginnotetrue}
+\DeclareOption{pdfbookmarks}{\ednotebookmarkstrue}
+\DeclareOption{comments}{\@showcomentariotrue}
+\DeclareOption{anonimize}{\@beanonymoustrue}
+\DeclareOption{noanonymize}{\@naoanonimizartrue}
+\DeclareOption{suggestions}{\@showsugestaotrue}
+\DeclareOption{subjects}{\@showsubjectstrue}
+\DeclareOption{drafts}{\@showdrafttrue}
+\DeclareOption{todos}{\@showtodotrue}
+\DeclareOption{editing}{\@modoedicaotrue}
+\DeclareOption{submit}{\@modosubmetertrue}
+\DeclareOption{publish}{\@modopublicartrue}
+\DeclareOption{acceptingpublish}{
+    \@modopublicartrue
+    \@modopublicaraceitandotrue
+}
+\ProcessOptions\relax
+\if@modoedicao
+\@showsubjectstrue
+\@showdrafttrue
+\@showcomentariotrue
+\@showsugestaotrue
+\@beanonymoustrue
+\@showtodotrue
+\fi
+\if@modosubmeter
+\@showsubjectsfalse
+\@showdraftfalse
+\@showcomentariofalse
+\@showsugestaofalse
+\@beanonymoustrue
+\@showtodofalse
+\fi
+\if@naoanonimizar
+\@beanonymousfalse
+\fi
+\if@modopublicar
+\@showsubjectsfalse
+\@showsugestaofalse
+\@showdraftfalse
+\@showcomentariofalse
+\@beanonymousfalse
+\@showtodofalse
+\fi%
+\if@showtodo
+\@showcomentariotrue
+\fi
+\RequirePackage{xcolor}
+\RequirePackage{soulutf8}
+\RequirePackage[normalem]{ulem}
+\RequirePackage{tocloft}
+\RequirePackage{etoolbox}
+\RequirePackage{environ}
+\RequirePackage{xstring}
+\RequirePackage{csquotes}
+\RequirePackage{mdframed}
+\ifshowednotes%
+\ifmarginnote%
+\RequirePackage{marginnote}%
+\fi%
+\else%
+\RequirePackage{verbatim}%
+\fi%
+\@ifpackageloaded{babel}%
+{%  \message{Babel Loaded!}%
+    \RequirePackage{iflang}%
+}{%
+    \message{Babel not detected!}%
+}%
+\ifednotebookmarks\RequirePackage{hyperref}\fi
+\newcommand{\cor@prof}{red}%
+\newcommand{\cor@cand}{blue}%
+\newcommand{\cor@subject}{green}%
+\newcommand{\cor@citar}{purple}%
+\newcommand{\cor@hldraft}{yellow}%
+\def\cwdrafttitle{Standard Draft}%
+\def\cwcommentstitle{Standard List of Comments}%
+\def\cwsubjtitle{Standard List of Subjects}%
+\def\cwcitationstitle{Standard List of Citation Needs}%
+\def\cwpleasecitetext{Plese cite}
+\def\cwpleasecitemessage{something to support this information}
+\def\cwpleasecitemarginnote{Cite}%
+\@ifpackageloaded{babel}%
+{%
+    \IfLanguageName{brazilian}%
+    {%
+        \def\cwdrafttitle{draft}%
+        \def\cwcommentstitle{Lista de Comentários}%
+        \def\cwsubjtitle{Lista de Assuntos}%
+        \def\cwcitationstitle{Necessidades de Citação}%
+        \def\cwpleasecitetext{Favor citar}%
+        \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+        \def\cwpleasecitemarginnote{Citar}%
+    }{}%
+    \IfLanguageName{portuguese}%
+    {%
+        \def\cwdrafttitle{draft}%
+        \def\cwcommentstitle{Lista de Comentários}%
+        \def\cwsubjtitle{Lista de Assuntos}%
+        \def\cwcitationstitle{Necessidades de Citação}%
+        \def\cwpleasecitetext{Favor citar}%
+        \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+        \def\cwpleasecitemarginnote{Citar}%
+    }{}%
+    \IfLanguageName{english}%
+    {%
+        \def\cwdrafttitle{Draft}%
+        \def\cwcommentstitle{List of Comments}%
+        \def\cwsubjtitle{List of Subjects}%
+        \def\cwcitationstitle{List of Citation Needs}%
+        \def\cwpleasecitetext{Plese cite}
+        \def\cwpleasecitemessage{something to support this information}
+        \def\cwpleasecitemarginnote{Cite}%
+    }{}%
+}%
+{}%
+\newcounter{cwnote}%
+\newcommand\cw@noteshape{\sffamily}%
+\def\cw@currentcolor{black}%
+%% footnote indicador e rótulo
+\newcommand\cw@foot[3]%
+{\def\@test{#3}\footnotetext[\arabic{cwnote}]%
+{{\scshape{\textcolor{\cw@currentcolor}{#2}}%
+\if\@test\@empty\else\label{ed:#3}\textcolor{\cw@currentcolor}{[#3]}%
+\fi\textcolor{\cw@currentcolor}{:}}%
+\cw@noteshape\textcolor{\cw@currentcolor}{#1}}}%
+\def\cw@mark@style#1{#1}%
+\newcommand\cw@mark[1]{\cw@mark@style{\footnotemark[#1]}}%
+\newcommand\cw@footnote[3]{\cw@mark{\arabic{cwnote}}\cw@foot{#1}{#2}{#3}}%
+\newcommand\cw@margin[1]{%
+\ifmargins%
+\ifmarginnote%
+\marginnote{%
+\textcolor{\cw@currentcolor}{#1}}%
+\else%
+\marginpar{\textcolor{\cw@currentcolor}{#1}}%
+\fi%
+\fi}%
+\newcommand\Cw@note[3]% text, type, label
+{\addtocounter{cwnote}{1}%
+\ifshowednotes%
+\cw@footnote{#1}{#2}{#3}%
+\ifednotebookmarks%
+\belowpdfbookmark{#2: #1}{#2.\thecwnote}%
+\fi
+\fi}%
+\newcommand\cw@note[4]% text, type, label, margin
+{\Cw@note{#1}{#2}{#3}%
+\ifshowednotes\cw@margin{#4:\arabic{cwnote}}%
+\fi}%
+\newcommand\cwnote@label{Editor}%
+\newcommand\cwnote@margin{Ed}%
+\newcommand\cwnotelabel[1]{\def\cwnote@label{#1}}%
+\newcommand\cwnotemargin[1]{\def\cwnote@margin{#1}}%
+\newcommand{\Cwnote}[2][]{\Cw@note{#2}\cwnote@label{#1}}%
+\newcommand{\cwnote}[3][]{%
+\def\cw@currentcolor{#3}%
+\cw@note{#2}%
+\cwnote@label{#1}%
+\cwnote@margin%
+}%
+%%%https://tex.stackexchange.com/questions/30483/how-can-i-check-in-latex-or-plain-tex-whether-a-command-exists-by-name
+%% as opções comentario, assuntos e anonimizar
+%% CORES
+\newcommand{\cor@suavizacao}{40}%
+\newcommand{\corleve}[1]{#1!\cor@suavizacao!white}
+\newcommand{\cw@hll}[2]% % Depedendo do soulutf8
+{\colorlet{x@coraqui}{\corleve{#1}}%
+\sethlcolor{x@coraqui}%
+\hl{#2}%
+}%
+%% rótulo texto cor indicador
+\newcommand{\cw@cwnote}[4][]{%
+\cwnotelabel{#4}%
+\cwnotemargin{#4}%
+\cwnote[#1]{#2}{#3}%
+}%
+\newcommand{\cw@anoncitetext}{(Anonymous, Year)}%
+\newcommand{\cw@anonciteptext}{(Anonymous, Year)}%
+\newcommand{\cw@anoncitettext}{Anonymous (Year)}%
+\newcommand{\cwdefanoncitetext}[1]{\renewcommand{\cw@anoncitetext}{#1}}%
+\newcommand{\cwdefanonciteptext}[1]{\renewcommand{\cw@anonciteptext}{#1}}
+\newcommand{\cwdefanoncitettext}[1]{\renewcommand{\cw@anoncitettext}{#1}}%
+\if@beanonymous
+\newcommand{\cwanon}[1]{Anonymous}%
+\newcommand{\cwanoncite}[2][]{\cw@anoncitetext}%
+\newcommand{\cwanoncitep}[2][]{\cw@anonciteptext}%
+\newcommand{\cwanoncitet}[2][]{\cw@anoncitettext}%
+\else
+\newcommand{\cwanon}[1]{#1}%
+\newcommand{\cwanoncite}[2][]{\cite[#1]{#2}}%
+\ifdef{\citep}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}{\newcommand{\cwanoncitep}[2][]{\cite[#1]{#2}}}%
+\ifdef{\citet}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}{\newcommand{\cwanoncitet}[2][]{\cite[#1]{#2}}}%
+\fi%|
+%% retrocompatibilidade
+\newcommand{\xanon}[2][]{\cwanon[#1]{#2}}%
+\newcommand{\xanoncitep}[2][]{\cwanoncitep[#1]{#2}}%
+\newcommand{\xanoncitet}[2][]{\cwanoncitet[#1]{#2}}%
+\if@showsubjects
+\newcommand{\listsubject}{\cwsubjtitle}%
+%% cria a lista, depende do pacoto tcloft
+\@ifundefined{chapter}
+{\newlistof[section]{subject}{aaa}{\listsubject}}
+{\newlistof[chapter]{subject}{aaa}{\listsubject}}%
+%%
+\newcommand{\cwsubject}[2][\cor@subject]{%
+\refstepcounter{subject}%
+\sethlcolor{#1}%
+\hl{#2}%
+\par%
+\addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+}%
+\setlength{\cftsubjectnumwidth}{2.5em}%
+\else%
+\newcommand{\listofsubject}{}%
+\newcommand{\cwsubject}[2][]{}%
+\fi%
+\if@showcomentario
+%% Resolve a lista de comentários
+\newcommand{\listcomentario}{\cwcommentstitle}%
+%% cria a lista
+\@ifundefined{chapter}
+{\newlistof[section]{comentario}{ccc}{\listcomentario}}
+{\newlistof[chapter]{comentario}{ccc}{\listcomentario}}%%
+%%
+%% Comentador genérico - parte I
+%% faz o cwnote e soma na lista
+%% []rótulo], texto , cor, indicador
+\newcommand{\cw@comentar}[4][]{%
+\ifstrempty{#4}{%
+\cw@cwnote[#1]{#2}{#3}{Comentário}% faz a nota de rodapé do ed
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#2}}%
+}%
+{%
+\cw@cwnote[#1]{#2}{#3}{#4}%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#4: #2}}%
+}%
+}%
+%% comentador genérico, parte II
+%% faz o highlight , soma o step e comenta
+%% [texto hl] footnote cor indicator
+\newcommand{\cw@comment}[4][]{%
+\refstepcounter{comentario}% soma um ao contador
+\cw@hll{#3}{#1}% ver subfunção de impressão com hl
+\cw@comentar{#2}{#3}{#4}%
+}%
+%%
+%%
+\newcommand{\cw@xcomment}[4][]{%
+\refstepcounter{comentario}% soma um ao contador
+\cw@hll{#3}{#1}% ver subfunção de impressão com hl
+\cw@comentar{\sout{#2}}{#3}{#4}%
+}%
+%%
+%%
+%% comentador genérico com rótulo
+%% [texto hl] footnote cor  indicator rótulo
+\newcommand{\cw@commentLabeled}[5][]{%
+\refstepcounter{comentario}%
+\cw@hll{#3}{#1}%
+\cw@comentar[#5]{#2}{#3}{#4}%
+}%
+%%
+%% [texto hl] footnote cor  indicator rótulo
+\newcommand{\cw@xcommentLabeled}[5][]{%
+\refstepcounter{comentario}%
+\cw@hll{#3}{#1}%
+\cw@comentar[#5]{\sout{#2}}{#3}{#4}%
+}%
+%%
+\setlength{\cftcomentarionumwidth}{2.5em}
+\else
+\newcommand{\cw@comentar}[4][]{}%
+\newcommand{\listofcomentario}{}%
+%% não pode perder o texto comentado
+\newcommand{\cw@comment}[4][]{#1}%
+\newcommand{\cw@commentLabeled}[5][]{#1}%
+\fi%|
+%% comentário, cor, indicador, textovelho, cor velho, textonovo, cor novo
+%% Em modo publicar coloca o textovelho
+\if@showsugestao
+\newcommand{\cw@gensug}[7][Uma proposta]{%
+\textcolor{#5}{\sout{#4}}% CORRIGINDO AQUI
+\textcolor{#7}{#6}%
+\if@showcomentario%
+\ifstrempty{#1}{}%
+{\refstepcounter{comentario}%
+\cw@comentar{#1}{#2}{#3}%% [rótulo], cor , footnote , indicador
+}%
+\fi%
+}%% [rótulo], cor , footnote , indicador
+\else%
+\if@modopublicaraceitando
+\newcommand{\cw@gensug}[7][]{#6}%
+\else%
+\newcommand{\cw@gensug}[7][]{#4}%
+\fi%
+\fi%
+\if@showcomentario%
+\newcommand{\listcomentarioref}{\cwcitationstitle}%
+\@ifundefined{chapter}{ \newlistof[section]{comentarioref}{ccr}{\listcomentarioref}}{\newlistof[chapter]{comentarioref}{ccr}{\listcomentarioref}}%
+\else%
+\newcommand{\listofcomentarioref}{}%
+\fi%
+\if@showcomentario%
+\newcommand{\cw@commentref}[3][]{%
+\refstepcounter{comentarioref}%
+\cw@hll{#3}{#1}%
+\cw@cwnote{#2}{#3}{\cwpleasecitemarginnote}%
+\addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}{#2}}%
+}%
+\setlength{\cftcomentariorefnumwidth}{2.5em}%
+\else%
+\newcommand{\cw@commentref}[3]{}%
+\fi%
+\if@showcomentario
+\newcommand{\favorcitar}[1][\cwpleasecitemessage]{%
+\cw@commentref{\cwpleasecitetext\  #1}{\cor@citar}}%
+\else%
+\newcommand{\favorcitar}[1][]{}%
+\fi%
+\if@showdraft%
+\NewEnviron{cwdraft}[1][]{%
+\ifstrempty{#1}%
+{\colorbox{\corleve{\cor@hldraft}}{\textbf{\cwdrafttitle}}}%
+{\cw@hll{\cor@hldraft}{\textbf{#1}}}%
+\newline%
+\BODY%
+}%
+{}%
+\surroundwithmdframed{cwdraft}%
+\else%
+\NewEnviron{draft}[1][]{}{}%
+\fi%
+%% nome do autor, cor, identificador
+\newcommand{\cwautor}[3]{%
+%% cwcomment - texto a hl, cor, comentário, indicador de pessoa
+\expandafter\newcommand\csname#1\endcsname[2][]%
+{%
+\cw@comment[##1]{##2}{#2}{#3}}%
+\expandafter\newcommand\csname#1r\endcsname[3][]%
+{\cw@commentLabeled[##1]{##2}{#2}{#3}{##3}}%
+%% cortados
+\expandafter\newcommand\csname#1x\endcsname[2][]%
+{%
+%% Comentários
+\cw@xcomment[##1]{##2}{#2}{#3}}%
+%% [texto a marcar], cor , comentário, palavra, rótulo
+\expandafter\newcommand\csname#1rx\endcsname[3][]%
+{\cw@xcommentLabeled[##1]{##2}{#2}{#3}{##3}}%
+%% sugestões
+\expandafter\newcommand\csname#1sug\endcsname[2][]%
+{\cw@gensug[##1]{#2}{#3}{}{#2}{##2}{#2}}%
+\expandafter\newcommand\csname#1rem\endcsname[2][]%
+{\cw@gensug[##1]{#2}{#3}{##2}{#2}{}{#2}}
+\expandafter\newcommand\csname#1troca\endcsname[3][]%
+{\cw@gensug[##1]{#2}{#3}{##2}{#2}{##3}{#2}}%
+\expandafter\newcommand\csname#1swap\endcsname[3][]%
+{\cw@gensug[##1]{#2}{#3}{##2}{#2}{##3}{#2}}%
+}%
+\cwautor{cwauthor}{red}{Author}
+\cwautor{cweditor}{blue}{Editor}
+\cwautor{cw@todoauthor}{orange}{To do}%
+\newcommand{\cw@todobackgroundcolor}{orange}%
+\newcommand{\todo}[2][comentar]{%
+\IfEq{inline}{#1}%
+{%
+\begin{mdframed}[backgroundcolor=\cw@todobackgroundcolor]
+#2%
+\end{mdframed}%
+}%
+{%
+\cw@todoauthor{#2}%
+}%
+}%
+\newcommand{\cwdefinetodocolor}[1]{\renewcommand{\cw@todobackgroundcolor}{#1}}%
+\let\rascunho=\cwdraft%
+\let\cwassunto=\cwsubject%
+\let\pleasecite=\favorcitar%
+\let\cwnamedef=\cwautor%
+\let\listofcomments=\listofcomentario%
+\let\listofcitationneeds=\listofcomentarioref%
+\let\listofassunto=\listofsubject%
+\endinput
+%%
+%% End of file `coop-writing.sty'.
