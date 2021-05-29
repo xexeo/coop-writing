@@ -253,3 +253,5 @@ TSWLatexianTemp*
 
 # standalone packages
 *.sta
+*.ccc
+*.aaa
