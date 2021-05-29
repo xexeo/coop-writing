@@ -20,8 +20,9 @@
 %% and version 1.3 or later is part of all distributions of LaTeX version
 %% 2005/12/01 or later.
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v4.4.0}
+\def\cw@version{v1.0}
 \ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
+%% \DescribeMacro{\cssetdraftcolor}
     %based on other implementations of to do in different packages.}
 \newcommand{\coopwritingversion}{\cw@version}%
 \newcommand{\printcoopwritingversion}{coop-writing v. \coopwritingversion}%
@@ -394,6 +395,7 @@
 \else%
 \NewEnviron{draft}[1][]{}{}%
 \fi%
+\newcommand{\cwsetdraftcolor}[1]{\def\cor@hldraft{#1}}
 %% nome do autor, cor, identificador
 \newcommand{\cwautor}[3]{%
 %% cwcomment - texto a hl, cor, comentário, indicador de pessoa
@@ -422,8 +424,9 @@
 }%
 \cwautor{cwauthor}{red}{Author}
 \cwautor{cweditor}{blue}{Editor}
-\cwautor{cw@todoauthor}{orange}{To do}%
 \newcommand{\cw@todobackgroundcolor}{orange}%
+\cwautor{cw@todoauthor}{orange}{To do}%
+\if@showtodo%
 \newcommand{\todo}[2][comentar]{%
 \IfEq{inline}{#1}%
 {%
@@ -435,6 +438,9 @@
 \cw@todoauthor{#2}%
 }%
 }%
+\else%
+\newcommand{\todo}[2]{}%
+\fi%
 \newcommand{\cwdefinetodocolor}[1]{\renewcommand{\cw@todobackgroundcolor}{#1}}%
 \let\rascunho=\cwdraft%
 \let\cwassunto=\cwsubject%

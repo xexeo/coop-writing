@@ -17,7 +17,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v4.4.0}
+%<package>\def\cw@version{v1.0}
 %<package>\ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
@@ -79,7 +79,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{0}
+% \CheckSum{657}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -97,15 +97,7 @@
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \changes{v4.0}{2021/05/01}{Primeira versão com dtx}
-% \changes{v4.0.3}{2021/05/05}{Consertando o strike through}
-% \changes{v4.1.0}{2021/05/06}{Publicar aceitando as mudanças introduzidos}
-% \changes{v4.2.0}{2021/05/18}{Comando todo}
-% \changes{v4.2.1}{2021/05/18}{Pacote paralist, herdado de código do ed, parece inútil e dar problemas com o enumerate e itemize}
-% \changes{v4.3.0}{2021/05/18}{Comandos que riscam os comentários, como profx}
-% \changes{v4.3.1}{2021/05/21}{Tem espaço demais entre marginnotes... tentando resolver}
-% \changes{v4.3.2}{2021/05/27}{Fixing behavior of draft, going for internationalization}
-% \changes{v4.4.0}{2021/05/28}{First version in English}
+% \changes{v1.0}{2021/05/29}{First version}
 %
 %\maketitle
 %
@@ -436,6 +428,10 @@
 % It has one optional parameter that names the draft. Its default value is ``Draft''
 % If the |draft| option is not enabled, the text inside the title and the text inside the environment will not appear. The user should remember that some options will automatically turn on the |draft| option, such as the option |edicao|.
 %
+% The color of the title highlight can be changed with
+%% \DescribeMacro{\cssetdraftcolor}
+%
+% |\cssetdraftcolor|\marg{color}
 %
 % The example:
 %
@@ -446,6 +442,7 @@
 %There must be a box around it.
 %\end{cwdraft}
 %
+%\cwsetdraftcolor{blue}
 %\begin{cwdraft}
 %This draft has the default title.
 %\end{cwdraft}
@@ -461,6 +458,7 @@
 % There must be a box around it.
 %\end{cwdraft}
 %
+%\cwsetdraftcolor{blue}
 %\begin{cwdraft}
 % This draft has the default title.
 %\end{cwdraft}% 
@@ -1159,6 +1157,15 @@
 \NewEnviron{draft}[1][]{}{}%
 \fi%
 %    \end{macrocode}
+% \begin{macro}{\cwsetdraftcolor}
+% Sets the color that highlights the draft title
+% 
+%    \begin{macrocode}
+% 
+\newcommand{\cwsetdraftcolor}[1]{\def\cor@hldraft{#1}}
+%
+%    \end{macrocode}
+% \end{macro}
 % \end{environment}
 % \subsection{Powerful command to create editors and authors}
 % This allows for many types of comments. This was the reason I started
@@ -1193,23 +1200,29 @@
 \expandafter\newcommand\csname#1swap\endcsname[3][]%
 {\cw@gensug[##1]{#2}{#3}{##2}{#2}{##3}{#2}}%
 }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\cwauthor}
+% \begin{macro}{\cweditor}
+% These are the two standard users. 
+%    \begin{macrocode}
 \cwautor{cwauthor}{red}{Author}
 \cwautor{cweditor}{blue}{Editor}
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 % \subsection{To do notes}
 % This was developed because some of my students started a text using |todonotes|, before being aware of my package, therefore I need to have some compatibility to make de change. With time it became useful and I will try to make something better in the future.
 % \begin{macro}{\todo}
-% Fazendo um todo do todonotes simples. 
-%
 % If option inline is not used, it is only a front-end to 
 % an editorial comment for a user called ``To do''. If it is used, it tries to simulate
 % the simplest behavior of |todonotes| package.
 % In the future this can be enhanced, since package |mdframe| is very powerful.
-% If the non-inline version is used, the to do note will not appear in the List of Commentaries.
+% If the non-inline version is used, the to do note will not appear in the List of Commentaries.\xexeo{It would be nice to check if todonotes is load and just use it}
 %    \begin{macrocode}
-\cwautor{cw@todoauthor}{orange}{To do}%
 \newcommand{\cw@todobackgroundcolor}{orange}%
+\cwautor{cw@todoauthor}{orange}{To do}%
+\if@showtodo%
 \newcommand{\todo}[2][comentar]{%
 \IfEq{inline}{#1}%
 {%
@@ -1221,6 +1234,9 @@
 \cw@todoauthor{#2}%
 }%
 }%
+\else%
+\newcommand{\todo}[2]{}%
+\fi%
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\cwdefinetodocolor}
