@@ -20,7 +20,7 @@
 %% and version 1.3 or later is part of all distributions of LaTeX version
 %% 2005/12/01 or later.
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.1}
+\def\cw@version{v1.1.1}
 \ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
     %based on other implementations of to do in different packages.}
@@ -30,7 +30,6 @@
 %%
 \newif\ifshowednotes\showednotestrue%
 \newif\ifmargins\marginstrue%
-\newif\ifmarginnote\marginnotefalse%
 \newif\ifednotebookmarks\ednotebookmarkstrue%
 \newif\if@showcomentario\@showcomentariofalse%
 \newif\if@naoanonimizar\@naoanonimizarfalse%
@@ -58,7 +57,7 @@
 }
 \DeclareOption{nopdfbookmarks}{\ednotebookmarksfalse}
 \DeclareOption{comments}{\@showcomentariotrue}
-\DeclareOption{anonimize}{\@beanonymoustrue}
+\DeclareOption{anonymize}{\@beanonymoustrue}
 \DeclareOption{noanonymize}{\@naoanonimizartrue}
 \DeclareOption{suggestions}{\@showsugestaotrue}
 \DeclareOption{subjects}{\@showsubjectstrue}
@@ -112,9 +111,6 @@
 \RequirePackage{csquotes}
 \RequirePackage{mdframed}
 \ifshowednotes%
-\ifmarginnote%
-\RequirePackage{marginnote}%
-\fi%
 \else%
 \RequirePackage{verbatim}%
 \fi%
@@ -200,13 +196,9 @@
 }%
 \newcommand\cw@margin[1]{%
 \ifmargins%
-\ifmarginnote%
-\marginnote{%
-\textcolor{\cw@currentcolor}{#1}}%
-\else%
 \marginpar{\textcolor{\cw@currentcolor}{#1}}%
 \fi%
-\fi}%
+}%
 \newcommand\Cw@note[3]% text, name, label
 {%
 \addtocounter{cwnote}{1}%
@@ -247,27 +239,25 @@
 \cwnotemargin{#4}%
 \cwnote[#1]{#2}{#3}%
 }%
+\newcommand{\cw@anontext}{Anonymous}
 \newcommand{\cw@anoncitetext}{(Anonymous, Year)}%
 \newcommand{\cw@anonciteptext}{(Anonymous, Year)}%
 \newcommand{\cw@anoncitettext}{Anonymous (Year)}%
+\newcommand{\cwdefanontext}[1]{\renewcommand{\cw@anontext}{#1}}%
 \newcommand{\cwdefanoncitetext}[1]{\renewcommand{\cw@anoncitetext}{#1}}%
 \newcommand{\cwdefanonciteptext}[1]{\renewcommand{\cw@anonciteptext}{#1}}
 \newcommand{\cwdefanoncitettext}[1]{\renewcommand{\cw@anoncitettext}{#1}}%
 \if@beanonymous
-\newcommand{\cwanon}[1]{Anonymous}%
+\newcommand{\cwanon}[1]{\cw@anontext}%
 \newcommand{\cwanoncite}[2][]{\cw@anoncitetext}%
 \newcommand{\cwanoncitep}[2][]{\cw@anonciteptext}%
 \newcommand{\cwanoncitet}[2][]{\cw@anoncitettext}%
 \else
 \newcommand{\cwanon}[1]{#1}%
 \newcommand{\cwanoncite}[2][]{\cite[#1]{#2}}%
-\ifdef{\citep}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}{\newcommand{\cwanoncitep}[2][]{\cite[#1]{#2}}}%
-\ifdef{\citet}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}{\newcommand{\cwanoncitet}[2][]{\cite[#1]{#2}}}%
+\ifdef{\citep}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}%
+\ifdef{\citet}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}%
 \fi%|
-%% retrocompatibilidade
-\newcommand{\xanon}[2][]{\cwanon[#1]{#2}}%
-\newcommand{\xanoncitep}[2][]{\cwanoncitep[#1]{#2}}%
-\newcommand{\xanoncitet}[2][]{\cwanoncitet[#1]{#2}}%
 \if@showsubjects
 \newcommand{\listsubject}{\cwsubjtitle}%
 %% cria a lista, depende do pacoto tcloft
@@ -347,6 +337,8 @@
 %% não pode perder o texto comentado
 \newcommand{\cw@comment}[4][]{#1}%
 \newcommand{\cw@commentLabeled}[5][]{#1}%
+\newcommand{\cw@xcomment}[4][]{#1}
+\newcommand{\cw@xcommentLabeled}[5][]{#1}%
 \fi%|
 %% comentário, cor, indicador, textovelho, cor velho, textonovo, cor novo
 %% Em modo publicar coloca o textovelho
@@ -402,7 +394,7 @@
 {}%
 \surroundwithmdframed{cwdraft}%
 \else%
-\NewEnviron{draft}[1][]{}{}%
+\NewEnviron{cwdraft}[1][]{}{}%
 \fi%
 \newcommand{\cwsetdraftcolor}[1]{\def\cor@hldraft{#1}}
 %% nome do autor, cor, identificador
