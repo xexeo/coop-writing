@@ -20,7 +20,7 @@
 %% and version 1.3 or later is part of all distributions of LaTeX version
 %% 2005/12/01 or later.
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.0}
+\def\cw@version{v1.1}
 \ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
     %based on other implementations of to do in different packages.}
@@ -31,7 +31,7 @@
 \newif\ifshowednotes\showednotestrue%
 \newif\ifmargins\marginstrue%
 \newif\ifmarginnote\marginnotefalse%
-\newif\ifednotebookmarks\ednotebookmarksfalse%
+\newif\ifednotebookmarks\ednotebookmarkstrue%
 \newif\if@showcomentario\@showcomentariofalse%
 \newif\if@naoanonimizar\@naoanonimizarfalse%
 \newif\if@showdraft\@showdraftfalse%
@@ -56,13 +56,7 @@
     \@modopublicartrue
     \@modopublicaraceitandotrue
 }
-\DeclareOption{show}{\showednotestrue\message{ed.sty: showing ednotes}}
-\DeclareOption{hide}{\showednotesfalse\message{ed.sty: hiding ednotes}}
-\DeclareOption{draft}{\showednotestrue\message{ed.sty: showing ednotes}}
-\DeclareOption{final}{\showednotesfalse\message{ed.sty: hiding ednotes}}
-\DeclareOption{nomargins}{\marginsfalse}
-\DeclareOption{marginnote}{\marginnotetrue}
-\DeclareOption{pdfbookmarks}{\ednotebookmarkstrue}
+\DeclareOption{nopdfbookmarks}{\ednotebookmarksfalse}
 \DeclareOption{comments}{\@showcomentariotrue}
 \DeclareOption{anonimize}{\@beanonymoustrue}
 \DeclareOption{noanonymize}{\@naoanonimizartrue}
@@ -182,18 +176,26 @@
 \def\cw@currentcolor{black}%
 %% footnote indicador e rótulo
 \newcommand\cw@foot[3]%
-{\def\@test{#3}\footnotetext[\arabic{cwnote}]%
-{{\scshape{\textcolor{\cw@currentcolor}{#2}}%
-\if\@test\@empty\else\label{ed:#3}\textcolor{\cw@currentcolor}{[#3]}%
-\fi\textcolor{\cw@currentcolor}{:}}%
-\cw@noteshape\textcolor{\cw@currentcolor}{#1}}}%
+{%
+\def\@test{#3}% @test just checks if argument #3 exists
+\footnotetext[\arabic{cwnote}]%
+{%
+{\scshape{\textcolor{\cw@currentcolor}{#2}}%
+\if\@test%
+\@empty%
+\else%
+\label{cw:#3}%
+\textcolor{\cw@currentcolor}{[#3]}% if \meta{label} is not empty
+\fi%
+\textcolor{\cw@currentcolor}{:}}%
+\cw@noteshape\textcolor{\cw@currentcolor}{#1}}%
+}%
 \def\cw@mark@style#1{#1}%
 \newcommand\cw@mark[1]{\cw@mark@style{\footnotemark[#1]}}%
 \newcommand{\cw@beforemarksymbol}{}%
 \newcommand{\cwsetcommwarn}[1]{\def\cw@beforemarksymbol{#1}}%
 \newcommand\cw@footnote[3]{%
 \textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnote}}}%
-%%%%\cw@mark{\arabic{cwnote}}
 \cw@foot{#1}{#2}{#3}%
 }%
 \newcommand\cw@margin[1]{%
@@ -205,8 +207,9 @@
 \marginpar{\textcolor{\cw@currentcolor}{#1}}%
 \fi%
 \fi}%
-\newcommand\Cw@note[3]% text, type, label
-{\addtocounter{cwnote}{1}%
+\newcommand\Cw@note[3]% text, name, label
+{%
+\addtocounter{cwnote}{1}%
 \ifshowednotes%
 \cw@footnote{#1}{#2}{#3}%
 \ifednotebookmarks%

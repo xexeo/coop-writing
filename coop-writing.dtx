@@ -76,7 +76,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{668}
+% \CheckSum{653}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -95,8 +95,7 @@
 %   Right brace   \}     Tilde         \~}
 %
 % \changes{v1.0}{2021/05/29}{First version}
-% \changes{v1.1}{2021/05/30}{You can put an aditional symbol before the comment
-superscript number} 
+% \changes{v1.1}{2021/05/30}{You can put an aditional symbol before the comment superscript number} 
 %\maketitle
 %
 % \tableofcontents
@@ -160,11 +159,15 @@ superscript number}
 %
 % Using the package allows the use of all macros and environments described in this manual, however, \textbf{if the options are not turned on, there will be no effect on the generated |pdf|}, since, by default, all options are false. 
 %
-% There are two types of options. The first type enables the visualization of the result of specific macros or environmnets, such as 
+% There are three types of options. The first type enables the visualization of the result of specific macros or environmnets, such as 
 % the |cwdraft| environment. They are named \textit{command oriented options}. You can use many of them in the same time.
 %
 % The second type  represent a state
 % of the text, which can be editing, submit, or publish, and some minor variations. They are named \textit{state oriented options}.
+%
+% The third type control other behaviors. They are named 
+% \textit{behavior oriented options}
+%
 %
 % If they appear together, state oriented commands have precedence over the others. However, the user should avoid mixing command and state oriented options. Also, most of the time, you should \textbf{use only one of the state oriented options.}
 %
@@ -188,6 +191,16 @@ superscript number}
 % \item |acceptingpublish|, \DescribeMacro{acceptingpublish}  disables all command oriented options, accept suggestions
 % \item |editing|, \DescribeMacro{editing}  enables |subjects|, |comments|, |drafts| and |suggestions|.
 % \end{itemize}
+%
+%\subsection{Behavior oriented options}
+%
+% Some of this option are inherited from |ed|.
+%
+%
+% \begin{itemize}
+%    \item |nopdfbookmarks| will avoid adding bookmarks in the |pdf| file for all comments. The default behavior of |coop-writing| is adding them.
+%    them.
+%\end{itemize}
 %
 % \subsection{General behavior}
 %
@@ -644,7 +657,7 @@ superscript number}
 \newif\ifshowednotes\showednotestrue%
 \newif\ifmargins\marginstrue%
 \newif\ifmarginnote\marginnotefalse%
-\newif\ifednotebookmarks\ednotebookmarksfalse%
+\newif\ifednotebookmarks\ednotebookmarkstrue%
 \newif\if@showcomentario\@showcomentariofalse%
 \newif\if@naoanonimizar\@naoanonimizarfalse%
 \newif\if@showdraft\@showdraftfalse%
@@ -673,15 +686,9 @@ superscript number}
     \@modopublicaraceitandotrue 
 }
 %    \end{macrocode}
-% \subsubsection{English Options, from ed package}
+% \subsubsection{English Options, inspired on ed package}
 %    \begin{macrocode}
-\DeclareOption{show}{\showednotestrue\message{ed.sty: showing ednotes}}
-\DeclareOption{hide}{\showednotesfalse\message{ed.sty: hiding ednotes}}
-\DeclareOption{draft}{\showednotestrue\message{ed.sty: showing ednotes}}
-\DeclareOption{final}{\showednotesfalse\message{ed.sty: hiding ednotes}}
-\DeclareOption{nomargins}{\marginsfalse}
-\DeclareOption{marginnote}{\marginnotetrue}
-\DeclareOption{pdfbookmarks}{\ednotebookmarkstrue}
+\DeclareOption{nopdfbookmarks}{\ednotebookmarksfalse}
 %    \end{macrocode}
 %
 % \subsubsection{Original English Options}
@@ -849,61 +856,112 @@ superscript number}
 % \subsection{ed inspired code}
 % This code, inspired in the |ed| package, makes the basic mechanism for 
 % inserting comments as footnotes with an observation in the margin.
-% As an adition to |ed|, it support colors.
-%
-% Setting up the counter
+% As an adition to |ed|, it support colors and some text
+% before the superscript number in the text
+% \begin{macro}{cwnote}
+% Setting up the counter that gives the number of the footnote
 %    \begin{macrocode}
 \newcounter{cwnote}%
 %    \end{macrocode}
-%
+% \end{macro}
+% \subsubsection{The footnote}
 % Format for the text 
 %    \begin{macrocode}
 \newcommand\cw@noteshape{\sffamily}%
 %    \end{macrocode}
 % Defining the variable that holds the color to be printed.
 % |soul| made it quite complex, global variable is not the best programming technique, but it works.
-\def\cw@currentcolor{black}%
 %    \begin{macrocode}
+\def\cw@currentcolor{black}%
 %    \end{macrocode}
 %% footnote indicador e rótulo
 % \begin{macro}{\cw@foot}
-% This macro really creates a footnote. It uses counter |cwnote| in arabic. 
+%
+% This macro write the text in the footnote using with standard \LaTeX\ |\footnotetext|
+%
+% It uses counter |cwnote| in arabic. 
 % It prints the footnote using the currently defined color (That is a global variable, setted up elsewehre. This is not good programming practice,
 % but it turned out to be the easiest way of doing it in \LaTeX without more and more arguments.)
 %
 % Syntax: |\cw@foot|\marg{footnote-text}\marg{author-name}\marg{label}
 %
+%
+% If this is a labeled note, it will create a \LaTeX label on the format
+%
+% |cw:|\meta{label}
+%
+% That can be used in a |\ref| command.
+%
 %    \begin{macrocode}
 \newcommand\cw@foot[3]% 
-{\def\@test{#3}\footnotetext[\arabic{cwnote}]%
-{{\scshape{\textcolor{\cw@currentcolor}{#2}}%
-\if\@test\@empty\else\label{ed:#3}\textcolor{\cw@currentcolor}{[#3]}%
-\fi\textcolor{\cw@currentcolor}{:}}%
-\cw@noteshape\textcolor{\cw@currentcolor}{#1}}}%
+{%
+\def\@test{#3}% @test just checks if argument #3 exists
+\footnotetext[\arabic{cwnote}]% 
+{%
+{\scshape{\textcolor{\cw@currentcolor}{#2}}%
+\if\@test%
+\@empty%
+\else%
+\label{cw:#3}%
+\textcolor{\cw@currentcolor}{[#3]}% if \meta{label} is not empty
+\fi%
+\textcolor{\cw@currentcolor}{:}}% 
+\cw@noteshape\textcolor{\cw@currentcolor}{#1}}%
+}%
 %    \end{macrocode}
 % \end{macro}
-% \subsection{More for the footnote}
 % \begin{macro}{\cw@mark}
-% This puts the footnote mark in the text
+% This macroo generates the footnote mark with standard \LaTeX\ 
+% |\footnotemark|
 %    \begin{macrocode}
 \def\cw@mark@style#1{#1}%
 \newcommand\cw@mark[1]{\cw@mark@style{\footnotemark[#1]}}%
 %    \end{macrocode}
-%
 % \end{macro}
-% \begin{macro}{\cw@footnote}
-% This macro actually makes the footnote mark and text
+% \begin{macro}{\cw@beforemarksymbol}
+% \begin{macro}{\cwsetcommwarn}
+%
+%  These macros control the symbol (or any text) that can
+%  appear before the footnotemark
+%
+%  |\cwsetcommwarn|\marg{symbol}
+%
+%  \meta{symbol} can be of any length, but we suggest only one
+% character. It can be empty, what is the default option,
+% and will print nothing at that point.
+%
 %    \begin{macrocode}
 \newcommand{\cw@beforemarksymbol}{}%
 \newcommand{\cwsetcommwarn}[1]{\def\cw@beforemarksymbol{#1}}%
+%    \end{macrocode}
+%
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\cw@footnote}
+%
+% This macro actually makes the footnote symbol, mark and text
+%  
+% Syntax is:
+%
+% |\cw@footnote|\marg{text}\marg{name}\marg{label}
+%
+% \meta{label} can be empty, but must be present
+%
+% It is in this macro that symbol, number and footnote mark
+% end up in the document. 
+%
+%    \begin{macrocode}
 \newcommand\cw@footnote[3]{%
 \textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnote}}}%
-%%%%\cw@mark{\arabic{cwnote}}
 \cw@foot{#1}{#2}{#3}%
 }%
 %    \end{macrocode}
 % \end{macro}
-% \subsection{The margin note}
+% \subsubsection{The margin note}
+%
+% This macro builds the margin note.
+%
 %    \begin{macrocode}
 \newcommand\cw@margin[1]{%
 \ifmargins%
@@ -916,10 +974,17 @@ superscript number}
 \fi}%
 %    \end{macrocode}
 % \begin{macro}{\Cw@note}
-% Basic function to build the note
+% Basic function to build the comment
+% 
+% |\Cw@note|\marg{text}\marg{name}\marg{label}
+%
+% If not label, it must be empty
+%
+%
 %    \begin{macrocode}
-\newcommand\Cw@note[3]% text, type, label
-{\addtocounter{cwnote}{1}%
+\newcommand\Cw@note[3]% text, name, label
+{%
+\addtocounter{cwnote}{1}%
 \ifshowednotes%
 \cw@footnote{#1}{#2}{#3}%
 \ifednotebookmarks%
