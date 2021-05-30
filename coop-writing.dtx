@@ -17,7 +17,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.1}
+%<package>\def\cw@version{v1.1.1}
 %<package>\ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
@@ -34,7 +34,7 @@
 \usepackage{marvosym}
 \usepackage[backend=biber,style=alphabetic,natbib]{biblatex}
 \addbibresource{coop-writing.bib}
-\usepackage[edicao]{coop-writing}
+\usepackage[editing]{coop-writing}
 %%\usepackage{textcomp,url,a4wide,array}
 %%\usepackage[eso-foot,today,draft]{svninfo}
 %%\usepackage{xcolor}
@@ -76,7 +76,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{668}
+% \CheckSum{644}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -95,8 +95,8 @@
 %   Right brace   \}     Tilde         \~}
 %
 % \changes{v1.0}{2021/05/29}{First version}
-% \changes{v1.1}{2021/05/30}{You can put an aditional symbol before the comment
-superscript number} 
+% \changes{v1.1}{2021/05/30}{You can put an aditional symbol before the comment superscript number} 
+% \changes{v1.1.1}{2021/05/30}{Fix some bugs, anonymization back on manual} 
 %\maketitle
 %
 % \tableofcontents
@@ -160,11 +160,15 @@ superscript number}
 %
 % Using the package allows the use of all macros and environments described in this manual, however, \textbf{if the options are not turned on, there will be no effect on the generated |pdf|}, since, by default, all options are false. 
 %
-% There are two types of options. The first type enables the visualization of the result of specific macros or environmnets, such as 
+% There are three types of options. The first type enables the visualization of the result of specific macros or environmnets, such as 
 % the |cwdraft| environment. They are named \textit{command oriented options}. You can use many of them in the same time.
 %
 % The second type  represent a state
 % of the text, which can be editing, submit, or publish, and some minor variations. They are named \textit{state oriented options}.
+%
+% The third type control other behaviors. They are named 
+% \textit{behavior oriented options}
+%
 %
 % If they appear together, state oriented commands have precedence over the others. However, the user should avoid mixing command and state oriented options. Also, most of the time, you should \textbf{use only one of the state oriented options.}
 %
@@ -176,18 +180,28 @@ superscript number}
 %    \item |comments|, \DescribeMacro{comments}  enables all editorial comments and the command |\pleasecite|;
 %    \item |drafts|, \DescribeMacro{drafts}  enables the |\cwdraft| command;
 %    \item |suggestions|, \DescribeMacro{suggestions}  enables the comments definided in the suggestion section of this text.
-%    \item |anonymize|, \DescribeMacro{anonymize}   enables anonimization commands, and
+%    \item |anonymize|, \DescribeMacro{anonymize}   enables anonymization commands, and
 %    \item |todos|, \DescribeMacro{todos}  enables the to do family of  commands.
 %\end{itemize}
 %
 %\subsection{State oriented options}
 % \begin{itemize}
-% \item |submit|, \DescribeMacro{submit} enables the submit state. Anonimization is on, subjects, comments, drafts and suggestions are off
+% \item |submit|, \DescribeMacro{submit} enables the submit state. anonymization is on, subjects, comments, drafts and suggestions are off
 % \item |noanonymize|, \DescribeMacro{noanonymize} disables anonymizations even in |submit| and |editing| options
 % \item |publish|, \DescribeMacro{publish} disables all command oriented options, ignore suggestions.
 % \item |acceptingpublish|, \DescribeMacro{acceptingpublish}  disables all command oriented options, accept suggestions
-% \item |editing|, \DescribeMacro{editing}  enables |subjects|, |comments|, |drafts| and |suggestions|.
+% \item |editing|, \DescribeMacro{editing}  enables |subjects|, |comments|, |drafts|, |anonymize|, and |suggestions|.
 % \end{itemize}
+%
+%\subsection{Behavior oriented options}
+%
+% Some of this option are inherited from |ed|.
+%
+%
+% \begin{itemize}
+%    \item |nopdfbookmarks| will avoid adding bookmarks in the |pdf| file for all comments. The default behavior of |coop-writing| is adding them.
+%    them.
+%\end{itemize}
 %
 % \subsection{General behavior}
 %
@@ -439,6 +453,59 @@ superscript number}
 % used to indicate that something should be done, is done or will not be 
 % done.
 %
+% \section{Anonymization}
+%
+% Anonymization will provide commands to replace
+% names and references by anonymous names and references.
+% It will, by default, be enable only in the |submit| option
+%
+% There are 4 anonymization commands:
+%
+% \begin{itemize}
+%   \item |\cwanon|\marg{text} \DescribeMacro{\cwanon}
+%   \item |\cwanoncite|\oarg{cite-compatible-oarg}\marg{cite-compatible-arg} \DescribeMacro{\cwanoncite}
+%   \item |\cwanoncitet|\oarg{citet-compatible-oarg}\marg{citet-compatible-arg} \DescribeMacro{\cwanoncitet}
+%   \item |\cwanoncitep|\oarg{citep-compatible-oarg}\marg{citep-compatible-arg} \DescribeMacro{\cwanoncitep}
+%\end{itemize}
+%
+% The alternative text used by anonymization commands can be configured with other commands:
+%\begin{itemize}
+%    \item |\cwdefanontext|\marg{replacement-text} \DescribeMacro{\cwdefanontext}
+%    \item |\cwdefanoncitetext|\marg{replacement-text} \DescribeMacro{\cwdefanoncitetext}%    
+%    \item |\cwdefanoncitettext|\marg{replacement-text} \DescribeMacro{\cwdefanoncitettext}
+%\item|\cwdefanonciteptext|\marg{replacement-text} \DescribeMacro{\cwdefanonciteptext}
+%\end{itemize}
+%
+% The example:
+%
+% \begin{verbatim}
+% My name is \cwanon{Geraldo Xexéo}, and I read \cwanoncite{ed},
+% \cwanoncitep[pags 1]{todonotes}, % \cwanoncitet{xcolor}.
+% \end{verbatim}
+%
+% generates:
+%
+% My name is \cwanon{Geraldo Xexéo}, and I read \cwanoncite{ed},
+% \cwanoncitep[pags 1]{todonotes}, % \cwanoncitet{xcolor}.
+%
+% Changing values, as in:
+%
+% \begin{verbatim}
+% \cwdefanontext{Can't say}
+% \cwdefanoncitetext{[0]}
+% \cwdefanonciteptext{[X]}
+% \cwdefanoncitettext{[Anon]}
+% My name is \cwanon{Geraldo Xexéo}, and I read \cwanoncite{ed},
+% \cwanoncitep[pags 1]{todonotes}, % \cwanoncitet{xcolor}.
+% \end{verbatim}
+% generates:
+%
+% \cwdefanontext{Can't say}
+% \cwdefanoncitetext{[0]}
+% \cwdefanonciteptext{[X]}
+% \cwdefanoncitettext{[Anon]}
+% My name is \cwanon{Geraldo Xexéo}, and I read \cwanoncite{ed},
+% \cwanoncitep[pags 1]{todonotes}, % \cwanoncitet{xcolor}.
 %
 %
 % \section{Draft environment}
@@ -639,12 +706,14 @@ superscript number}
 %% 
 %%
 % \subsection{Option Processing}
-% \subsubsection{Creating Options Variables}
+% \subsubsection{Creating Options Variables used in ed}
+% Some come from ed code and are being cleaned
+%
 %    \begin{macrocode}
-\newif\ifshowednotes\showednotestrue%
+\newif\ifshowednotes\showednotestrue% 
 \newif\ifmargins\marginstrue%
-\newif\ifmarginnote\marginnotefalse%
-\newif\ifednotebookmarks\ednotebookmarksfalse%
+\newif\ifednotebookmarks\ednotebookmarkstrue%
+% \subsubsection{Creating Original Options Variables}
 \newif\if@showcomentario\@showcomentariofalse%
 \newif\if@naoanonimizar\@naoanonimizarfalse%
 \newif\if@showdraft\@showdraftfalse%
@@ -673,22 +742,16 @@ superscript number}
     \@modopublicaraceitandotrue 
 }
 %    \end{macrocode}
-% \subsubsection{English Options, from ed package}
+% \subsubsection{English Options, inspired on ed package}
 %    \begin{macrocode}
-\DeclareOption{show}{\showednotestrue\message{ed.sty: showing ednotes}}
-\DeclareOption{hide}{\showednotesfalse\message{ed.sty: hiding ednotes}}
-\DeclareOption{draft}{\showednotestrue\message{ed.sty: showing ednotes}}
-\DeclareOption{final}{\showednotesfalse\message{ed.sty: hiding ednotes}}
-\DeclareOption{nomargins}{\marginsfalse}
-\DeclareOption{marginnote}{\marginnotetrue}
-\DeclareOption{pdfbookmarks}{\ednotebookmarkstrue}
+\DeclareOption{nopdfbookmarks}{\ednotebookmarksfalse}
 %    \end{macrocode}
 %
 % \subsubsection{Original English Options}
 %
 %    \begin{macrocode}
 \DeclareOption{comments}{\@showcomentariotrue}
-\DeclareOption{anonimize}{\@beanonymoustrue}
+\DeclareOption{anonymize}{\@beanonymoustrue}
 \DeclareOption{noanonymize}{\@naoanonimizartrue}
 \DeclareOption{suggestions}{\@showsugestaotrue}
 \DeclareOption{subjects}{\@showsubjectstrue}
@@ -761,9 +824,6 @@ superscript number}
 % Package that are required only sometimes
 %    \begin{macrocode}
 \ifshowednotes%
-\ifmarginnote%
-\RequirePackage{marginnote}%
-\fi%
 \else%
 \RequirePackage{verbatim}%
 \fi%
@@ -849,77 +909,131 @@ superscript number}
 % \subsection{ed inspired code}
 % This code, inspired in the |ed| package, makes the basic mechanism for 
 % inserting comments as footnotes with an observation in the margin.
-% As an adition to |ed|, it support colors.
-%
-% Setting up the counter
+% As an adition to |ed|, it support colors and some text
+% before the superscript number in the text
+% \begin{macro}{cwnote}
+% Setting up the counter that gives the number of the footnote
 %    \begin{macrocode}
 \newcounter{cwnote}%
 %    \end{macrocode}
-%
+% \end{macro}
+% \subsubsection{The footnote}
 % Format for the text 
 %    \begin{macrocode}
 \newcommand\cw@noteshape{\sffamily}%
 %    \end{macrocode}
 % Defining the variable that holds the color to be printed.
 % |soul| made it quite complex, global variable is not the best programming technique, but it works.
-\def\cw@currentcolor{black}%
 %    \begin{macrocode}
+\def\cw@currentcolor{black}%
 %    \end{macrocode}
 %% footnote indicador e rótulo
 % \begin{macro}{\cw@foot}
-% This macro really creates a footnote. It uses counter |cwnote| in arabic. 
+%
+% This macro write the text in the footnote using with standard \LaTeX\ |\footnotetext|
+%
+% It uses counter |cwnote| in arabic. 
 % It prints the footnote using the currently defined color (That is a global variable, setted up elsewehre. This is not good programming practice,
 % but it turned out to be the easiest way of doing it in \LaTeX without more and more arguments.)
 %
 % Syntax: |\cw@foot|\marg{footnote-text}\marg{author-name}\marg{label}
 %
+%
+% If this is a labeled note, it will create a \LaTeX label on the format
+%
+% |cw:|\meta{label}
+%
+% That can be used in a |\ref| command.
+%
 %    \begin{macrocode}
 \newcommand\cw@foot[3]% 
-{\def\@test{#3}\footnotetext[\arabic{cwnote}]%
-{{\scshape{\textcolor{\cw@currentcolor}{#2}}%
-\if\@test\@empty\else\label{ed:#3}\textcolor{\cw@currentcolor}{[#3]}%
-\fi\textcolor{\cw@currentcolor}{:}}%
-\cw@noteshape\textcolor{\cw@currentcolor}{#1}}}%
+{%
+\def\@test{#3}% @test just checks if argument #3 exists
+\footnotetext[\arabic{cwnote}]% 
+{%
+{\scshape{\textcolor{\cw@currentcolor}{#2}}%
+\if\@test%
+\@empty%
+\else%
+\label{cw:#3}%
+\textcolor{\cw@currentcolor}{[#3]}% if \meta{label} is not empty
+\fi%
+\textcolor{\cw@currentcolor}{:}}% 
+\cw@noteshape\textcolor{\cw@currentcolor}{#1}}%
+}%
 %    \end{macrocode}
 % \end{macro}
-% \subsection{More for the footnote}
 % \begin{macro}{\cw@mark}
-% This puts the footnote mark in the text
+% This macroo generates the footnote mark with standard \LaTeX\ 
+% |\footnotemark|
 %    \begin{macrocode}
 \def\cw@mark@style#1{#1}%
 \newcommand\cw@mark[1]{\cw@mark@style{\footnotemark[#1]}}%
 %    \end{macrocode}
-%
 % \end{macro}
-% \begin{macro}{\cw@footnote}
-% This macro actually makes the footnote mark and text
+% \begin{macro}{\cw@beforemarksymbol}
+% \begin{macro}{\cwsetcommwarn}
+%
+%  These macros control the symbol (or any text) that can
+%  appear before the footnotemark
+%
+%  |\cwsetcommwarn|\marg{symbol}
+%
+%  \meta{symbol} can be of any length, but we suggest only one
+% character. It can be empty, what is the default option,
+% and will print nothing at that point.
+%
 %    \begin{macrocode}
 \newcommand{\cw@beforemarksymbol}{}%
 \newcommand{\cwsetcommwarn}[1]{\def\cw@beforemarksymbol{#1}}%
+%    \end{macrocode}
+%
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\cw@footnote}
+%
+% This macro actually makes the footnote symbol, mark and text
+%  
+% Syntax is:
+%
+% |\cw@footnote|\marg{text}\marg{name}\marg{label}
+%
+% \meta{label} can be empty, but must be present
+%
+% It is in this macro that symbol, number and footnote mark
+% end up in the document. 
+%
+%    \begin{macrocode}
 \newcommand\cw@footnote[3]{%
 \textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnote}}}%
-%%%%\cw@mark{\arabic{cwnote}}
 \cw@foot{#1}{#2}{#3}%
 }%
 %    \end{macrocode}
 % \end{macro}
-% \subsection{The margin note}
+% \subsubsection{The margin note}
+%
+% This macro builds the margin note.
+%
 %    \begin{macrocode}
 \newcommand\cw@margin[1]{%
 \ifmargins%
-\ifmarginnote%
-\marginnote{%
-\textcolor{\cw@currentcolor}{#1}}%
-\else%
 \marginpar{\textcolor{\cw@currentcolor}{#1}}%
 \fi%
-\fi}%
+}%
 %    \end{macrocode}
 % \begin{macro}{\Cw@note}
-% Basic function to build the note
+% Basic function to build the comment
+% 
+% |\Cw@note|\marg{text}\marg{name}\marg{label}
+%
+% If not label, it must be empty
+%
+%
 %    \begin{macrocode}
-\newcommand\Cw@note[3]% text, type, label
-{\addtocounter{cwnote}{1}%
+\newcommand\Cw@note[3]% text, name, label
+{%
+\addtocounter{cwnote}{1}%
 \ifshowednotes%
 \cw@footnote{#1}{#2}{#3}%
 \ifednotebookmarks%
@@ -978,9 +1092,10 @@ superscript number}
 \cwnote[#1]{#2}{#3}%
 }%
 %    \end{macrocode}
-% \subsection{Anonimization}
+% \subsection{Anonymization}
 % Will write anonymous or cite anonymous. 
 % The user has a way to configure the citation as he or she wants.
+% \begin{macro}{\cw@anontext}
 % \begin{macro}{\cw@anoncitetext}
 % \begin{macro}{\cw@anonciteptext}
 % \begin{macro}{\cw@anoncitettext}
@@ -988,6 +1103,8 @@ superscript number}
 % Default values for anonymous citation.
 %
 %    \begin{macrocode}
+%
+\newcommand{\cw@anontext}{Anonymous}
 \newcommand{\cw@anoncitetext}{(Anonymous, Year)}%
 \newcommand{\cw@anonciteptext}{(Anonymous, Year)}%
 \newcommand{\cw@anoncitettext}{Anonymous (Year)}%
@@ -995,6 +1112,8 @@ superscript number}
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \begin{macro}{\cwdefanontext}
 % \begin{macro}{\cwdefanoncitetext}
 % \begin{macro}{\cwdefanonciteptext}
 % \begin{macro}{\cwdefanoncitettext}
@@ -1002,6 +1121,7 @@ superscript number}
 % anonymous mode is activated. For exemplo, one can change all the
 % citation formats to |[0]|.
 %    \begin{macrocode}
+\newcommand{\cwdefanontext}[1]{\renewcommand{\cw@anontext}{#1}}%
 \newcommand{\cwdefanoncitetext}[1]{\renewcommand{\cw@anoncitetext}{#1}}%
 \newcommand{\cwdefanonciteptext}[1]{\renewcommand{\cw@anonciteptext}{#1}}
 \newcommand{\cwdefanoncitettext}[1]{\renewcommand{\cw@anoncitettext}{#1}}%
@@ -1009,22 +1129,19 @@ superscript number}
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %    \begin{macrocode}
 \if@beanonymous
-\newcommand{\cwanon}[1]{Anonymous}%
+\newcommand{\cwanon}[1]{\cw@anontext}%
 \newcommand{\cwanoncite}[2][]{\cw@anoncitetext}%
 \newcommand{\cwanoncitep}[2][]{\cw@anonciteptext}%
 \newcommand{\cwanoncitet}[2][]{\cw@anoncitettext}%
 \else
 \newcommand{\cwanon}[1]{#1}%
 \newcommand{\cwanoncite}[2][]{\cite[#1]{#2}}%
-\ifdef{\citep}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}{\newcommand{\cwanoncitep}[2][]{\cite[#1]{#2}}}%
-\ifdef{\citet}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}{\newcommand{\cwanoncitet}[2][]{\cite[#1]{#2}}}%
+\ifdef{\citep}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}%
+\ifdef{\citet}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}%
 \fi%|
-%% retrocompatibilidade
-\newcommand{\xanon}[2][]{\cwanon[#1]{#2}}%
-\newcommand{\xanoncitep}[2][]{\cwanoncitep[#1]{#2}}%
-\newcommand{\xanoncitet}[2][]{\cwanoncitet[#1]{#2}}%
 %    \end{macrocode}
 % \subsection{Subjects}
 % The idea of subjects is to have one subject for each paragraph
@@ -1114,6 +1231,8 @@ superscript number}
 %% não pode perder o texto comentado
 \newcommand{\cw@comment}[4][]{#1}%
 \newcommand{\cw@commentLabeled}[5][]{#1}%
+\newcommand{\cw@xcomment}[4][]{#1}
+\newcommand{\cw@xcommentLabeled}[5][]{#1}%
 \fi%|
 %    \end{macrocode}
 % \subsection{Suggestions, Removes and Changes}
@@ -1188,7 +1307,7 @@ superscript number}
 {}%
 \surroundwithmdframed{cwdraft}%
 \else%
-\NewEnviron{draft}[1][]{}{}%
+\NewEnviron{cwdraft}[1][]{}{}%
 \fi%
 %    \end{macrocode}
 % \begin{macro}{\cwsetdraftcolor}
