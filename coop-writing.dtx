@@ -17,7 +17,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.0}
+%<package>\def\cw@version{v1.1}
 %<package>\ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
@@ -38,6 +38,7 @@
 %%\usepackage{textcomp,url,a4wide,array}
 %%\usepackage[eso-foot,today,draft]{svninfo}
 %%\usepackage{xcolor}
+\usepackage{marvosym}
 \usepackage{hyperref}
 \cwnamedef{xexeo}{red}{Xexéo}
 %
@@ -75,7 +76,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{657}
+% \CheckSum{668}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -94,7 +95,8 @@
 %   Right brace   \}     Tilde         \~}
 %
 % \changes{v1.0}{2021/05/29}{First version}
-%
+% \changes{v1.1}{2021/05/30}{You can put an aditional symbol before the comment
+superscript number} 
 %\maketitle
 %
 % \tableofcontents
@@ -395,6 +397,30 @@
 % This will work as the union of a removal and a suggestion. Actually, both are simplified forms of this command.
 %
 % \cwauthorswap{This should work like this.}{This is an example of how the command should work.}
+%
+% \subsection{Putting more warning in text}
+%
+% It is possible to define a symbol, or any other thing, to appear
+% before the superscript number that indicates the comment.
+%
+% This is done using \DescribeMacro{\cwsetcommwarn} the following command
+% and syntax:
+%
+% |\cwsetcommwarn|\marg{symbol}
+%
+% Using package |marvosym|, the example:
+%
+% |\cwsetcommwarn{\Lightning}|
+% \cwsetcommwarn{\Lightning}
+%
+% will change the behavior of editorial\xexeo{This comment superscript number should be preceeded by a \Lightning} comments to include the \Lightning\  symbol.
+%
+% You can remove the symbol by simply using |\cwsetcommwarn{}|
+%
+% \cwsetcommwarn{}
+%
+% It should be clear that |coop-writing| does not provide any font. If
+% the user wants to use one font, like |marvosym|, he or she must import it with |\usepackage|.
 %
 % \subsection{A tip for using comments}
 % 
@@ -857,12 +883,24 @@
 %    \end{macrocode}
 % \end{macro}
 % \subsection{More for the footnote}
-% \begin{macro}{\cw@footnote}
-% This macro actually makes the footnote mark and text
+% \begin{macro}{\cw@mark}
+% This puts the footnote mark in the text
 %    \begin{macrocode}
 \def\cw@mark@style#1{#1}%
 \newcommand\cw@mark[1]{\cw@mark@style{\footnotemark[#1]}}%
-\newcommand\cw@footnote[3]{\cw@mark{\arabic{cwnote}}\cw@foot{#1}{#2}{#3}}%
+%    \end{macrocode}
+%
+% \end{macro}
+% \begin{macro}{\cw@footnote}
+% This macro actually makes the footnote mark and text
+%    \begin{macrocode}
+\newcommand{\cw@beforemarksymbol}{}%
+\newcommand{\cwsetcommwarn}[1]{\def\cw@beforemarksymbol{#1}}%
+\newcommand\cw@footnote[3]{%
+\textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnote}}}%
+%%%%\cw@mark{\arabic{cwnote}}
+\cw@foot{#1}{#2}{#3}%
+}%
 %    \end{macrocode}
 % \end{macro}
 % \subsection{The margin note}
