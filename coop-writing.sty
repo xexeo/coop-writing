@@ -167,14 +167,14 @@
     }{}%
 }%
 {}%
-\newcounter{cwnote}%
+\newcounter{cwnotecounter}%
 \newcommand\cw@noteshape{\sffamily}%
 \def\cw@currentcolor{black}%
 %% footnote indicador e rótulo
 \newcommand\cw@foot[3]%
 {%
 \def\@test{#3}% @test just checks if argument #3 exists
-\footnotetext[\arabic{cwnote}]%
+\footnotetext[\arabic{cwnotecounter}]%
 {%
 {\scshape{\textcolor{\cw@currentcolor}{#2}}%
 \if\@test%
@@ -191,7 +191,7 @@
 \newcommand{\cw@beforemarksymbol}{}%
 \newcommand{\cwsetcommwarn}[1]{\def\cw@beforemarksymbol{#1}}%
 \newcommand\cw@footnote[3]{%
-\textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnote}}}%
+\textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnotecounter}}}%
 \cw@foot{#1}{#2}{#3}%
 }%
 \newcommand\cw@margin[1]{%
@@ -201,16 +201,17 @@
 }%
 \newcommand\Cw@note[3]% text, name, label
 {%
-\addtocounter{cwnote}{1}%
+\addtocounter{cwnotecounter}{1}%
 \ifshowednotes%
 \cw@footnote{#1}{#2}{#3}%
 \ifednotebookmarks%
-\belowpdfbookmark{#2: #1}{#2.\thecwnote}%
-\fi
+\belowpdfbookmark{#2: #1}{cwnotepdfbm.\thecwnotecounter}%
+\fi%
 \fi}%
 \newcommand\cw@note[4]% text, type, label, margin
 {\Cw@note{#1}{#2}{#3}%
-\ifshowednotes\cw@margin{#4:\arabic{cwnote}}%
+\ifshowednotes%
+\cw@margin{#4:\arabic{cwnotecounter}}%
 \fi}%
 \newcommand\cwnote@label{Editor}%
 \newcommand\cwnote@margin{Ed}%
