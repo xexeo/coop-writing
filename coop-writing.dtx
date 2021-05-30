@@ -76,7 +76,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{644}
+% \CheckSum{652}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -315,6 +315,8 @@
 %
 % These are the simplest commands, and will make a comment in the form of a identified footnote\cwauthor{Simplest footnote comment}. They can also be used to \cweditor[highlight some text]{Comment with highlighting}.
 %
+% \subsubsection{Labeled Comments}
+%
 % \DescribeMacro{\<name>r}
 % \DescribeMacro{\cwauthorr}
 % \DescribeMacro{\cweditorr}
@@ -324,8 +326,9 @@
 %
 % |\cweditorr| \oarg{selection}\marg{footnote comment}\marg{label}
 %
-% This command will make a comment in the form of a labeled footnote\cwauthorr{labeled footnote comment}{First label}. It can also be used to \cwauthorr[highlight some text]{labeled 
-% comment with highlighting}{Yet Another label}. The label must be unique, since it is used as a \LaTeX\  |label| too.
+% This command will make a comment in the form of a labeled footnote\cwauthorr{labeled footnote comment}{FirstLabel}. It can also be used to \cwauthorr[highlight some text]{labeled 
+% comment with highlighting}{OtherLabel}. The label must be unique, and usually a single word, since it is used as a \LaTeX\  |\label| too. You can refer to this command using |\ref{cw:\meta{label}}|. For example, the comment \ref{cw:FirstLabel} would 
+% be referenced as |\ref{FirstLabel}|.
 %
 %
 % \subsection{Striked-throught comments}
@@ -379,7 +382,15 @@
 % by the author. It is also possible to make a comment, but in this command the command 
 % is the optional argument.
 % 
-% As example, in this paragraph the 
+% As example, in this paragraph the following text:
+%
+% \begin{verbatim}
+%  \cwauthorsug{inserted text} will appears in the red, and it is 
+% possible to \cweditorsug[I want to insert this]{use a comment}.
+% \end{verbatim}
+%
+% generates:
+%
 %  \cwauthorsug{inserted text} will appears in the red, and it is 
 % possible to \cweditorsug[I want to insert this]{use a comment}.
 %
@@ -394,9 +405,19 @@
 %
 % This macro is used to suggest removals. 
 %
-% This is an example \cwauthorrem{that is quite good}. Again, it is also possible to comment
-% the \cwauthorrem[Repeated words]{the removal} removal.
+% For example:
 %
+% \begin{verbatim}
+% This is an example \cwauthorrem{that is quite good}. 
+% Again, it is also possible to comment
+% the \cwauthorrem[Repeated words]{the removal} removal.
+%\end{verbatim}
+%
+% generates:
+%
+% This is an example \cwauthorrem{that is quite good}. 
+% Again, it is also possible to comment
+% the \cwauthorrem[Repeated words]{the removal} removal.
 %
 %
 % \DescribeMacro{\<name>swap}
@@ -411,7 +432,21 @@
 % 
 % This will work as the union of a removal and a suggestion. Actually, both are simplified forms of this command.
 %
-% \cwauthorswap{This should work like this.}{This is an example of how the command should work.}
+% For example:
+%
+% \begin{verbatim}
+% \cwauthorswap{This should work like this.}%
+% {This is an example of how the command should work.}%
+% The following text is not a suggestion.
+%\end{verbatim}
+%
+%
+% generates:
+%
+% \cwauthorswap{This should work like this.}%
+% {This is an example of how the command should work.}%
+% The following text is not a suggestion.%
+%
 %
 % \subsection{Putting more warning in text}
 %
@@ -965,7 +1000,7 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\cw@mark}
-% This macroo generates the footnote mark with standard \LaTeX\ 
+% This macro generates the footnote mark with standard \LaTeX\ 
 % |\footnotemark|
 %    \begin{macrocode}
 \def\cw@mark@style#1{#1}%
@@ -1005,8 +1040,11 @@
 % It is in this macro that symbol, number and footnote mark
 % end up in the document. 
 %
+% This command also changes the color of footnote mark
+%
 %    \begin{macrocode}
 \newcommand\cw@footnote[3]{%
+\renewcommand\@makefnmark{\hbox{\@textsuperscript{\normalfont\color{\cw@currentcolor}\@thefnmark}}}    
 \textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnotecounter}}}%
 \cw@foot{#1}{#2}{#3}%
 }%
