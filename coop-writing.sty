@@ -189,7 +189,13 @@
 \cw@noteshape\textcolor{\cw@currentcolor}{#1}}}%
 \def\cw@mark@style#1{#1}%
 \newcommand\cw@mark[1]{\cw@mark@style{\footnotemark[#1]}}%
-\newcommand\cw@footnote[3]{\cw@mark{\arabic{cwnote}}\cw@foot{#1}{#2}{#3}}%
+\newcommand{\cw@beforemarksymbol}{}%
+\newcommand{\cwsetcommwarn}[1]{\def\cw@beforemarksymbol{#1}}%
+\newcommand\cw@footnote[3]{%
+\textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnote}}}%
+%%%%\cw@mark{\arabic{cwnote}}
+\cw@foot{#1}{#2}{#3}%
+}%
 \newcommand\cw@margin[1]{%
 \ifmargins%
 \ifmarginnote%
