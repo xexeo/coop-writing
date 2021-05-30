@@ -901,8 +901,8 @@
 \def\cwcommentstitle{Standard List of Comments}%
 \def\cwsubjtitle{Standard List of Subjects}%
 \def\cwcitationstitle{Standard List of Citation Needs}%
-\def\cwpleasecitetext{Plese cite}
-\def\cwpleasecitemessage{something to support this information}
+\def\cwpleasecitetext{Plese cite}%
+\def\cwpleasecitemessage{something to support this information}%
 \def\cwpleasecitemarginnote{Cite}%
 %
 \@ifpackageloaded{babel}%
@@ -935,8 +935,8 @@
         \def\cwcommentstitle{List of Comments}%
         \def\cwsubjtitle{List of Subjects}%
         \def\cwcitationstitle{List of Citation Needs}%
-        \def\cwpleasecitetext{Plese cite}
-        \def\cwpleasecitemessage{something to support this information}
+        \def\cwpleasecitetext{Plese cite}%
+        \def\cwpleasecitemessage{something to support this information}%
         \def\cwpleasecitemarginnote{Cite}%
     }{}%
 }%
@@ -1044,7 +1044,7 @@
 %
 %    \begin{macrocode}
 \newcommand\cw@footnote[3]{%
-\renewcommand\@makefnmark{\hbox{\@textsuperscript{\normalfont\color{\cw@currentcolor}\@thefnmark}}}    
+\renewcommand\@makefnmark{\hbox{\@textsuperscript{\normalfont\color{\cw@currentcolor}\@thefnmark}}}%
 \textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnotecounter}}}%
 \cw@foot{#1}{#2}{#3}%
 }%
