@@ -20,10 +20,9 @@
 %% and version 1.3 or later is part of all distributions of LaTeX version
 %% 2005/12/01 or later.
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.1.2}
+\def\cw@version{v1.2.0}
 \ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
-    %based on other implementations of to do in different packages.}
 \newcommand{\coopwritingversion}{\cw@version}%
 \newcommand{\printcoopwritingversion}{coop-writing v. \coopwritingversion}%
 %%
@@ -124,6 +123,7 @@
 \newcommand{\cor@prof}{red}%
 \newcommand{\cor@cand}{blue}%
 \newcommand{\cor@subject}{green}%
+\newcommand{\cor@main}{yellow}%
 \newcommand{\cor@citar}{purple}%
 \newcommand{\cor@hldraft}{yellow}%
 \def\cwdrafttitle{Standard Draft}%
@@ -260,13 +260,14 @@
 \ifdef{\citep}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}%
 \ifdef{\citet}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}%
 \fi%|
+\newcommand{\cwsetsubjectcolor}[1]{\def\cor@subject{#1}}%
+\newcommand{\cwsetmaincolor}[1]{\def\cor@main{#1}}%
 \if@showsubjects
 \newcommand{\listsubject}{\cwsubjtitle}%
 %% cria a lista, depende do pacoto tcloft
 \@ifundefined{chapter}
 {\newlistof[section]{subject}{aaa}{\listsubject}}
 {\newlistof[chapter]{subject}{aaa}{\listsubject}}%
-%%
 \newcommand{\cwsubject}[2][\cor@subject]{%
 \refstepcounter{subject}%
 \sethlcolor{#1}%
@@ -274,10 +275,17 @@
 \par%
 \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
 }%
-\setlength{\cftsubjectnumwidth}{2.5em}%
+\newcommand{\cwmainemphasis}[1]{\hl{#1}}
+\newcommand{\cwmain}[2][\cor@main]{%
+    \refstepcounter{subject}%
+    \sethlcolor{#1}%
+    \cwmainemphasis{#2}%
+    \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+}%
 \else%
 \newcommand{\listofsubject}{}%
 \newcommand{\cwsubject}[2][]{}%
+\newcommand{\cwmain}[2][]{#2}
 \fi%
 \if@showcomentario
 %% Resolve a lista de comentários
@@ -289,7 +297,7 @@
 %%
 %% Comentador genérico - parte I
 %% faz o cwnote e soma na lista
-%% []rótulo], texto , cor, indicador
+%% [rótulo], texto , cor, indicador
 \newcommand{\cw@comentar}[4][]{%
 \ifstrempty{#4}{%
 \cw@cwnote[#1]{#2}{#3}{Comentário}% faz a nota de rodapé do ed
@@ -452,6 +460,7 @@
 \let\listofcomments=\listofcomentario%
 \let\listofcitationneeds=\listofcomentarioref%
 \let\listofassunto=\listofsubject%
+\let\listofsubjects=\listofsubject%
 \endinput
 %%
 %% End of file `coop-writing.sty'.

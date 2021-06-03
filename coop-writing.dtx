@@ -17,7 +17,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.1.2}
+%<package>\def\cw@version{v1.2.0}
 %<package>\ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
@@ -41,6 +41,12 @@
 \usepackage{marvosym}
 \usepackage{hyperref}
 \cwnamedef{xexeo}{red}{Xexéo}
+%
+%
+\setlength{\cftsubjectnumwidth}{20pt}
+\setlength{\cftcomentarionumwidth}{20pt}
+\setlength{\cftcomentariorefnumwidth}{20pt}
+%
 %
 \EnableCrossrefs
 \CodelineIndex
@@ -67,16 +73,17 @@
     \PrintChanges
     \newpage
     \PrintIndex
+    \newpage
     \listofcomments
     \newpage
     \listofcitationneeds
     \newpage
-    \listofsubject
+    \listofsubjects
 \end{document}
 %</driver>
 % \fi
 %
-% \CheckSum{652}
+% \CheckSum{680}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -95,9 +102,10 @@
 %   Right brace   \}     Tilde         \~}
 %
 % \changes{v1.0}{2021/05/29}{First version}
-% \changes{v1.1}{2021/05/30}{You can put an aditional symbol before the comment superscript number} 
-% \changes{v1.1.1}{2021/05/30}{Fix some bugs, anonymization back on manual} 
-% \changes{v1.1.2}{2021/05/30}{PDF bookmarks can't handle full UTF} 
+% \changes{v1.1}{2021/05/30}{You can put an aditional symbol before the comment superscript number}
+% \changes{v1.1.1}{2021/05/30}{Fix some bugs, anonymization back on manual}
+% \changes{v1.1.2}{2021/05/30}{PDF bookmarks can't handle full UTF}
+% \changes{v1.2.0}{2021/05/30}{New command cwmain and configuration for it}
 %\maketitle
 %
 % \tableofcontents
@@ -106,39 +114,39 @@
 %
 % This package supports editorial comments and gives some extra support for writing papers, or any document that involves more than one author or editor.
 %
-% Usually, a final version of a  document would be printed with the |publish| option turned one, and no editorial comment would appear.  
-% In this document \xexeo[the reader will see some uses]{This is an exemple of using this package to make a comment with highlighted text} of the package, since it is distributted with the |editing| option turned on.  
+% Usually, a final version of a  document would be printed with the |publish| option turned one, and no editorial comment would appear.
+% In this document \xexeo[the reader will see some uses]{This is an exemple of using this package to make a comment with highlighted text} of the package, since it is distributted with the |editing| option turned on.
 % This is done because I must provide the examples of use. A version using |publish| is available to be used as a comparision.
 %
 %
 % \subsection{A bit of context}
 %
-% |coop-writing| was written to support my way of working, and received  
+% |coop-writing| was written to support my way of working, and received
 % suggestions from my students. The starting goal was to build only a front-end to put together other packages, but with time, and the difficulty to make differente packages with commands that have the same name work together, it grow in scope.
 %
-% It picks ideas from different packages, such as |ed|\citep{ed}, |color-edits|\citep{color-edits}, and |todonotes|\citep{todonotes}, and from my practice writing papers and supervising thesis.  
+% It picks ideas from different packages, such as |ed|\citep{ed}, |color-edits|\citep{color-edits}, and |todonotes|\citep{todonotes}, and from my practice writing papers and supervising thesis.
 % As it is my first package, \TeX\  and \LaTeX\  programming is sometimes naive. However, due to the large amount of available code, and sites as StackExchange, this is not a rule.
 %
 % \subsection{The Brazilian origin}
 %
 % Originally, |coop-writing| was written in Portuguese. The Portuguese commands are still available.
 %
-% \section{How to use coop-writing}
+%\section{How to use coop-writing}
 %
 % |coop-writing| is available as open source at \url{https://github.com/xexeo/coop-writing}. The stable distribution is in the folder |dist|, while the lastest, and unstable, will be in the root folder.
 %
 % The only file you really need, besides this manual, is
-% |coop-writing.sty|. This should be in your \LaTeX\   path, such as in the same folder that your main |.tex| file. 
+% |coop-writing.sty|. This should be in your \LaTeX\   path, such as in the same folder that your main |.tex| file.
 %
 % If you are new to \LaTeX, just put one of these 3 lines in the preamble part of you document, i.e., before |\begin{document}|:
 %
 % |\usepackage[editing]{coop-writing}|
 %
 % |\usepackage[submit]{coop-writing}|
-% 
+%
 % |\usepackage[publish]{coop-writing}|
 %
-% After that, you can use |\cwauthor| or |\cweditor| to make commentaries, but you must 
+% After that, you can use |\cwauthor| or |\cweditor| to make commentaries, but you must
 % look at the many options available that are described in section \ref{sec:edcom}. You will probably want to define authors as described in subsection \ref{sec:create}.
 %
 % You can make suggestions, complain about bugs, and request features using GitHub's ``Issues'' feature, in \url{https://github.com/xexeo/coop-writing/issues} (you must be signed in).
@@ -146,7 +154,7 @@
 % \subsection{Using from Overleaf}
 %
 % The best way to use |coop-writing| inside Overleaf is to link
-% the distributed style file through its URL. To do that, inside your project, select first ``Upload''. An ``Add files'' window will appear, then select ``From Externa URL'' and enter \url{https://raw.githubusercontent.com/xexeo/coop-writing/main/dist/coop-writing.sty} as ``URL to fetch the file from'' and ``coop-writing'' as ``File Name in This Project'', as in Figure \ref{fig:overleaffileurl}. 
+% the distributed style file through its URL. To do that, inside your project, select first ``Upload''. An ``Add files'' window will appear, then select ``From Externa URL'' and enter \url{https://raw.githubusercontent.com/xexeo/coop-writing/main/dist/coop-writing.sty} as ``URL to fetch the file from'' and ``coop-writing'' as ``File Name in This Project'', as in Figure \ref{fig:overleaffileurl}.
 %
 %\begin{figure}[tbh]
 %    \centering
@@ -156,18 +164,18 @@
 %\end{figure}
 %
 %
-% \section{Package Options}
+%\section{Package Options}
 %
 %
-% Using the package allows the use of all macros and environments described in this manual, however, \textbf{if the options are not turned on, there will be no effect on the generated |pdf|}, since, by default, all options are false. 
+% Using the package allows the use of all macros and environments described in this manual, however, \textbf{if the options are not turned on, there will be no effect on the generated |pdf|}, since, by default, all options are false.
 %
-% There are three types of options. The first type enables the visualization of the result of specific macros or environmnets, such as 
+% There are three types of options. The first type enables the visualization of the result of specific macros or environmnets, such as
 % the |cwdraft| environment. They are named \textit{command oriented options}. You can use many of them in the same time.
 %
 % The second type  represent a state
 % of the text, which can be editing, submit, or publish, and some minor variations. They are named \textit{state oriented options}.
 %
-% The third type control other behaviors. They are named 
+% The third type control other behaviors. They are named
 % \textit{behavior oriented options}
 %
 %
@@ -206,21 +214,21 @@
 %
 % \subsection{General behavior}
 %
-% The general behavior of this package is to provide different 
-% ways of marking your text, for example with comments or to do notes, that can be totally supressed when desired. Mostly, this can be easilly done using one the the 3 main option states: |editing|, |submit|, and |publish|. 
+% The general behavior of this package is to provide different
+% ways of marking your text, for example with comments or to do notes, that can be totally supressed when desired. Mostly, this can be easilly done using one the the 3 main option states: |editing|, |submit|, and |publish|.
 %
-% 
+%
 % Users should use the |editing| state most of the time. In this state, all
 % markings will appear and the anonymization will be off.
 %
-% When submitting, the |submit| state will provide 
+% When submitting, the |submit| state will provide
 % a clean article, without any markings. Most of the times the article should be anonymized,
 % but if this is not enforced, it is possible to use the options |submit| and |noanonymize| together. |publish| will never anonymize.
 %
 % The goal is to make the |submit| and |publish| documents states minimally
 % invasive, to avoid any clash with publishers' styles. A clash will be considered a bug, and should be reported to the authors.
 %
-% If you use comments, there will be a lot of ``Marginpar moved'' warnings. 
+% If you use comments, there will be a lot of ``Marginpar moved'' warnings.
 % This is normal behavior, caused by the margin notes.
 %
 %
@@ -236,9 +244,9 @@
 % Provides name and version
 %
 %
-% |\coopwritingversion| was used in the title of this article. The current version is \coopwritingversion. 
+% |\coopwritingversion| was used in the title of this article. The current version is \coopwritingversion.
 %
-% If needed, the second macro prints also the name of the 
+% If needed, the second macro prints also the name of the
 % package:
 %
 %|\printcoopwritingversion|
@@ -254,9 +262,9 @@
 %
 % This is the main reason of this package.
 %
-% The idea is that not only users can make editorial comments on the 
+% The idea is that not only users can make editorial comments on the
 % text they are writing, but they can also establish a dialog through those comments.
-% I this package an editorial comment has 3 visual parts: an intervention in the 
+% I this package an editorial comment has 3 visual parts: an intervention in the
 % text, a margin note indicating this intervention, and a footnote explaining it\xexeo{This is the simplest form of an editorial note.}. Figure \ref{fig:editorialnotes} illustrate this behavior.
 %
 %
@@ -269,18 +277,18 @@
 %
 %
 %
-% \subsection{Creating authors}
-%\label{sec:create} 
+%\subsection{Creating authors}
+%\label{sec:create}
 % \DescribeMacro{\cwnamedef}
 % This macro creates a series of commands based on a desired base command name. The command name is, usually, the name of the author, of the editor, or a function in the work being done.
 %
-%  It must be given in the preamble of the \LaTeX document, i.e., before the |\begin{document}| declaration. It is usually done just after the |\usepackage{coop-writing}| line. 
+%  It must be given in the preamble of the \LaTeX document, i.e., before the |\begin{document}| declaration. It is usually done just after the |\usepackage{coop-writing}| line.
 % Its syntax is:
 %
 %|\cwnamedef| \marg{name}\marg{color}\marg{author-name}
 %
 %
-% Where \meta{name} will be the base command name, which generates different commands by receiving sufixes, \meta{color} is the color to be used by all 
+% Where \meta{name} will be the base command name, which generates different commands by receiving sufixes, \meta{color} is the color to be used by all
 % comments and suggestions made by this author, and \meta{author-name} is the string to be used to represent the author.
 %
 % As an example, I usually declare myself as:
@@ -295,27 +303,27 @@
 % The \meta{name} and \meta{author-name} are different to support short command names and characters not supported in \LaTeX\  macros. Therefore, if you name is \textit{Gutemberg} you can create a family of commenting macros based on |\gut|, but use ``Gutemberg'' as your identifier.
 %
 %
-% \DescribeMacro{\cwauthor}\DescribeMacro{\cweditor} 
-% Two authors are pre-defined in the style, |cwauthor| and |cweditor|, to represent an author and an editor. 
+% \DescribeMacro{\cwauthor}\DescribeMacro{\cweditor}
+% Two authors are pre-defined in the style, |cwauthor| and |cweditor|, to represent an author and an editor.
 %
-% \subsection{Available commands}
+%\subsection{Available commands}
 %
 % For each user created with command name \meta{name}, such as |cwauthor| and |cweditor|, used as example, the following commands are available.
 %
-% \subsubsection{Comments}
+%\subsubsection{Comments}
 %
 % \DescribeMacro{\<name>}
 % \DescribeMacro{\cwauthor}
 % \DescribeMacro{\cweditor}
-% |\<name>| \oarg{selection}\marg{footnote comment} 
+% |\<name>| \oarg{selection}\marg{footnote comment}
 %
 % |\cwauthor| \oarg{selection}\marg{footnote comment}
 %
-% |\cweditor| \oarg{selection}\marg{footnote comment}  
+% |\cweditor| \oarg{selection}\marg{footnote comment}
 %
 % These are the simplest commands, and will make a comment in the form of a identified footnote\cwauthor{Simplest footnote comment}. They can also be used to \cweditor[highlight some text]{Comment with highlighting}.
 %
-% \subsubsection{Labeled Comments}
+%\subsubsection{Labeled Comments}
 %
 % \DescribeMacro{\<name>r}
 % \DescribeMacro{\cwauthorr}
@@ -326,30 +334,30 @@
 %
 % |\cweditorr| \oarg{selection}\marg{footnote comment}\marg{label}
 %
-% This command will make a comment in the form of a labeled footnote\cwauthorr{labeled footnote comment}{FirstLabel}. It can also be used to \cwauthorr[highlight some text]{labeled 
-% comment with highlighting}{OtherLabel}. The label must be unique, and usually a single word, since it is used as a \LaTeX\  |\label| too. You can refer to this command using |\ref{cw:\meta{label}}|. For example, the comment \ref{cw:FirstLabel} would 
+% This command will make a comment in the form of a labeled footnote\cwauthorr{labeled footnote comment}{FirstLabel}. It can also be used to \cwauthorr[highlight some text]{labeled
+% comment with highlighting}{OtherLabel}. The label must be unique, and usually a single word, since it is used as a \LaTeX\  |\label| too. You can refer to this command using |\ref{cw:\meta{label}}|. For example, the comment \ref{cw:FirstLabel} would
 % be referenced as |\ref{FirstLabel}|.
 %
 %
-% \subsection{Striked-throught comments}
+%\subsection{Striked-throught comments}
 %
 % After using the editorial comments for a time we started to delete the old ones that
 % represented fixed problems. However, we notice that some comments should be kept,
 % even if solved.
-% The solution was to create the striked-trought comments. They are easy to 
+% The solution was to create the striked-trought comments. They are easy to
 % use, just put an |x| after the command name.
-% 
+%
 %
 % \DescribeMacro{\<name>x}
 % \DescribeMacro{\cwauthorx}
 % \DescribeMacro{\cweditorx}
-% |\<name>x| \oarg{selection}\marg{footnote comment} 
+% |\<name>x| \oarg{selection}\marg{footnote comment}
 %
-% |\cwauthorx| \oarg{selection}\marg{footnote comment} 
+% |\cwauthorx| \oarg{selection}\marg{footnote comment}
 %
-% |\cweditorx| \oarg{selection}\marg{footnote comment} 
+% |\cweditorx| \oarg{selection}\marg{footnote comment}
 %
-% This command will make a comment in the form of a footnote\cweditorx{Simplest footnote 
+% This command will make a comment in the form of a footnote\cweditorx{Simplest footnote
 % comment}, however the comment is striked through. It can also be used to \cwauthorx[highlight some text]{Comment with highlighting}.
 %
 % \DescribeMacro{\<name>rx}
@@ -364,7 +372,7 @@
 %
 % This command will make a comment in the form of a labeled footnote\cwauthorrx{labeled footnote comment}{Second label}, however the comment is striked through. It can also be used to \cwauthorrx[highlight some text]{labeled comment with highlighting}{New label}. The label must be unique, since it is used as a \LaTeX\  |label| too.
 %
-% \subsection{Text Modification - Suggestions}
+%\subsection{Text Modification - Suggestions}
 % Sometimes one of the authors wants to insert, remove or edit some
 % text, but he or she is not sure that every one will agree, therefore
 % he or she can make a suggestion, that will appear with his or her color.
@@ -378,20 +386,20 @@
 %
 % |\cweditorsug|\oarg{comment}\marg{suggested text}
 %
-%  This macro supports making a suggestion. It inserts text, using the color chosen 
-% by the author. It is also possible to make a comment, but in this command the command 
+%  This macro supports making a suggestion. It inserts text, using the color chosen
+% by the author. It is also possible to make a comment, but in this command the command
 % is the optional argument.
-% 
+%
 % As example, in this paragraph the following text:
 %
 % \begin{verbatim}
-%  \cwauthorsug{inserted text} will appears in the red, and it is 
+%  \cwauthorsug{inserted text} will appears in the red, and it is
 % possible to \cweditorsug[I want to insert this]{use a comment}.
 % \end{verbatim}
 %
 % generates:
 %
-%  \cwauthorsug{inserted text} will appears in the red, and it is 
+%  \cwauthorsug{inserted text} will appears in the red, and it is
 % possible to \cweditorsug[I want to insert this]{use a comment}.
 %
 % \DescribeMacro{\<name>rem}
@@ -403,19 +411,19 @@
 %
 % |\cweditorrem|\oarg{comment}\marg{suggested removal}
 %
-% This macro is used to suggest removals. 
+% This macro is used to suggest removals.
 %
 % For example:
 %
 % \begin{verbatim}
-% This is an example \cwauthorrem{that is quite good}. 
+% This is an example \cwauthorrem{that is quite good}.
 % Again, it is also possible to comment
 % the \cwauthorrem[Repeated words]{the removal} removal.
 %\end{verbatim}
 %
 % generates:
 %
-% This is an example \cwauthorrem{that is quite good}. 
+% This is an example \cwauthorrem{that is quite good}.
 % Again, it is also possible to comment
 % the \cwauthorrem[Repeated words]{the removal} removal.
 %
@@ -429,7 +437,7 @@
 %
 % |\cweditorwap|\oarg{comment}\marg{suggested removal}\marg{suggested insertion}
 %
-% 
+%
 % This will work as the union of a removal and a suggestion. Actually, both are simplified forms of this command.
 %
 % For example:
@@ -448,7 +456,7 @@
 % The following text is not a suggestion.%
 %
 %
-% \subsection{Putting more warning in text}
+%\subsection{Putting more warning in text}
 %
 % It is possible to define a symbol, or any other thing, to appear
 % before the superscript number that indicates the comment.
@@ -472,24 +480,25 @@
 % It should be clear that |coop-writing| does not provide any font. If
 % the user wants to use one font, like |marvosym|, he or she must import it with |\usepackage|.
 %
-% \subsection{A tip for using comments}
-% 
+%\subsection{A tip for using comments}
+%
 % A student asked me to give a priority to my demands. This would
 % make me add yet another set of commands, with more arguments.
 % labels don't work because they must be unique to allow for being used as
-% references. 
+% references.
 %
 % The solution, however, is simple, special characters, such as $\star$, |$\star$|
-% can be used and are highly efficient to communicate priority\xexeo{$\star$$\star$ Two stars are still low priority}.
+% can be used and are highly efficient to communicate
+% priority\xexeo{$\star\star$ Two stars are still low priority}.
 %
-% Using other fonts, more can be acomplished. For example, package 
-%|marvosym| offers |\HollowBox|, \HollowBox, 
-%|\Checkedbox|, \Checkedbox, 
-%|\CrossedBox|, \CrossedBox, which can be 
-% used to indicate that something should be done, is done or will not be 
+% Using other fonts, more can be acomplished. For example, package
+%|marvosym| offers |\HollowBox|, \HollowBox,
+%|\Checkedbox|, \Checkedbox,
+%|\CrossedBox|, \CrossedBox, which can be
+% used to indicate that something should be done, is done or will not be
 % done.
 %
-% \section{Anonymization}
+%\section{Anonymization}
 %
 % Anonymization will provide commands to replace
 % names and references by anonymous names and references.
@@ -507,7 +516,7 @@
 % The alternative text used by anonymization commands can be configured with other commands:
 %\begin{itemize}
 %    \item |\cwdefanontext|\marg{replacement-text} \DescribeMacro{\cwdefanontext}
-%    \item |\cwdefanoncitetext|\marg{replacement-text} \DescribeMacro{\cwdefanoncitetext}%    
+%    \item |\cwdefanoncitetext|\marg{replacement-text} \DescribeMacro{\cwdefanoncitetext}%
 %    \item |\cwdefanoncitettext|\marg{replacement-text} \DescribeMacro{\cwdefanoncitettext}
 %\item|\cwdefanonciteptext|\marg{replacement-text} \DescribeMacro{\cwdefanonciteptext}
 %\end{itemize}
@@ -544,8 +553,8 @@
 % \cwanoncitep[pags 1]{todonotes}, % \cwanoncitet{xcolor}.
 %
 %
-% \section{Draft environment}
-% 
+%\section{Draft environment}
+%
 % \DescribeEnv{cwdraft}
 % The |cwdraft| environment aims to allow writers to include text that is marked somehow as a draft\footnote{This was motivated because my students liked to hide text from me because ``it was only a draft'', but I need to have some way to measure if they were advancing. Marking text as a draft allowed them to be free of the fear of showing errors to me. I see it most as a psychological support to writing without fear of making mistakes. And, yes, you can still use footnotes and they will be correcly numbered}
 %
@@ -586,16 +595,21 @@
 %\cwsetdraftcolor{blue}
 %\begin{cwdraft}
 % This draft has the default title.
-%\end{cwdraft}% 
+%\end{cwdraft}%
 %
 %
-% \section{Subjects}
+%\section{Subjects}
 %
 % \DescribeMacro{\cwsubject}
+% \DescribeMacro{\cwmain}
+%
 % |\cwsubject|\oarg{color}\marg{text}
 %
-% These are supposed to help organizing a text by giving a ``title'' for each
-% paragraph. 
+% These are alternatives supposed to help organizing a text.
+%
+% |\cwsubject| provides a header or title for a paragraph.
+%
+% |\cwmain| provides an emphasis (yellow highlight by default) for any text. It should be used in the main message of the paragraph
 %
 % The idea here is that each paragraph should be about one and only one subject,
 % and that reading these paragraph title will allow the authors to better understand
@@ -610,7 +624,11 @@
 % A subject is the main subject of a paragraph
 %
 % \cwsubject[pink]{A pink colored subject}
-% You can use other colors, such as pink.%
+% You can use other colors, such as pink.
+%
+% \cwsetsubjectcolor{cyan}
+% \cwsubject{All subjects will be cyan.}
+% You can use other colors, such as pink.
 %\end{verbatim}
 %
 %
@@ -622,17 +640,81 @@
 % \cwsubject[pink]{A pink colored subject}
 % You can use other colors, such as pink.
 %
+% \cwsetsubjectcolor{cyan}
+% \cwsubject{All subjects will be cyan.}
+% You can use other colors, such as pink.
+%
+% While the example:
+%
+%\begin{verbatim}
+% \cwmain{This is the main idea}. This is the explanation. These are examples.
+%
+% \cwmain[pink]{This is another main idea}. This is the explanation. These are examples.
+%
+% \cwsetmaincolor{cyan}
+% \cwmain{This is the main idea}. This is the explanation. These are examples.
+%\end{verbatim}
+%
+% generates:
+%
+% \cwmain{This is the main idea}. This is the explanation. These are examples.
+%
+% \cwmain[pink]{This is another main idea}. This is the explanation. These are examples.
+%
+% \cwsetmaincolor{cyan}
+% \cwmain{This is the main idea}. This is the explanation. These are examples.
+%
+% Intentionally, entries in |\cwsubject| and |\cwmain| go both for the list of
+% subjects, since users should use one or another for each paragraph.
+%
+%\subsection{Reconfiguring the behavior of \texttt{cwmain}}
+%
+% It is possible to reconfigure partially the behavior of |\cwmain| by
+% using the standard \LaTeX\ macro |\renewcommand| on the command |\cwmainemphasis|.
+%
+% Its standard definition is:
+%
+% |\newcommand{\cwmainemphasis}[1]{\hl{#1}}|
+%
+% And this will highlight it with the current highlight color, which can be easily defined with |\cwsetmaincolor|.
+%
+% However, suppose if you want the text to be in bold, you must redefine this
+% command, like in:
+%
+% |\renewcommand{\cwmainemphasis}[1]{\textbf{#1}}|
+%
+% This is easy to do, but an error can always cause mayhem.
+%
+% Therefore, the example:
+%
+%\begin{verbatim}
+% \renewcommand{\cwmainemphasis}[1]{\textbf{#1}}
+% \cwmain{This is the main idea}. This is the explanation. These are examples.
+%\end{verbatim}
+%
+% generates.
+%
+% \renewcommand{\cwmainemphasis}[1]{\textbf{#1}}
+% \cwmain{This is the main idea}. This is the explanation. These are examples.
+%
+% \renewcommand{\cwmainemphasis}[1]{\hl{#1}}
+% \cwsetmaincolor{yellow}
+% \cwsetsubjectcolor{green}
+%
 % \section{Lists}
 %
-% \DescribeMacro{\listofcomment}\DescribeMacro{\listofcomment}\DescribeMacro{\listofsubject}Comments, citation demands and subjects can be list with these commands.
+% \DescribeMacro{\listofcomments}
+% \DescribeMacro{\listofcitationneeds}
+% \DescribeMacro{\listofsubjects}
+% Comments, citation demands and subjects can be list with these commands.
 %
 % The lists will only appear if their commands are enable (or in the all-enabling editing option).
-% 
+%
 % They are usually put in the end of the file.
 %
 % \section{To dos}
 %
-% The |todo| command \DescribeMacro{\todo} is a much simpler version than 
+% The |todo| command \DescribeMacro{\todo} is a much simpler version than
 % the one available in |todonotes|\xexeo{But it will grow in power with time}. It´s syntax is:
 %
 % |\todo|[inline]\marg{text}
@@ -644,7 +726,7 @@
 % The example:
 %
 %\begin{verbatim}
-% \todo[inline]{This command can have other options, 
+% \todo[inline]{This command can have other options,
 %based on other implementations of to do in different packages.}
 %\end{verbatim}
 %
@@ -652,9 +734,10 @@
 %
 % \todo[inline]{This command can have other options, based on other implementations of to do in different packages}.
 %
-% It is possible to change the background color of the box using \DescribeMacro{\cwdefinetodocolor}. The idea, however, is that all to-dos should have the same color.
+% It is possible to change the background color of the box using this macro \DescribeMacro{\cwdefinetodocolor}.
+% The idea, however, is that all to-dos should have the same color.
 %
-%  |\cwdefinetodocolor|\marg{color}. 
+%  |\cwdefinetodocolor|\marg{color}.
 %
 %
 %
@@ -662,19 +745,19 @@
 %
 %\begin{verbatim}
 % \cwdefinetodocolor{yellow}
-% \todo[inline]{This command can have other options, 
+% \todo[inline]{This command can have other options,
 %based on other implementations of to do in different packages.}
 %\end{verbatim}
 %
 % generates:
 %
 % \cwdefinetodocolor{yellow}
-% \todo[inline]{This command can have other options, 
-    %based on other implementations of to do in different packages.}
+% \todo[inline]{This command can have other options,
+% based on other implementations of to do in different packages.}
 %
 %
 %\section{Warnings}
-% This package uses another package that changes \LaTeX's standard behavior for summary and lists. When you use it, you must explicitly change pages with |\newpage| 
+% This package uses another package that changes \LaTeX's standard behavior for summary and lists. When you use it, you must explicitly change pages with |\newpage|
 % before |\tableofcontents| or similar commands.
 %
 %
@@ -682,10 +765,10 @@
 % This section is in Brazilian Portuguese.
 %
 %\selectlanguage{brazilian}
-% A Tabela \ref{tab:e2p} Mostra o mapeamento em inglês e português.  
-% 
+% A Tabela \ref{tab:e2p} Mostra o mapeamento em inglês e português.
+%
 % \begin{table}[htb]
-% \caption{Tradução dos comandos para português.}     
+% \caption{Tradução dos comandos para português.}
 %\begin{tabular}{ccc}
 %    \hline
 %    Tipo & Inglês & Português \\
@@ -694,7 +777,7 @@
 %    macro & |\cwnamedef| &|\cwautor|  \\
 %    macro & |\cwsubject| & |\cwassunto|\\
 %    macro & |\listofcomment| & |\listofcomentario|\\
-%    macro & |\listofsubject| & |\listofassunto|\\
+%    macro & |\listofsubjects| & |\listofassunto|\\
 %    macro & |\listofcitationneeds| & |\listofcomentarioref|\\
 %    macro & |\todo| & |\todo| \\
 %    \hline
@@ -704,7 +787,7 @@
 %
 % \subsection{Opções em Português}
 %
-% As seguintes opções são aceitas em português, todas sem acentos ou cedilha: anonimizar, naoanonimizar, rascunhos, assuntos, comentarios, edicao, submeter, publicar, sugestoes, publicaraceitando. 
+% As seguintes opções são aceitas em português, todas sem acentos ou cedilha: anonimizar, naoanonimizar, rascunhos, assuntos, comentarios, edicao, submeter, publicar, sugestoes, publicaraceitando.
 %\selectlanguage{english}
 %\section{Comparision with other packages}
 %
@@ -712,16 +795,16 @@
 % \begin{itemize}
 %    \item |ed| has more features for commenting, and is more configurable, however it does not have colors.
 % \item |todonotes| it does not have the identification of the commentator, which must be put by hand. It has more options too.
-% \item |color-edits| does not support to do notes and drafts. 
+% \item |color-edits| does not support to do notes and drafts.
 % \end{itemize}
-% 
-% 
+%
+%
 %
 % \StopEventually{End of Code}
 %
 % \section{Implementation}
 % This package was initially written in Portuguese. As it become more
-% useful, it was translated to English. There are still some signs 
+% useful, it was translated to English. There are still some signs
 % of this in the code.
 %
 % \subsection{Access to the current version}
@@ -732,21 +815,21 @@
 \newcommand{\coopwritingversion}{\cw@version}%
 %    \end{macrocode}
 % \end{macro}
-% 
+%
 % \begin{macro}{\printcoopwritingversion}
 % Provides package name and version
 %    \begin{macrocode}
 \newcommand{\printcoopwritingversion}{coop-writing v. \coopwritingversion}%
 %    \end{macrocode}
 % \end{macro}
-%% 
+%%
 %%
 % \subsection{Option Processing}
 % \subsubsection{Creating Options Variables used in ed}
 % Some come from ed code and are being cleaned
 %
 %    \begin{macrocode}
-\newif\ifshowednotes\showednotestrue% 
+\newif\ifshowednotes\showednotestrue%
 \newif\ifmargins\marginstrue%
 \newif\ifednotebookmarks\ednotebookmarkstrue%
 % \subsubsection{Creating Original Options Variables}
@@ -774,8 +857,8 @@
 \DeclareOption{submeter}{\@modosubmetertrue}
 \DeclareOption{publicar}{\@modopublicartrue}
 \DeclareOption{publicaraceitando}{
-    \@modopublicartrue 
-    \@modopublicaraceitandotrue 
+    \@modopublicartrue
+    \@modopublicaraceitandotrue
 }
 %    \end{macrocode}
 % \subsubsection{English Options, inspired on ed package}
@@ -797,8 +880,8 @@
 \DeclareOption{submit}{\@modosubmetertrue}
 \DeclareOption{publish}{\@modopublicartrue}
 \DeclareOption{acceptingpublish}{
-    \@modopublicartrue 
-    \@modopublicaraceitandotrue 
+    \@modopublicartrue
+    \@modopublicaraceitandotrue
 }
 \ProcessOptions\relax
 %    \end{macrocode}
@@ -838,7 +921,7 @@
 % \subsection{Required Packages}
 % Packages that are always required
 %\begin{itemize}
-%    \item xcolor - used to support colors 
+%    \item xcolor - used to support colors
 %    \item soulutf8 - this is a variation of soul, used for highlighting
 % \item ulem - used to support strikethrought\todo{I must complete this explanation list}
 % \item tocloft - used to support modifications in lists and tocs
@@ -882,6 +965,7 @@
 \newcommand{\cor@prof}{red}%
 \newcommand{\cor@cand}{blue}%
 \newcommand{\cor@subject}{green}%
+\newcommand{\cor@main}{yellow}%
 \newcommand{\cor@citar}{purple}%
 \newcommand{\cor@hldraft}{yellow}%
 %    \end{macrocode}
@@ -912,23 +996,23 @@
         \def\cwdrafttitle{draft}%
         \def\cwcommentstitle{Lista de Comentários}%
         \def\cwsubjtitle{Lista de Assuntos}%
-        \def\cwcitationstitle{Necessidades de Citação}%        
+        \def\cwcitationstitle{Necessidades de Citação}%
         \def\cwpleasecitetext{Favor citar}%
         \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
         \def\cwpleasecitemarginnote{Citar}%
     }{}%
-%    
+%
     \IfLanguageName{portuguese}%
     {%
         \def\cwdrafttitle{draft}%
         \def\cwcommentstitle{Lista de Comentários}%
         \def\cwsubjtitle{Lista de Assuntos}%
-        \def\cwcitationstitle{Necessidades de Citação}%        
+        \def\cwcitationstitle{Necessidades de Citação}%
         \def\cwpleasecitetext{Favor citar}%
         \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
         \def\cwpleasecitemarginnote{Citar}%
     }{}%
-%    
+%
     \IfLanguageName{english}%
     {%
         \def\cwdrafttitle{Draft}%
@@ -943,7 +1027,7 @@
 {}%
 %    \end{macrocode}
 % \subsection{ed inspired code}
-% This code, inspired in the |ed| package, makes the basic mechanism for 
+% This code, inspired in the |ed| package, makes the basic mechanism for
 % inserting comments as footnotes with an observation in the margin.
 % As an adition to |ed|, it support colors and some text
 % before the superscript number in the text
@@ -954,7 +1038,7 @@
 %    \end{macrocode}
 % \end{macro}
 % \subsubsection{The footnote}
-% Format for the text 
+% Format for the text
 %    \begin{macrocode}
 \newcommand\cw@noteshape{\sffamily}%
 %    \end{macrocode}
@@ -968,7 +1052,7 @@
 %
 % This macro write the text in the footnote using with standard \LaTeX\ |\footnotetext|
 %
-% It uses counter |cwnotecounter| in arabic. 
+% It uses counter |cwnotecounter| in arabic.
 % It prints the footnote using the currently defined color (That is a global variable, setted up elsewehre. This is not good programming practice,
 % but it turned out to be the easiest way of doing it in \LaTeX without more and more arguments.)
 %
@@ -982,10 +1066,10 @@
 % That can be used in a |\ref| command.
 %
 %    \begin{macrocode}
-\newcommand\cw@foot[3]% 
+\newcommand\cw@foot[3]%
 {%
 \def\@test{#3}% @test just checks if argument #3 exists
-\footnotetext[\arabic{cwnotecounter}]% 
+\footnotetext[\arabic{cwnotecounter}]%
 {%
 {\scshape{\textcolor{\cw@currentcolor}{#2}}%
 \if\@test%
@@ -994,13 +1078,13 @@
 \label{cw:#3}%
 \textcolor{\cw@currentcolor}{[#3]}% if \meta{label} is not empty
 \fi%
-\textcolor{\cw@currentcolor}{:}}% 
+\textcolor{\cw@currentcolor}{:}}%
 \cw@noteshape\textcolor{\cw@currentcolor}{#1}}%
 }%
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\cw@mark}
-% This macro generates the footnote mark with standard \LaTeX\ 
+% This macro generates the footnote mark with standard \LaTeX\
 % |\footnotemark|
 %    \begin{macrocode}
 \def\cw@mark@style#1{#1}%
@@ -1030,7 +1114,7 @@
 % \begin{macro}{\cw@footnote}
 %
 % This macro actually makes the footnote symbol, mark and text
-%  
+%
 % Syntax is:
 %
 % |\cw@footnote|\marg{text}\marg{name}\marg{label}
@@ -1038,7 +1122,7 @@
 % \meta{label} can be empty, but must be present
 %
 % It is in this macro that symbol, number and footnote mark
-% end up in the document. 
+% end up in the document.
 %
 % This command also changes the color of footnote mark
 %
@@ -1063,7 +1147,7 @@
 %    \end{macrocode}
 % \begin{macro}{\Cw@note}
 % Basic function to build the comment
-% 
+%
 % |\Cw@note|\marg{text}\marg{name}\marg{label}
 %
 % If not label, it must be empty
@@ -1106,7 +1190,7 @@
 %    \end{macrocode}
 % \begin{macro}{\corleve}
 % Make a color lighter for later use in highlightings
-% This code is more complex than it shuould be because o |soulutf8|'s package |\hl| behavior. Solution found in: 
+% This code is more complex than it shuould be because o |soulutf8|'s package |\hl| behavior. Solution found in:
 % \url{https://tex.stackexchange.com/questions/410295/soul-color-transparency}
 %    \begin{macrocode}
 \newcommand{\cor@suavizacao}{40}%
@@ -1133,7 +1217,7 @@
 }%
 %    \end{macrocode}
 % \subsection{Anonymization}
-% Will write anonymous or cite anonymous. 
+% Will write anonymous or cite anonymous.
 % The user has a way to configure the citation as he or she wants.
 % \begin{macro}{\cw@anontext}
 % \begin{macro}{\cw@anoncitetext}
@@ -1184,8 +1268,32 @@
 \fi%|
 %    \end{macrocode}
 % \subsection{Subjects}
-% The idea of subjects is to have one subject for each paragraph
+% The idea of subjects is to have one subject for each paragraph.
+%
+% There are two commands to support it:
+%|\cwsubject|\oarg{highlight-color}\marg{subject}
+%and
+%|\cwmain|\oarg{highlight-color}\marg{line-inside-a-paragraph}
+%
+% Both are listed with |\listofsubject|.
+%
+%
+% \begin{macro}{\cwsetsubjectcolor}
+% \begin{macro}{\cwsetmaincolor}
+% Sets color for all cwsubject and cwcolor
+%    \begin{macrocode}
+\newcommand{\cwsetsubjectcolor}[1]{\def\cor@subject{#1}}%
+\newcommand{\cwsetmaincolor}[1]{\def\cor@main{#1}}%
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\cwsubject}
 % Currently is just a list of subjects and and a highlight
+%
+%  \cwsubject{This is an use for cwsubject}
+%   it is a header for a paragraph.
+%
+%
 %    \begin{macrocode}
 \if@showsubjects
 \newcommand{\listsubject}{\cwsubjtitle}%
@@ -1193,7 +1301,8 @@
 \@ifundefined{chapter}
 {\newlistof[section]{subject}{aaa}{\listsubject}}
 {\newlistof[chapter]{subject}{aaa}{\listsubject}}%
-%%
+%
+%
 \newcommand{\cwsubject}[2][\cor@subject]{%
 \refstepcounter{subject}%
 \sethlcolor{#1}%
@@ -1201,12 +1310,40 @@
 \par%
 \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
 }%
-\setlength{\cftsubjectnumwidth}{2.5em}%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\cwmain}
+% This is another way to control the main idea for a paragraph, but using
+% an sentence inside it.
+%
+%  \cwmain{This is a use for cwmain.} In the first sentence of a paragraph.
+%
+% Trying to configure it:
+%
+% \renewcommand{\cwmainemphasis}[1]{\hl{\textbf{#1}}}
+% \cwsetmaincolor{pink}
+%
+% \cwmain{This is a use for cwmain.} In the first sentence of a paragraph.
+%
+%    \begin{macrocode}
+\newcommand{\cwmainemphasis}[1]{\hl{#1}}
+%
+\newcommand{\cwmain}[2][\cor@main]{%
+    \refstepcounter{subject}%
+    \sethlcolor{#1}%
+    \cwmainemphasis{#2}%
+    \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+}%
+%
+%\setlength{\cftsubjectnumwidth}{2.5em}%
 \else%
 \newcommand{\listofsubject}{}%
 \newcommand{\cwsubject}[2][]{}%
+\newcommand{\cwmain}[2][]{#2}
 \fi%
 %    \end{macrocode}
+%
+% \end{macro}
 % \subsection{Editorial Comments}
 % The main subject of this package
 %    \begin{macrocode}
@@ -1220,7 +1357,7 @@
 %%
 %% Comentador genérico - parte I
 %% faz o cwnote e soma na lista
-%% []rótulo], texto , cor, indicador
+%% [rótulo], texto , cor, indicador
 \newcommand{\cw@comentar}[4][]{%
 \ifstrempty{#4}{%
 % rótulo texto cor indicador
@@ -1352,9 +1489,9 @@
 %    \end{macrocode}
 % \begin{macro}{\cwsetdraftcolor}
 % Sets the color that highlights the draft title
-% 
+%
 %    \begin{macrocode}
-% 
+%
 \newcommand{\cwsetdraftcolor}[1]{\def\cor@hldraft{#1}}
 %
 %    \end{macrocode}
@@ -1397,7 +1534,7 @@
 % \end{macro}
 % \begin{macro}{\cwauthor}
 % \begin{macro}{\cweditor}
-% These are the two standard users. 
+% These are the two standard users.
 %    \begin{macrocode}
 \cwautor{cwauthor}{red}{Author}
 \cwautor{cweditor}{blue}{Editor}
@@ -1407,7 +1544,7 @@
 % \subsection{To do notes}
 % This was developed because some of my students started a text using |todonotes|, before being aware of my package, therefore I need to have some compatibility to make de change. With time it became useful and I will try to make something better in the future.
 % \begin{macro}{\todo}
-% If option inline is not used, it is only a front-end to 
+% If option inline is not used, it is only a front-end to
 % an editorial comment for a user called ``To do''. If it is used, it tries to simulate
 % the simplest behavior of |todonotes| package.
 % In the future this can be enhanced, since package |mdframe| is very powerful.
@@ -1449,6 +1586,8 @@
 \let\listofcomments=\listofcomentario%
 \let\listofcitationneeds=\listofcomentarioref%
 \let\listofassunto=\listofsubject%
+\let\listofsubjects=\listofsubject%
+%
 %    \end{macrocode}
 % \Finale
 %
