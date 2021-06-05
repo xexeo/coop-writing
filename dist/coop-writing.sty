@@ -20,7 +20,7 @@
 %% and version 1.3 or later is part of all distributions of LaTeX version
 %% 2005/12/01 or later.
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.2.0}
+\def\cw@version{v1.2.1}
 \ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
 \newcommand{\coopwritingversion}{\cw@version}%
@@ -191,9 +191,11 @@
 \newcommand{\cw@beforemarksymbol}{}%
 \newcommand{\cwsetcommwarn}[1]{\def\cw@beforemarksymbol{#1}}%
 \newcommand\cw@footnote[3]{%
-\renewcommand\@makefnmark{\hbox{\@textsuperscript{\normalfont\color{\cw@currentcolor}\@thefnmark}}}%
+\let\@temp@makefnmark\@makefnmark%
+\def\@makefnmark{\hbox{\@textsuperscript{\normalfont\color{\cw@currentcolor}\@thefnmark}}}%
 \textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnotecounter}}}%
 \cw@foot{#1}{#2}{#3}%
+\let\@makefnmark\@temp@makefnmark%
 }%
 \newcommand\cw@margin[1]{%
 \ifmargins%
@@ -220,10 +222,12 @@
 \newcommand\cwnotemargin[1]{\def\cwnote@margin{#1}}%
 \newcommand{\Cwnote}[2][]{\Cw@note{#2}\cwnote@label{#1}}%
 \newcommand{\cwnote}[3][]{%
+\let\@temp@color\cw@currentcolor%
 \def\cw@currentcolor{#3}%
 \cw@note{#2}%
 \cwnote@label{#1}%
 \cwnote@margin%
+\let\cw@currentcolor\@temp@color%
 }%
 %%%https://tex.stackexchange.com/questions/30483/how-can-i-check-in-latex-or-plain-tex-whether-a-command-exists-by-name
 %% as opções comentario, assuntos e anonimizar

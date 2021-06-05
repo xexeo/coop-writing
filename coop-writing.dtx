@@ -17,7 +17,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.2.0}
+%<package>\def\cw@version{v1.2.1}
 %<package>\ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
@@ -83,7 +83,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{686}
+% \CheckSum{692}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -106,6 +106,7 @@
 % \changes{v1.1.1}{2021/05/30}{Fix some bugs, anonymization back on manual}
 % \changes{v1.1.2}{2021/05/30}{PDF bookmarks can't handle full UTF}
 % \changes{v1.2.0}{2021/05/30}{New command cwmain and configuration for it}
+% \changes{v1.2.1}{2021/06/05}{Fixing problems with footnote mark color and also recovering \LaTeX\ command (at-sign)makefnmark}
 %\maketitle
 %
 % \tableofcontents
@@ -1125,17 +1126,30 @@
 % end up in the document.
 %
 % This command also changes the color of footnote mark
-% ATTENTION: This make mandatory to keep control of \cw@currentcolor
-% because it will be used for the normal footnote.
+% WARNING: it does that by redefining |\@makefnmark|,
+% however this interferes with normal
+% \LaTeX\ operation. Therefore we save and
+% restore the original value.
+%
+% Whe change the |\@makefnmark| to a slighter
+% different version that includes color, that
+% is controled by a ``global'' is a variable of
+% coop-writing, even if is not global in the
+% |\gdef| sense.
+%
+% It is possible that this cause, in a style that
+% changes the footnote, some difference between
+% coop-writing footnotes and normal (style) footnotes.
+% This is not bad necessarily, it can even be good.
+%
 %
 %    \begin{macrocode}
 \newcommand\cw@footnote[3]{%
-% WARNING: The line below is not the best idea because it introduces
-% our variable |\cw@currentcolor| inside a \LaTeX\  command.
-% Therefore it will be better to do other thing
-\renewcommand\@makefnmark{\hbox{\@textsuperscript{\normalfont\color{\cw@currentcolor}\@thefnmark}}}%
+\let\@temp@makefnmark\@makefnmark%
+\def\@makefnmark{\hbox{\@textsuperscript{\normalfont\color{\cw@currentcolor}\@thefnmark}}}%
 \textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnotecounter}}}%
 \cw@foot{#1}{#2}{#3}%
+\let\@makefnmark\@temp@makefnmark%
 }%
 %    \end{macrocode}
 % \end{macro}
@@ -1182,7 +1196,20 @@
 \newcommand\cwnotelabel[1]{\def\cwnote@label{#1}}%
 \newcommand\cwnotemargin[1]{\def\cwnote@margin{#1}}%
 \newcommand{\Cwnote}[2][]{\Cw@note{#2}\cwnote@label{#1}}%
+%    \end{macrocode}
 %
+%
+% \begin{macro}{\cwnote}
+%
+%  It writes the footnote, the symbol and the
+% margin.
+%
+%  To avoid problems we keep |\cw@currentcolor|
+%
+% WARNING: will this use a lot of memory? Every
+% creation will keep the old value alive?
+%
+%    \begin{macrocode}
 \newcommand{\cwnote}[3][]{%
 \let\@temp@color\cw@currentcolor%
 \def\cw@currentcolor{#3}%
@@ -1191,10 +1218,11 @@
 \cwnote@margin%
 \let\cw@currentcolor\@temp@color%
 }%
+%    \end{macrocode}
+%\end{macro}
 %%%https://tex.stackexchange.com/questions/30483/how-can-i-check-in-latex-or-plain-tex-whether-a-command-exists-by-name
 %% as opções comentario, assuntos e anonimizar
 %% CORES
-%    \end{macrocode}
 % \begin{macro}{\corleve}
 % Make a color lighter for later use in highlightings
 % This code is more complex than it shuould be because o |soulutf8|'s package |\hl| behavior. Solution found in:
