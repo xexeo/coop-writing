@@ -83,7 +83,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{680}
+% \CheckSum{686}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -1125,9 +1125,14 @@
 % end up in the document.
 %
 % This command also changes the color of footnote mark
+% ATTENTION: This make mandatory to keep control of \cw@currentcolor
+% because it will be used for the normal footnote.
 %
 %    \begin{macrocode}
 \newcommand\cw@footnote[3]{%
+% WARNING: The line below is not the best idea because it introduces
+% our variable |\cw@currentcolor| inside a \LaTeX\  command.
+% Therefore it will be better to do other thing
 \renewcommand\@makefnmark{\hbox{\@textsuperscript{\normalfont\color{\cw@currentcolor}\@thefnmark}}}%
 \textcolor{\cw@currentcolor}{\cw@beforemarksymbol\cw@mark{\arabic{cwnotecounter}}}%
 \cw@foot{#1}{#2}{#3}%
@@ -1179,10 +1184,12 @@
 \newcommand{\Cwnote}[2][]{\Cw@note{#2}\cwnote@label{#1}}%
 %
 \newcommand{\cwnote}[3][]{%
+\let\@temp@color\cw@currentcolor%
 \def\cw@currentcolor{#3}%
 \cw@note{#2}%
 \cwnote@label{#1}%
 \cwnote@margin%
+\let\cw@currentcolor\@temp@color%
 }%
 %%%https://tex.stackexchange.com/questions/30483/how-can-i-check-in-latex-or-plain-tex-whether-a-command-exists-by-name
 %% as opções comentario, assuntos e anonimizar

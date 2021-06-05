@@ -220,10 +220,12 @@
 \newcommand\cwnotemargin[1]{\def\cwnote@margin{#1}}%
 \newcommand{\Cwnote}[2][]{\Cw@note{#2}\cwnote@label{#1}}%
 \newcommand{\cwnote}[3][]{%
+\let\@temp@color\cw@currentcolor%
 \def\cw@currentcolor{#3}%
 \cw@note{#2}%
 \cwnote@label{#1}%
 \cwnote@margin%
+\let\cw@currentcolor\@temp@color%
 }%
 %%%https://tex.stackexchange.com/questions/30483/how-can-i-check-in-latex-or-plain-tex-whether-a-command-exists-by-name
 %% as opções comentario, assuntos e anonimizar
