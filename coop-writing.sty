@@ -20,8 +20,8 @@
 %% and version 1.3 or later is part of all distributions of LaTeX version
 %% 2005/12/01 or later.
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.2.1}
-\ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
+\def\cw@version{v1.2.2}
+\ProvidesPackage{coop-writing}[2021/06/06 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
 \newcommand{\coopwritingversion}{\cw@version}%
 \newcommand{\printcoopwritingversion}{coop-writing v. \coopwritingversion}%
@@ -143,9 +143,19 @@
 \def\cwpleasecitemarginnote{Cite}%
 \@ifpackageloaded{babel}%
 {%
+    \IfLanguageName{brazil}%
+    {%
+    \def\cwdrafttitle{Rascunho}%
+    \def\cwcommentstitle{Lista de Comentários}%
+    \def\cwsubjtitle{Lista de Assuntos}%
+    \def\cwcitationstitle{Necessidades de Citação}%
+    \def\cwpleasecitetext{Favor citar}%
+    \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+    \def\cwpleasecitemarginnote{Citar}%
+    }{}%
     \IfLanguageName{brazilian}%
     {%
-        \def\cwdrafttitle{draft}%
+        \def\cwdrafttitle{Rascunho}%
         \def\cwcommentstitle{Lista de Comentários}%
         \def\cwsubjtitle{Lista de Assuntos}%
         \def\cwcitationstitle{Necessidades de Citação}%
@@ -155,7 +165,7 @@
     }{}%
     \IfLanguageName{portuguese}%
     {%
-        \def\cwdrafttitle{draft}%
+        \def\cwdrafttitle{Rascunho}%
         \def\cwcommentstitle{Lista de Comentários}%
         \def\cwsubjtitle{Lista de Assuntos}%
         \def\cwcitationstitle{Necessidades de Citação}%
@@ -453,10 +463,11 @@
 \newcommand{\cw@commentref}[3]{}%
 \fi%
 \if@showcomentario
-\newcommand{\favorcitar}[1][\cwpleasecitemessage]{%
+
+\newcommand{\pleasecite}[1][\cwpleasecitemessage]{%
 \cw@commentref{\cwpleasecitetext\  #1}{\cor@citar}}%
 \else%
-\newcommand{\favorcitar}[1][]{}%
+\newcommand{\pleasecite}[1][]{}%
 \fi%
 \if@showdraft%
 \NewEnviron{cwdraft}[1][]{%
@@ -473,7 +484,7 @@
 \fi%
 \newcommand{\cwsetdraftcolor}[1]{\def\cor@hldraft{#1}}
 %% nome do autor, cor, identificador
-\newcommand{\cwautor}[3]{%
+\newcommand{\cwnamedef}[3]{%
 %% cwcomment - texto a hl, cor, comentário, indicador de pessoa
 \expandafter\newcommand\csname#1\endcsname[2][]%
 {%
@@ -498,10 +509,10 @@
 \expandafter\newcommand\csname#1swap\endcsname[3][]%
 {\cw@gensug[##1]{#2}{#3}{##2}{#2}{##3}{#2}}%
 }%
-\cwautor{cwauthor}{red}{Author}
-\cwautor{cweditor}{blue}{Editor}
+\cwnamedef{cwauthor}{red}{Author}
+\cwnamedef{cweditor}{blue}{Editor}
 \newcommand{\cw@todobackgroundcolor}{orange}%
-\cwautor{cw@todoauthor}{orange}{To do}%
+\cwnamedef{cw@todoauthor}{orange}{To do}%
 \if@showtodo%
 \newcommand{\todo}[2][comentar]{%
 \IfEq{inline}{#1}%
@@ -520,8 +531,8 @@
 \newcommand{\cwdefinetodocolor}[1]{\renewcommand{\cw@todobackgroundcolor}{#1}}%
 \let\rascunho=\cwdraft%
 \let\cwassunto=\cwsubject%
-\let\pleasecite=\favorcitar%
-\let\cwnamedef=\cwautor%
+\let\favorcitar=\pleasecite%
+\let\cwautor=\cwnamedef%
 \let\listofcomments=\listofcomentario%
 \let\listofcitationneeds=\listofcomentarioref%
 \let\listofassunto=\listofsubject%

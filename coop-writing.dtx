@@ -17,8 +17,8 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.2.1}
-%<package>\ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
+%<package>\def\cw@version{v1.2.2}
+%<package>\ProvidesPackage{coop-writing}[2021/06/06 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
@@ -80,7 +80,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{772}
+% \CheckSum{787}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -104,6 +104,7 @@
 % \changes{v1.1.2}{2021/05/30}{PDF bookmarks can't handle full UTF}
 % \changes{v1.2.0}{2021/05/30}{New command cwmain and configuration for it}
 % \changes{v1.2.1}{2021/06/05}{Fixing problems with footnote mark color and also recovering \LaTeX\ command (at-sign)makefnmark}
+% \changes{v1.2.2}{2021/06/06}{Memoir class, used by abnetex2, used by my department,  ``emulates'' tocloft, but not correctly. Many IFs were necessary}
 %\maketitle
 %
 % \tableofcontents
@@ -754,6 +755,35 @@
 % based on other implementations of to do in different packages.}
 %
 %
+%
+% \section{Language Support}
+%
+% This style supports the following |babel| defined languages:
+% \begin{itemize}
+%    \item brazil,
+%    \item brazilian,
+%    \item portuguese, and
+%    \item english.
+%\end{itemize}
+%
+% \DescribeMacro{\cwcommentstitle}
+% \DescribeMacro{\cwdrafttitle}
+% \DescribeMacro{\cwsubjtitle}
+% \DescribeMacro{\cwcitationstitle}
+% \DescribeMacro{\cwpleasecitetext}
+% \DescribeMacro{\cwpleasecitemessage}
+% \DescribeMacro{\cwpleasecitemarginnote}
+% To use other languade, you should define these macros, as in:
+%
+%    |\def\cwdrafttitle{Draft}|%
+%    |\def\cwcommentstitle{List of Comments}|%
+%    |\def\cwsubjtitle{List of Subjects}|%
+%    |\def\cwcitationstitle{List of Citation Needs}|%
+%    |\def\cwpleasecitetext{Plese cite}|%
+%    |\def\cwpleasecitemessage{something to support this information}|%
+%    |\def\cwpleasecitemarginnote{Cite}|%
+%
+%
 %\section{Warnings}
 % This package uses another package that changes \LaTeX's standard behavior for summary and lists. When you use it, you must explicitly change pages with |\newpage|
 % before |\tableofcontents| or similar commands.
@@ -1016,9 +1046,19 @@
 %
 \@ifpackageloaded{babel}%
 {%
+    \IfLanguageName{brazil}%
+    {%
+    \def\cwdrafttitle{Rascunho}%
+    \def\cwcommentstitle{Lista de Comentários}%
+    \def\cwsubjtitle{Lista de Assuntos}%
+    \def\cwcitationstitle{Necessidades de Citação}%
+    \def\cwpleasecitetext{Favor citar}%
+    \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+    \def\cwpleasecitemarginnote{Citar}%
+    }{}%
     \IfLanguageName{brazilian}%
     {%
-        \def\cwdrafttitle{draft}%
+        \def\cwdrafttitle{Rascunho}%
         \def\cwcommentstitle{Lista de Comentários}%
         \def\cwsubjtitle{Lista de Assuntos}%
         \def\cwcitationstitle{Necessidades de Citação}%
@@ -1029,7 +1069,7 @@
 %
     \IfLanguageName{portuguese}%
     {%
-        \def\cwdrafttitle{draft}%
+        \def\cwdrafttitle{Rascunho}%
         \def\cwcommentstitle{Lista de Comentários}%
         \def\cwsubjtitle{Lista de Assuntos}%
         \def\cwcitationstitle{Necessidades de Citação}%
@@ -1357,6 +1397,10 @@
 \if@showsubjects
 \newcommand{\listsubject}{\cwsubjtitle}%
 %% cria a lista, depende do pacoto tcloft
+%    \end{macrocode}
+% Memoir class needs 2 commands to really define a list
+% It also changes the  |\newlistof| arguments' meaning
+%    \begin{macrocode}
 \if@cwmemoirdefense%
 \@ifundefined{chapter}%
 {\newlistentry[section]{subject}{aaa}{0}}
@@ -1374,6 +1418,8 @@
 \sethlcolor{#1}%
 \hl{#2}%
 \par%
+% I really can´t say why we need to
+% avoid curly braces in the next command
 \if@cwmemoirdefense%
 \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
 \else%
@@ -1569,12 +1615,18 @@
 \newcommand{\cw@commentref}[3]{}%
 \fi%
 \if@showcomentario
-\newcommand{\favorcitar}[1][\cwpleasecitemessage]{%
+%    \end{macrocode}
+% \begin{macro}{\pleasecite}
+% |\pleasecite|\oarg{footnote-text}
+%    \begin{macrocode}
+
+\newcommand{\pleasecite}[1][\cwpleasecitemessage]{%
 \cw@commentref{\cwpleasecitetext\  #1}{\cor@citar}}%
 \else%
-\newcommand{\favorcitar}[1][]{}%
+\newcommand{\pleasecite}[1][]{}%
 \fi%
 %    \end{macrocode}
+% \end{macro}
 % \subsection{Draft}
 % \begin{environment}{cwdraft}
 % This enviroment creates a boxed text, with title used as a first parameter
@@ -1613,9 +1665,9 @@
 % using a front-end to |ed|, and later decided to use colors, that |ed| dones not support.
 % If I had known of |color-edits|, maybe this package was never done. I actually implemented the same functionalities without knowing about that package. One day, looking for other editorial packages that used editorial symbols, I found |color-edits|, but it was too late, I was already hooked on \LaTeX\  programming addiction.
 %% nome do autor, cor, identificador
-% \begin{macro}{\cwautor}
+% \begin{macro}{\cwnamedef}
 %    \begin{macrocode}
-\newcommand{\cwautor}[3]{%
+\newcommand{\cwnamedef}[3]{%
 %% cwcomment - texto a hl, cor, comentário, indicador de pessoa
 \expandafter\newcommand\csname#1\endcsname[2][]%
 {%
@@ -1647,8 +1699,8 @@
 % \begin{macro}{\cweditor}
 % These are the two standard users.
 %    \begin{macrocode}
-\cwautor{cwauthor}{red}{Author}
-\cwautor{cweditor}{blue}{Editor}
+\cwnamedef{cwauthor}{red}{Author}
+\cwnamedef{cweditor}{blue}{Editor}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1662,7 +1714,7 @@
 % If the non-inline version is used, the to do note will not appear in the List of Commentaries.\xexeo{It would be nice to check if todonotes is load and just use it}
 %    \begin{macrocode}
 \newcommand{\cw@todobackgroundcolor}{orange}%
-\cwautor{cw@todoauthor}{orange}{To do}%
+\cwnamedef{cw@todoauthor}{orange}{To do}%
 \if@showtodo%
 \newcommand{\todo}[2][comentar]{%
 \IfEq{inline}{#1}%
@@ -1692,8 +1744,8 @@
 %    \begin{macrocode}
 \let\rascunho=\cwdraft%
 \let\cwassunto=\cwsubject%
-\let\pleasecite=\favorcitar%
-\let\cwnamedef=\cwautor%
+\let\favorcitar=\pleasecite%
+\let\cwautor=\cwnamedef%
 \let\listofcomments=\listofcomentario%
 \let\listofcitationneeds=\listofcomentarioref%
 \let\listofassunto=\listofsubject%
