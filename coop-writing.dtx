@@ -43,9 +43,6 @@
 \cwnamedef{xexeo}{red}{Xexéo}
 %
 %
-\setlength{\cftsubjectnumwidth}{20pt}
-\setlength{\cftcomentarionumwidth}{20pt}
-\setlength{\cftcomentariorefnumwidth}{20pt}
 %
 %
 \EnableCrossrefs
@@ -83,7 +80,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{692}
+% \CheckSum{728}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -957,10 +954,37 @@
     \message{Babel not detected!}%
 }%
 %    \end{macrocode}
-%    \begin{macrocode}
 % |hyperref| must always be the last
+%    \begin{macrocode}
 \ifednotebookmarks\RequirePackage{hyperref}\fi
 %    \end{macrocode}
+%
+% \subsection{Solving problems with other packages}
+%
+% \subsubsection{Problems with \texttt{abntex2} and \texttt{memoir}}
+%
+% |abntex2| causes error in |\newlistof|, you
+% can't refer to |chapter|, |section| or other counter
+% as optional argument
+%
+% This error is actually |memoir| fault, since it emulates
+% |tocloft| (and other packages). I can´t imagine why...
+%
+% Therefore, we will avoid using the command with option
+% when the class is present
+%
+%    \begin{macrocode}
+\@ifclassloaded{memoir}%
+{% TRUE
+\newif\if@cwmemoirdefense\@cwmemoirdefensetrue%
+}%
+{%
+\newif\if@cwmemoirdefense\@cwmemoirdefensefalse%
+}%
+%
+%    \end{macrocode}
+%
+%
 % \subsection{Color related variables}
 %    \begin{macrocode}
 \newcommand{\cor@prof}{red}%
@@ -969,6 +993,7 @@
 \newcommand{\cor@main}{yellow}%
 \newcommand{\cor@citar}{purple}%
 \newcommand{\cor@hldraft}{yellow}%
+\newcommand{\cw@cftnumwidth}{20pt}
 %    \end{macrocode}
 %
 % \subsection{I18N Almost Using Babel}
@@ -1333,9 +1358,13 @@
 \if@showsubjects
 \newcommand{\listsubject}{\cwsubjtitle}%
 %% cria a lista, depende do pacoto tcloft
-\@ifundefined{chapter}
-{\newlistof[section]{subject}{aaa}{\listsubject}}
+\if@cwmemoirdefense%
+\newlistof{subject}{aaa}{\listsubject}
+\else%
+\@ifundefined{chapter}%
+{\newlistof[section]{subject}{aaa}{\listsubject}}%
 {\newlistof[chapter]{subject}{aaa}{\listsubject}}%
+\fi%
 %
 %
 \newcommand{\cwsubject}[2][\cor@subject]{%
@@ -1370,7 +1399,10 @@
     \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
 }%
 %
-%\setlength{\cftsubjectnumwidth}{2.5em}%
+\if@cwmemoirdefense%
+\else%
+\setlength{\cftsubjectnumwidth}{\cw@cftnumwidth}%
+\fi%
 \else%
 \newcommand{\listofsubject}{}%
 \newcommand{\cwsubject}[2][]{}%
@@ -1386,9 +1418,13 @@
 %% Resolve a lista de comentários
 \newcommand{\listcomentario}{\cwcommentstitle}%
 %% cria a lista
+\if@cwmemoirdefense%
+\newlistof{comentario}{ccc}{\listcomentario}%
+\else%
 \@ifundefined{chapter}
 {\newlistof[section]{comentario}{ccc}{\listcomentario}}
 {\newlistof[chapter]{comentario}{ccc}{\listcomentario}}%%
+\fi%
 %%
 %% Comentador genérico - parte I
 %% faz o cwnote e soma na lista
@@ -1436,7 +1472,10 @@
 \cw@comentar[#5]{\sout{#2}}{#3}{#4}%
 }%
 %%
-\setlength{\cftcomentarionumwidth}{2.5em}
+\if@cwmemoirdefense%
+\else%
+\setlength{\cftcomentarionumwidth}{\cw@cftnumwidth}%
+\fi%
 \else
 \newcommand{\cw@comentar}[4][]{}%
 \newcommand{\listofcomentario}{}%
@@ -1477,7 +1516,13 @@
 %    \begin{macrocode}
 \if@showcomentario%
 \newcommand{\listcomentarioref}{\cwcitationstitle}%
-\@ifundefined{chapter}{ \newlistof[section]{comentarioref}{ccr}{\listcomentarioref}}{\newlistof[chapter]{comentarioref}{ccr}{\listcomentarioref}}%
+\if@cwmemoirdefense%
+\newlistof{comentarioref}{ccr}{\listcomentarioref}
+\else%
+\@ifundefined{chapter}%
+{\newlistof[section]{comentarioref}{ccr}{\listcomentarioref}}
+{\newlistof[chapter]{comentarioref}{ccr}{\listcomentarioref}}%
+\fi%
 \else%
 \newcommand{\listofcomentarioref}{}%
 \fi%
@@ -1488,7 +1533,10 @@
 \cw@cwnote{#2}{#3}{\cwpleasecitemarginnote}%
 \addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}{#2}}%
 }%
-\setlength{\cftcomentariorefnumwidth}{2.5em}%
+\if@cwmemoirdefense%
+\else%
+\setlength{\cftcomentariorefnumwidth}{\cw@cftnumwidth}%
+\fi%
 \else%
 \newcommand{\cw@commentref}[3]{}%
 \fi%
