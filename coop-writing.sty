@@ -120,12 +120,20 @@
     \message{Babel not detected!}%
 }%
 \ifednotebookmarks\RequirePackage{hyperref}\fi
+\@ifclassloaded{memoir}%
+{% TRUE
+\newif\if@cwmemoirdefense\@cwmemoirdefensetrue%
+}%
+{% FALSE
+\newif\if@cwmemoirdefense\@cwmemoirdefensefalse%
+}%
 \newcommand{\cor@prof}{red}%
 \newcommand{\cor@cand}{blue}%
 \newcommand{\cor@subject}{green}%
 \newcommand{\cor@main}{yellow}%
 \newcommand{\cor@citar}{purple}%
 \newcommand{\cor@hldraft}{yellow}%
+\newcommand{\cw@cftnumwidth}{20pt}
 \def\cwdrafttitle{Standard Draft}%
 \def\cwcommentstitle{Standard List of Comments}%
 \def\cwsubjtitle{Standard List of Subjects}%
@@ -269,23 +277,42 @@
 \if@showsubjects
 \newcommand{\listsubject}{\cwsubjtitle}%
 %% cria a lista, depende do pacoto tcloft
-\@ifundefined{chapter}
-{\newlistof[section]{subject}{aaa}{\listsubject}}
+\if@cwmemoirdefense%
+\@ifundefined{chapter}%
+{\newlistentry[section]{subject}{aaa}{0}}
+{\newlistentry[chapter]{subject}{aaa}{0}}
+\newlistof{listofsubjects}{aaa}{\listsubject}
+\else%
+\@ifundefined{chapter}%
+{\newlistof[section]{subject}{aaa}{\listsubject}}%
 {\newlistof[chapter]{subject}{aaa}{\listsubject}}%
+\fi%
 \newcommand{\cwsubject}[2][\cor@subject]{%
 \refstepcounter{subject}%
 \sethlcolor{#1}%
 \hl{#2}%
 \par%
+\if@cwmemoirdefense%
+\addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
+\else%
 \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+\fi%
 }%
 \newcommand{\cwmainemphasis}[1]{\hl{#1}}
 \newcommand{\cwmain}[2][\cor@main]{%
     \refstepcounter{subject}%
     \sethlcolor{#1}%
     \cwmainemphasis{#2}%
+    \if@cwmemoirdefense%
+    \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
+    \else%
     \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+    \fi%
 }%
+\if@cwmemoirdefense%
+\else%
+\setlength{\cftsubjectnumwidth}{\cw@cftnumwidth}%
+\fi%
 \else%
 \newcommand{\listofsubject}{}%
 \newcommand{\cwsubject}[2][]{}%
@@ -295,9 +322,16 @@
 %% Resolve a lista de comentários
 \newcommand{\listcomentario}{\cwcommentstitle}%
 %% cria a lista
+\if@cwmemoirdefense%
+\@ifundefined{chapter}%
+{\newlistentry[section]{comentario}{ccc}{0}}
+{\newlistentry[chapter]{comentario}{ccc}{0}}
+\newlistof{listofcomentario}{ccc}{\listcomentario}%
+\else%
 \@ifundefined{chapter}
 {\newlistof[section]{comentario}{ccc}{\listcomentario}}
 {\newlistof[chapter]{comentario}{ccc}{\listcomentario}}%%
+\fi%
 %%
 %% Comentador genérico - parte I
 %% faz o cwnote e soma na lista
@@ -305,11 +339,19 @@
 \newcommand{\cw@comentar}[4][]{%
 \ifstrempty{#4}{%
 \cw@cwnote[#1]{#2}{#3}{Comentário}% faz a nota de rodapé do ed
+\if@cwmemoirdefense%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}#2}%
+\else%
 \addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#2}}%
+\fi%
 }%
 {%
 \cw@cwnote[#1]{#2}{#3}{#4}%
+\if@cwmemoirdefense%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}#4: #2}%
+\else%
 \addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#4: #2}}%
+\fi%
 }%
 }%
 %% comentador genérico, parte II
@@ -344,7 +386,10 @@
 \cw@comentar[#5]{\sout{#2}}{#3}{#4}%
 }%
 %%
-\setlength{\cftcomentarionumwidth}{2.5em}
+\if@cwmemoirdefense%
+\else%
+\setlength{\cftcomentarionumwidth}{\cw@cftnumwidth}%
+\fi%
 \else
 \newcommand{\cw@comentar}[4][]{}%
 \newcommand{\listofcomentario}{}%
@@ -376,7 +421,16 @@
 \fi%
 \if@showcomentario%
 \newcommand{\listcomentarioref}{\cwcitationstitle}%
-\@ifundefined{chapter}{ \newlistof[section]{comentarioref}{ccr}{\listcomentarioref}}{\newlistof[chapter]{comentarioref}{ccr}{\listcomentarioref}}%
+\if@cwmemoirdefense%
+\@ifundefined{chapter}%
+{\newlistentry[section]{comentarioref}{ccr}{0}}
+{\newlistentry[chapter]{comentarioref}{ccr}{0}}
+\newlistof{listofcomentarioref}{ccr}{\listcomentarioref}
+\else%
+\@ifundefined{chapter}%
+{\newlistof[section]{comentarioref}{ccr}{\listcomentarioref}}
+{\newlistof[chapter]{comentarioref}{ccr}{\listcomentarioref}}%
+\fi%
 \else%
 \newcommand{\listofcomentarioref}{}%
 \fi%
@@ -385,9 +439,16 @@
 \refstepcounter{comentarioref}%
 \cw@hll{#3}{#1}%
 \cw@cwnote{#2}{#3}{\cwpleasecitemarginnote}%
+\if@cwmemoirdefense%
+\addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}#2}%
+\else%
 \addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}{#2}}%
+\fi%
 }%
-\setlength{\cftcomentariorefnumwidth}{2.5em}%
+\if@cwmemoirdefense%
+\else%
+\setlength{\cftcomentariorefnumwidth}{\cw@cftnumwidth}%
+\fi%
 \else%
 \newcommand{\cw@commentref}[3]{}%
 \fi%

@@ -80,7 +80,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{728}
+% \CheckSum{772}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -774,7 +774,7 @@
 %    environment & |cwdraft| &|rascunho|\\
 %    macro & |\cwnamedef| &|\cwautor|  \\
 %    macro & |\cwsubject| & |\cwassunto|\\
-%    macro & |\listofcomment| & |\listofcomentario|\\
+%    macro & |\listofcomments| & |\listofcomentario|\\
 %    macro & |\listofsubjects| & |\listofassunto|\\
 %    macro & |\listofcitationneeds| & |\listofcomentarioref|\\
 %    macro & |\todo| & |\todo| \\
@@ -967,7 +967,7 @@
 % can't refer to |chapter|, |section| or other counter
 % as optional argument
 %
-% This error is actually |memoir| fault, since it emulates
+% This error is actually |memoir| fault\pleasecite[memoir package], since it emulates
 % |tocloft| (and other packages). I can´t imagine why...
 %
 % Therefore, we will avoid using the command with option
@@ -978,12 +978,11 @@
 {% TRUE
 \newif\if@cwmemoirdefense\@cwmemoirdefensetrue%
 }%
-{%
+{% FALSE
 \newif\if@cwmemoirdefense\@cwmemoirdefensefalse%
 }%
 %
 %    \end{macrocode}
-%
 %
 % \subsection{Color related variables}
 %    \begin{macrocode}
@@ -1053,7 +1052,7 @@
 {}%
 %    \end{macrocode}
 % \subsection{ed inspired code}
-% This code, inspired in the |ed| package, makes the basic mechanism for
+% This code, inspired in the |ed| package\favorcitar[ed package], makes the basic mechanism for
 % inserting comments as footnotes with an observation in the margin.
 % As an adition to |ed|, it support colors and some text
 % before the superscript number in the text
@@ -1359,7 +1358,10 @@
 \newcommand{\listsubject}{\cwsubjtitle}%
 %% cria a lista, depende do pacoto tcloft
 \if@cwmemoirdefense%
-\newlistof{subject}{aaa}{\listsubject}
+\@ifundefined{chapter}%
+{\newlistentry[section]{subject}{aaa}{0}}
+{\newlistentry[chapter]{subject}{aaa}{0}}
+\newlistof{listofsubjects}{aaa}{\listsubject}
 \else%
 \@ifundefined{chapter}%
 {\newlistof[section]{subject}{aaa}{\listsubject}}%
@@ -1372,7 +1374,11 @@
 \sethlcolor{#1}%
 \hl{#2}%
 \par%
+\if@cwmemoirdefense%
+\addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
+\else%
 \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+\fi%
 }%
 %    \end{macrocode}
 % \end{macro}
@@ -1396,7 +1402,11 @@
     \refstepcounter{subject}%
     \sethlcolor{#1}%
     \cwmainemphasis{#2}%
+    \if@cwmemoirdefense%
+    \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
+    \else%
     \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+    \fi%
 }%
 %
 \if@cwmemoirdefense%
@@ -1419,7 +1429,10 @@
 \newcommand{\listcomentario}{\cwcommentstitle}%
 %% cria a lista
 \if@cwmemoirdefense%
-\newlistof{comentario}{ccc}{\listcomentario}%
+\@ifundefined{chapter}%
+{\newlistentry[section]{comentario}{ccc}{0}}
+{\newlistentry[chapter]{comentario}{ccc}{0}}
+\newlistof{listofcomentario}{ccc}{\listcomentario}%
 \else%
 \@ifundefined{chapter}
 {\newlistof[section]{comentario}{ccc}{\listcomentario}}
@@ -1433,11 +1446,19 @@
 \ifstrempty{#4}{%
 % rótulo texto cor indicador
 \cw@cwnote[#1]{#2}{#3}{Comentário}% faz a nota de rodapé do ed
+\if@cwmemoirdefense%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}#2}%
+\else%
 \addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#2}}%
+\fi%
 }%
 {%
 \cw@cwnote[#1]{#2}{#3}{#4}%
+\if@cwmemoirdefense%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}#4: #2}%
+\else%
 \addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#4: #2}}%
+\fi%
 }%
 }%
 %% comentador genérico, parte II
@@ -1517,7 +1538,10 @@
 \if@showcomentario%
 \newcommand{\listcomentarioref}{\cwcitationstitle}%
 \if@cwmemoirdefense%
-\newlistof{comentarioref}{ccr}{\listcomentarioref}
+\@ifundefined{chapter}%
+{\newlistentry[section]{comentarioref}{ccr}{0}}
+{\newlistentry[chapter]{comentarioref}{ccr}{0}}
+\newlistof{listofcomentarioref}{ccr}{\listcomentarioref}
 \else%
 \@ifundefined{chapter}%
 {\newlistof[section]{comentarioref}{ccr}{\listcomentarioref}}
@@ -1531,7 +1555,11 @@
 \refstepcounter{comentarioref}%
 \cw@hll{#3}{#1}%
 \cw@cwnote{#2}{#3}{\cwpleasecitemarginnote}%
+\if@cwmemoirdefense%
+\addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}#2}%
+\else%
 \addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}{#2}}%
+\fi%
 }%
 \if@cwmemoirdefense%
 \else%
