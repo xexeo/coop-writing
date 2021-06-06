@@ -20,8 +20,8 @@
 %% and version 1.3 or later is part of all distributions of LaTeX version
 %% 2005/12/01 or later.
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.2.1}
-\ProvidesPackage{coop-writing}[2021/05/18 \cw@version dtx version of coop-writing]
+\def\cw@version{v1.2.2}
+\ProvidesPackage{coop-writing}[2021/06/06 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
 \newcommand{\coopwritingversion}{\cw@version}%
 \newcommand{\printcoopwritingversion}{coop-writing v. \coopwritingversion}%
@@ -120,12 +120,20 @@
     \message{Babel not detected!}%
 }%
 \ifednotebookmarks\RequirePackage{hyperref}\fi
+\@ifclassloaded{memoir}%
+{% TRUE
+\newif\if@cwmemoirdefense\@cwmemoirdefensetrue%
+}%
+{% FALSE
+\newif\if@cwmemoirdefense\@cwmemoirdefensefalse%
+}%
 \newcommand{\cor@prof}{red}%
 \newcommand{\cor@cand}{blue}%
 \newcommand{\cor@subject}{green}%
 \newcommand{\cor@main}{yellow}%
 \newcommand{\cor@citar}{purple}%
 \newcommand{\cor@hldraft}{yellow}%
+\newcommand{\cw@cftnumwidth}{20pt}
 \def\cwdrafttitle{Standard Draft}%
 \def\cwcommentstitle{Standard List of Comments}%
 \def\cwsubjtitle{Standard List of Subjects}%
@@ -135,9 +143,19 @@
 \def\cwpleasecitemarginnote{Cite}%
 \@ifpackageloaded{babel}%
 {%
+    \IfLanguageName{brazil}%
+    {%
+    \def\cwdrafttitle{Rascunho}%
+    \def\cwcommentstitle{Lista de Comentários}%
+    \def\cwsubjtitle{Lista de Assuntos}%
+    \def\cwcitationstitle{Necessidades de Citação}%
+    \def\cwpleasecitetext{Favor citar}%
+    \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+    \def\cwpleasecitemarginnote{Citar}%
+    }{}%
     \IfLanguageName{brazilian}%
     {%
-        \def\cwdrafttitle{draft}%
+        \def\cwdrafttitle{Rascunho}%
         \def\cwcommentstitle{Lista de Comentários}%
         \def\cwsubjtitle{Lista de Assuntos}%
         \def\cwcitationstitle{Necessidades de Citação}%
@@ -147,7 +165,7 @@
     }{}%
     \IfLanguageName{portuguese}%
     {%
-        \def\cwdrafttitle{draft}%
+        \def\cwdrafttitle{Rascunho}%
         \def\cwcommentstitle{Lista de Comentários}%
         \def\cwsubjtitle{Lista de Assuntos}%
         \def\cwcitationstitle{Necessidades de Citação}%
@@ -269,23 +287,42 @@
 \if@showsubjects
 \newcommand{\listsubject}{\cwsubjtitle}%
 %% cria a lista, depende do pacoto tcloft
-\@ifundefined{chapter}
-{\newlistof[section]{subject}{aaa}{\listsubject}}
+\if@cwmemoirdefense%
+\@ifundefined{chapter}%
+{\newlistentry[section]{subject}{aaa}{0}}
+{\newlistentry[chapter]{subject}{aaa}{0}}
+\newlistof{listofsubject}{aaa}{\listsubject}
+\else%
+\@ifundefined{chapter}%
+{\newlistof[section]{subject}{aaa}{\listsubject}}%
 {\newlistof[chapter]{subject}{aaa}{\listsubject}}%
+\fi%
 \newcommand{\cwsubject}[2][\cor@subject]{%
 \refstepcounter{subject}%
 \sethlcolor{#1}%
 \hl{#2}%
 \par%
+\if@cwmemoirdefense%
+\addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
+\else%
 \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+\fi%
 }%
 \newcommand{\cwmainemphasis}[1]{\hl{#1}}
 \newcommand{\cwmain}[2][\cor@main]{%
     \refstepcounter{subject}%
     \sethlcolor{#1}%
     \cwmainemphasis{#2}%
+    \if@cwmemoirdefense%
+    \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
+    \else%
     \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+    \fi%
 }%
+\if@cwmemoirdefense%
+\else%
+\setlength{\cftsubjectnumwidth}{\cw@cftnumwidth}%
+\fi%
 \else%
 \newcommand{\listofsubject}{}%
 \newcommand{\cwsubject}[2][]{}%
@@ -295,9 +332,16 @@
 %% Resolve a lista de comentários
 \newcommand{\listcomentario}{\cwcommentstitle}%
 %% cria a lista
+\if@cwmemoirdefense%
+\@ifundefined{chapter}%
+{\newlistentry[section]{comentario}{ccc}{0}}
+{\newlistentry[chapter]{comentario}{ccc}{0}}
+\newlistof{listofcomentario}{ccc}{\listcomentario}%
+\else%
 \@ifundefined{chapter}
 {\newlistof[section]{comentario}{ccc}{\listcomentario}}
 {\newlistof[chapter]{comentario}{ccc}{\listcomentario}}%%
+\fi%
 %%
 %% Comentador genérico - parte I
 %% faz o cwnote e soma na lista
@@ -305,11 +349,19 @@
 \newcommand{\cw@comentar}[4][]{%
 \ifstrempty{#4}{%
 \cw@cwnote[#1]{#2}{#3}{Comentário}% faz a nota de rodapé do ed
+\if@cwmemoirdefense%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}#2}%
+\else%
 \addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#2}}%
+\fi%
 }%
 {%
 \cw@cwnote[#1]{#2}{#3}{#4}%
+\if@cwmemoirdefense%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}#4: #2}%
+\else%
 \addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#4: #2}}%
+\fi%
 }%
 }%
 %% comentador genérico, parte II
@@ -344,7 +396,10 @@
 \cw@comentar[#5]{\sout{#2}}{#3}{#4}%
 }%
 %%
-\setlength{\cftcomentarionumwidth}{2.5em}
+\if@cwmemoirdefense%
+\else%
+\setlength{\cftcomentarionumwidth}{\cw@cftnumwidth}%
+\fi%
 \else
 \newcommand{\cw@comentar}[4][]{}%
 \newcommand{\listofcomentario}{}%
@@ -376,7 +431,16 @@
 \fi%
 \if@showcomentario%
 \newcommand{\listcomentarioref}{\cwcitationstitle}%
-\@ifundefined{chapter}{ \newlistof[section]{comentarioref}{ccr}{\listcomentarioref}}{\newlistof[chapter]{comentarioref}{ccr}{\listcomentarioref}}%
+\if@cwmemoirdefense%
+\@ifundefined{chapter}%
+{\newlistentry[section]{comentarioref}{ccr}{0}}
+{\newlistentry[chapter]{comentarioref}{ccr}{0}}
+\newlistof{listofcomentarioref}{ccr}{\listcomentarioref}
+\else%
+\@ifundefined{chapter}%
+{\newlistof[section]{comentarioref}{ccr}{\listcomentarioref}}
+{\newlistof[chapter]{comentarioref}{ccr}{\listcomentarioref}}%
+\fi%
 \else%
 \newcommand{\listofcomentarioref}{}%
 \fi%
@@ -385,17 +449,25 @@
 \refstepcounter{comentarioref}%
 \cw@hll{#3}{#1}%
 \cw@cwnote{#2}{#3}{\cwpleasecitemarginnote}%
+\if@cwmemoirdefense%
+\addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}#2}%
+\else%
 \addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}{#2}}%
+\fi%
 }%
-\setlength{\cftcomentariorefnumwidth}{2.5em}%
+\if@cwmemoirdefense%
+\else%
+\setlength{\cftcomentariorefnumwidth}{\cw@cftnumwidth}%
+\fi%
 \else%
 \newcommand{\cw@commentref}[3]{}%
 \fi%
 \if@showcomentario
-\newcommand{\favorcitar}[1][\cwpleasecitemessage]{%
+
+\newcommand{\pleasecite}[1][\cwpleasecitemessage]{%
 \cw@commentref{\cwpleasecitetext\  #1}{\cor@citar}}%
 \else%
-\newcommand{\favorcitar}[1][]{}%
+\newcommand{\pleasecite}[1][]{}%
 \fi%
 \if@showdraft%
 \NewEnviron{cwdraft}[1][]{%
@@ -412,7 +484,7 @@
 \fi%
 \newcommand{\cwsetdraftcolor}[1]{\def\cor@hldraft{#1}}
 %% nome do autor, cor, identificador
-\newcommand{\cwautor}[3]{%
+\newcommand{\cwnamedef}[3]{%
 %% cwcomment - texto a hl, cor, comentário, indicador de pessoa
 \expandafter\newcommand\csname#1\endcsname[2][]%
 {%
@@ -437,10 +509,10 @@
 \expandafter\newcommand\csname#1swap\endcsname[3][]%
 {\cw@gensug[##1]{#2}{#3}{##2}{#2}{##3}{#2}}%
 }%
-\cwautor{cwauthor}{red}{Author}
-\cwautor{cweditor}{blue}{Editor}
+\cwnamedef{cwauthor}{red}{Author}
+\cwnamedef{cweditor}{blue}{Editor}
 \newcommand{\cw@todobackgroundcolor}{orange}%
-\cwautor{cw@todoauthor}{orange}{To do}%
+\cwnamedef{cw@todoauthor}{orange}{To do}%
 \if@showtodo%
 \newcommand{\todo}[2][comentar]{%
 \IfEq{inline}{#1}%
@@ -459,8 +531,8 @@
 \newcommand{\cwdefinetodocolor}[1]{\renewcommand{\cw@todobackgroundcolor}{#1}}%
 \let\rascunho=\cwdraft%
 \let\cwassunto=\cwsubject%
-\let\pleasecite=\favorcitar%
-\let\cwnamedef=\cwautor%
+\let\favorcitar=\pleasecite%
+\let\cwautor=\cwnamedef%
 \let\listofcomments=\listofcomentario%
 \let\listofcitationneeds=\listofcomentarioref%
 \let\listofassunto=\listofsubject%
