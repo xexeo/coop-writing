@@ -120,13 +120,12 @@
 \RequirePackage[titles]{tocloft}%
 }%
 {%
-\RequirePackage{tocloft}%
-}%
 \if@cwtoclofttitles%
-       \RequirePackage[titles]{tocloft}%
+\RequirePackage[titles]{tocloft}%
 \else%
-    \RequirePackage{tocloft}%
+\RequirePackage{tocloft}%
 \fi%
+}%
 \@ifpackageloaded{babel}%
 {%  \message{Babel Loaded!}%
     \RequirePackage{iflang}%

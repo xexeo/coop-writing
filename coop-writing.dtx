@@ -80,7 +80,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{799}
+% \CheckSum{798}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -1018,13 +1018,12 @@
 \RequirePackage[titles]{tocloft}%
 }%
 {%
-\RequirePackage{tocloft}%
-}%
 \if@cwtoclofttitles%
-       \RequirePackage[titles]{tocloft}%
+\RequirePackage[titles]{tocloft}%
 \else%
-    \RequirePackage{tocloft}%
+\RequirePackage{tocloft}%
 \fi%
+}%
 %    \end{macrocode}
 % Checking if babel is loaded, use iflang
 %    \begin{macrocode}
