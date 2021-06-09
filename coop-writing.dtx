@@ -17,7 +17,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.2.2}
+%<package>\def\cw@version{v1.2.3}
 %<package>\ProvidesPackage{coop-writing}[2021/06/06 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
@@ -80,7 +80,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{787}
+% \CheckSum{799}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -105,6 +105,7 @@
 % \changes{v1.2.0}{2021/05/30}{New command cwmain and configuration for it}
 % \changes{v1.2.1}{2021/06/05}{Fixing problems with footnote mark color and also recovering \LaTeX\ command (at-sign)makefnmark}
 % \changes{v1.2.2}{2021/06/06}{Memoir class, used by abnetex2, used by my department,  ``emulates'' tocloft, but not correctly. Many IFs were necessary}
+% \changes{v1.2.3}{2021/06/09}{CoppeTex class asks for LoF and etc... to appear in ToC. This is an option in tocloft, but Book does not behave like that}
 %\maketitle
 %
 % \tableofcontents
@@ -209,6 +210,7 @@
 % \begin{itemize}
 %    \item |nopdfbookmarks| will avoid adding bookmarks in the |pdf| file for all comments. The default behavior of |coop-writing| is adding them.
 %    them.
+%   \item |toclofttitles| toggles the option |titles| in |tocloft|, that avoid the redefinition of |\listoffigures| and |\listoftables|. This fix the bug with |CoppeTeX| package, identified as coppe.
 %\end{itemize}
 %
 % \subsection{General behavior}
@@ -833,6 +835,27 @@
 % \end{itemize}
 %
 %
+% \section{Interaction with other packages}
+%
+% This packages uses other packages, and this can cause
+% interaction with them and even other packages. \LaTeX\  is
+% a harsh mistress.
+%
+% |tocloft| seems to be the main agressor and it is a candidate
+% to be removed, since its function in the code is mostly
+% secondary, generate lists of the comments, etc.
+%
+% |tocloft| interacts with |memoir|. At this point, I
+% blame |memoir|, since it \textbf{emulates} |tocloft|,
+% but change syntax and behavior. This is a crazy idea
+% for me, and show the need for namespaces in \LaTeX.
+%
+% |tocloft| also interacts with |coppe|, the class for the
+% CoppeTeX package, which I am one of the mainteiners,
+% both redefine LoF and LoT. More IFs, that detect
+% coppe and turn on |titles| option in |tocloft|, and
+% a new option |toclofttitles| to solve the general problem
+% of |tocloft| changing LoF and LoT definitions.
 %
 % \StopEventually{End of Code}
 %
@@ -861,7 +884,7 @@
 % \subsection{Option Processing}
 % \subsubsection{Creating Options Variables used in ed}
 % Some come from ed code and are being cleaned
-%
+% \label{code:option}
 %    \begin{macrocode}
 \newif\ifshowednotes\showednotestrue%
 \newif\ifmargins\marginstrue%
@@ -878,6 +901,7 @@
 \newif\if@modosubmeter\@modosubmeterfalse%
 \newif\if@modopublicar\@modopublicarfalse%
 \newif\if@modopublicaraceitando\@modopublicaraceitandofalse%
+\newif\if@cwtoclofttitles\@cwtoclofttitlesfalse
 %    \end{macrocode}
 % \subsubsection{Portuguese Options}
 %    \begin{macrocode}
@@ -917,6 +941,10 @@
     \@modopublicartrue
     \@modopublicaraceitandotrue
 }
+%    \end{macrocode}
+% New option to titles in tocloft
+%    \begin{macrocode}
+\DeclareOption{toclofttitles}{\@cwtoclofttitlestrue}
 \ProcessOptions\relax
 %    \end{macrocode}
 % \subsubsection{Fixing the Super Options}
@@ -966,7 +994,6 @@
 \RequirePackage{xcolor}
 \RequirePackage{soulutf8}
 \RequirePackage[normalem]{ulem}
-\RequirePackage{tocloft}
 \RequirePackage{etoolbox}
 \RequirePackage{environ}
 \RequirePackage{xstring}
@@ -979,6 +1006,24 @@
 \ifshowednotes%
 \else%
 \RequirePackage{verbatim}%
+\fi%
+%    \end{macrocode}
+% \subsection{CoppeTeX problems}
+% tocloft and CoppeTeX have different assumptions whether
+% LoF, LoT and etc... appears in ToC. In default Book, they
+% do not appear
+%    \begin{macrocode}
+\@ifclassloaded{coppe}%
+{%
+\RequirePackage[titles]{tocloft}%
+}%
+{%
+\RequirePackage{tocloft}%
+}%
+\if@cwtoclofttitles%
+       \RequirePackage[titles]{tocloft}%
+\else%
+    \RequirePackage{tocloft}%
 \fi%
 %    \end{macrocode}
 % Checking if babel is loaded, use iflang
