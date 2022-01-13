@@ -1,11 +1,9 @@
 % \iffalse meta-comment
 %
-% Copyright (C) 2021 by Geraldo Xexéo
+% Copyright (C) 2022 by Geraldo Xexéo
 %
 % This file may be distributed and/or modified under the
-% conditions of the LaTeX Project Public License, either
-% version 1.3 of this license or (at your option) any later
-% version. The latest version of this license is in:
+% conditions of the MIT License
 %
 % http://www.latex-project.org/lppl.txt
 %
@@ -17,8 +15,8 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.2.3}
-%<package>\ProvidesPackage{coop-writing}[2021/06/06 \cw@version dtx version of coop-writing]
+%<package>\def\cw@version{v1.2.4}
+%<package>\ProvidesPackage{coop-writing}[2022/01/13 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
@@ -106,6 +104,7 @@
 % \changes{v1.2.1}{2021/06/05}{Fixing problems with footnote mark color and also recovering \LaTeX\ command (at-sign)makefnmark}
 % \changes{v1.2.2}{2021/06/06}{Memoir class, used by abnetex2, used by my department,  ``emulates'' tocloft, but not correctly. Many IFs were necessary}
 % \changes{v1.2.3}{2021/06/09}{CoppeTex class asks for LoF and etc... to appear in ToC. This is an option in tocloft, but Book does not behave like that}
+% \changes{v1.2.4}{2022/01/13}{Corrections for CTAN}
 %\maketitle
 %
 % \tableofcontents
@@ -114,26 +113,26 @@
 %
 % This package supports editorial comments and gives some extra support for writing papers, or any document that involves more than one author or editor.
 %
-% Usually, a final version of a  document would be printed with the |publish| option turned one, and no editorial comment would appear.
+% Usually, a final version of a  document would be printed with the |publish| option turned on, and no editorial comments would appear.
 % In this document \xexeo[the reader will see some uses]{This is an exemple of using this package to make a comment with highlighted text} of the package, since it is distributted with the |editing| option turned on.
-% This is done because I must provide the examples of use. A version using |publish| is available to be used as a comparision.
+% This is done to provide the examples of use.
 %
 %
 % \subsection{A bit of context}
 %
 % |coop-writing| was written to support my way of working, and received
-% suggestions from my students. The starting goal was to build only a front-end to put together other packages, but with time, and the difficulty to make differente packages with commands that have the same name work together, it grow in scope.
+% suggestions from my students. The starting goal was to build only a front-end to put together other packages, mostly |ed| and |todonotes|, but with time, and the difficulty to make different packages with commands that have the same name to work together, it grow in scope.
 %
 % It picks ideas from different packages, such as |ed|\citep{ed}, |color-edits|\citep{color-edits}, and |todonotes|\citep{todonotes}, and from my practice writing papers and supervising thesis.
 % As it is my first package, \TeX\  and \LaTeX\  programming is sometimes naive. However, due to the large amount of available code, and sites as StackExchange, this is not a rule.
 %
 % \subsection{The Brazilian origin}
 %
-% Originally, |coop-writing| was written in Portuguese. The Portuguese commands are still available.
+% Originally, |coop-writing| was written in Portuguese. The Portuguese commands are still available. Typos and others errors can appear in this text, please use GitHub issues to warn me any errors that you find.
 %
 %\section{How to use coop-writing}
 %
-% |coop-writing| is available as open source at \url{https://github.com/xexeo/coop-writing}. The stable distribution is in the folder |dist|, while the lastest, and unstable, will be in the root folder.
+% |coop-writing| is available as open source at \url{https://github.com/xexeo/coop-writing}, using a MIT License. The stable distribution is in the folder |dist|, while the lastest, and unstable, will be in the root folder. A CTAN folder now contains the current submitted CTAN distribution.
 %
 % The only file you really need, besides this manual, is
 % |coop-writing.sty|. This should be in your \LaTeX\   path, such as in the same folder that your main |.tex| file.
@@ -149,12 +148,15 @@
 % After that, you can use |\cwauthor| or |\cweditor| to make commentaries, but you must
 % look at the many options available that are described in section \ref{sec:edcom}. You will probably want to define authors as described in subsection \ref{sec:create}.
 %
-% You can make suggestions, complain about bugs, and request features using GitHub's ``Issues'' feature, in \url{https://github.com/xexeo/coop-writing/issues} (you must be signed in).
+%\subsection{How to complain or make suggestions}
+%
+% You can make suggestions, complain about bugs, and request features using GitHub's ``Issues'' feature, in
+% \url{https://github.com/xexeo/coop-writing/issues}.
 %
 % \subsection{Using from Overleaf}
 %
 % The best way to use |coop-writing| inside Overleaf is to link
-% the distributed style file through its URL. To do that, inside your project, select first ``Upload''. An ``Add files'' window will appear, then select ``From Externa URL'' and enter \url{https://raw.githubusercontent.com/xexeo/coop-writing/main/dist/coop-writing.sty} as ``URL to fetch the file from'' and ``coop-writing'' as ``File Name in This Project'', as in Figure \ref{fig:overleaffileurl}.
+% the distributed style file through its URL. To do that, inside your project, select first ``Upload''. An ``Add files'' window will appear, then select ``From External URL'' and enter \url{https://raw.githubusercontent.com/xexeo/coop-writing/main/dist/coop-writing.sty} as ``URL to fetch the file from'' and ``coop-writing'' as ``File Name in This Project'', as in Figure \ref{fig:overleaffileurl}.
 %
 %\begin{figure}[tbh]
 %    \centering
@@ -169,19 +171,19 @@
 %
 % Using the package allows the use of all macros and environments described in this manual, however, \textbf{if the options are not turned on, there will be no effect on the generated |pdf|}, since, by default, all options are false.
 %
-% There are three types of options. The first type enables the visualization of the result of specific macros or environmnets, such as
+% There are three types of options. The first type enables the visualization of the result of specific macros or environments, such as
 % the |cwdraft| environment. They are named \textit{command oriented options}. You can use many of them in the same time.
 %
-% The second type  represent a state
-% of the text, which can be editing, submit, or publish, and some minor variations. They are named \textit{state oriented options}.
+% The second type  represents a state
+% of the text, which can be |editing|, |submit|, or |publish|, and some minor variations. They are named \textit{state oriented options}.
 %
 % The third type control other behaviors. They are named
 % \textit{behavior oriented options}
 %
 %
-% If they appear together, state oriented commands have precedence over the others. However, the user should avoid mixing command and state oriented options. Also, most of the time, you should \textbf{use only one of the state oriented options.}
+% If they appear together, state oriented commands have precedence over the others. However, the user should avoid mixing command and state oriented options. Also, you should \textbf{use only one of the state oriented options.}
 %
-% It should be clear that the options have no impact on the availability of the macros and enviroments, they will be there for you to use, but the deeply affect their behavior. A macro that is very complex, such as |\cwauthor|, if one of options |comments| or |editing| is selected, is replaced by a simple version that do almost nothing.
+% It should be clear that the options have no impact on the availability of the macros and enviroments, they will be there for you to use, but the deeply affect their behavior. A macro that is very complex, such as |\cwauthor|, if one of the options |comments| or |editing| is selected, is replaced by a simple version that do almost nothing.
 %
 % \subsection{Command oriented options}
 % \begin{itemize}
@@ -195,8 +197,8 @@
 %
 %\subsection{State oriented options}
 % \begin{itemize}
-% \item |submit|, \DescribeMacro{submit} enables the submit state. anonymization is on, subjects, comments, drafts and suggestions are off
-% \item |noanonymize|, \DescribeMacro{noanonymize} disables anonymizations even in |submit| and |editing| options
+% \item |submit|, \DescribeMacro{submit} enables the |submit| state. |anonymize| is on, |subjects|, |comments|, |drafts| and |suggestions| are off.
+% \item |noanonymize|, \DescribeMacro{noanonymize} disables |anonymize| even in |submit| and |editing| options.
 % \item |publish|, \DescribeMacro{publish} disables all command oriented options, ignore suggestions.
 % \item |acceptingpublish|, \DescribeMacro{acceptingpublish}  disables all command oriented options, accept suggestions
 % \item |editing|, \DescribeMacro{editing}  enables |subjects|, |comments|, |drafts|, |anonymize|, and |suggestions|.
@@ -209,14 +211,14 @@
 %
 % \begin{itemize}
 %    \item |nopdfbookmarks| will avoid adding bookmarks in the |pdf| file for all comments. The default behavior of |coop-writing| is adding them.
-%    them.
-%   \item |toclofttitles| toggles the option |titles| in |tocloft|, that avoid the redefinition of |\listoffigures| and |\listoftables|. This fix the bug with |CoppeTeX| package, identified as coppe.
+%
+%   \item |toclofttitles| toggles the option |titles| in |tocloft|, that avoid the redefinition of |\listoffigures| and |\listoftables|. This fix the bug with |CoppeTeX| package, identified as |coppe|.
 %\end{itemize}
 %
 % \subsection{General behavior}
 %
 % The general behavior of this package is to provide different
-% ways of marking your text, for example with comments or to do notes, that can be totally supressed when desired. Mostly, this can be easilly done using one the the 3 main option states: |editing|, |submit|, and |publish|.
+% ways of marking your text, for example, with comments or to do notes, which can be totally supressed when desired. Mostly, this can be easilly done using one the the 3 main option states: |editing|, |submit|, and |publish|.
 %
 %
 % Users should use the |editing| state most of the time. In this state, all
@@ -224,13 +226,14 @@
 %
 % When submitting, the |submit| state will provide
 % a clean article, without any markings. Most of the times the article should be anonymized,
-% but if this is not enforced, it is possible to use the options |submit| and |noanonymize| together. |publish| will never anonymize.
+% but if this is not enforced by a conference or journal, it is possible to use the options |submit| and |noanonymize| together. |publish| will never anonymize.
 %
 % The goal is to make the |submit| and |publish| documents states minimally
 % invasive, to avoid any clash with publishers' styles. A clash will be considered a bug, and should be reported to the authors.
+% Most of the time, using these options will simply create dummy commands.
 %
-% If you use comments, there will be a lot of ``Marginpar moved'' warnings.
-% This is normal behavior, caused by the margin notes.
+% If you use |comments|, there will be a lot of ``Marginpar moved'' warnings.
+% This is normal behavior, caused by the margin notes. It will not happen when |submit| or |publish| is active.
 %
 %
 %\section{Version}
@@ -265,7 +268,7 @@
 %
 % The idea is that not only users can make editorial comments on the
 % text they are writing, but they can also establish a dialog through those comments.
-% I this package an editorial comment has 3 visual parts: an intervention in the
+% In this package an editorial comment has 3 visual parts: an intervention in the
 % text, a margin note indicating this intervention, and a footnote explaining it\xexeo{This is the simplest form of an editorial note.}. Figure \ref{fig:editorialnotes} illustrate this behavior.
 %
 %
@@ -283,14 +286,14 @@
 % \DescribeMacro{\cwnamedef}
 % This macro creates a series of commands based on a desired base command name. The command name is, usually, the name of the author, of the editor, or a function in the work being done.
 %
-%  It must be given in the preamble of the \LaTeX document, i.e., before the |\begin{document}| declaration. It is usually done just after the |\usepackage{coop-writing}| line.
+%  This macro must be used in the preamble of the \LaTeX document, i.e., before the |\begin{document}| declaration. It is usually done just after the |\usepackage{coop-writing}| line.
 % Its syntax is:
 %
 %|\cwnamedef| \marg{name}\marg{color}\marg{author-name}
 %
 %
-% Where \meta{name} will be the base command name, which generates different commands by receiving sufixes, \meta{color} is the color to be used by all
-% comments and suggestions made by this author, and \meta{author-name} is the string to be used to represent the author.
+% Where \meta{name} will be the base command name, which generates different commands, by receiving sufixes, \meta{color} is the color to be used by all
+% comments and suggestions made by this author, and \meta{author-name} is the string to be used to represent the collaborator.
 %
 % As an example, I usually declare myself as:
 %
@@ -305,7 +308,7 @@
 %
 %
 % \DescribeMacro{\cwauthor}\DescribeMacro{\cweditor}
-% Two authors are pre-defined in the style, |cwauthor| and |cweditor|, to represent an author and an editor.
+% Two authors are pre-defined in the style, |cwauthor| and |cweditor|, to represent an author and an editor. They can be freely used.
 %
 %\subsection{Available commands}
 %
@@ -322,7 +325,7 @@
 %
 % |\cweditor| \oarg{selection}\marg{footnote comment}
 %
-% These are the simplest commands, and will make a comment in the form of a identified footnote\cwauthor{Simplest footnote comment}. They can also be used to \cweditor[highlight some text]{Comment with highlighting}.
+% These are the simplest commands, and will make a comment in the form of a identified footnote\cwauthor{Simplest footnote comment}. The optional \meta{selection} parameter allows to \cweditor[highlight some text]{Comment with highlighting}.
 %
 %\subsubsection{Labeled Comments}
 %
@@ -336,8 +339,8 @@
 % |\cweditorr| \oarg{selection}\marg{footnote comment}\marg{label}
 %
 % This command will make a comment in the form of a labeled footnote\cwauthorr{labeled footnote comment}{FirstLabel}. It can also be used to \cwauthorr[highlight some text]{labeled
-% comment with highlighting}{OtherLabel}. The label must be unique, and usually a single word, since it is used as a \LaTeX\  |\label| too. You can refer to this command using |\ref{cw:\meta{label}}|. For example, the comment \ref{cw:FirstLabel} would
-% be referenced as |\ref{FirstLabel}|.
+% comment with highlighting}{OtherLabel}. The label must be unique, and usually a single word, since it is used as a \LaTeX\  |\label| too. You can refer to this command using |\ref{cw:|\meta{label}|}|. For example, the comment \ref{cw:FirstLabel} would
+% be referenced as |\ref{cw:FirstLabel}|, as in here \autoref{cw:FirstLabel}.
 %
 %
 %\subsection{Striked-throught comments}
@@ -478,8 +481,8 @@
 %
 % \cwsetcommwarn{}
 %
-% It should be clear that |coop-writing| does not provide any font. If
-% the user wants to use one font, like |marvosym|, he or she must import it with |\usepackage|.
+% It should be clear that |coop-writing| does not provide any font for these symbols. If
+% users want to use a certain font, like |marvosym|, they  import it with |\usepackage|.
 %
 %\subsection{A tip for using comments}
 %
@@ -561,7 +564,7 @@
 %
 % This environment is evolving, looking for a good way to signal the draft status, due to the different interactions with the packages it uses and user's packages.
 % It has one optional parameter that names the draft. Its default value is ``Draft''
-% If the |draft| option is not enabled, the text inside the title and the text inside the environment will not appear. The user should remember that some options will automatically turn on the |draft| option, such as the option |edicao|.
+% If the |draft| option is not enabled, the text inside the title and the text inside the environment will not appear. The user should remember that some options will automatically turn on the |draft| option, such as the option |editing|.
 %
 % The color of the title highlight can be changed with
 %% \DescribeMacro{\cssetdraftcolor}
@@ -1079,7 +1082,7 @@
 % We can detect if babel is enable and allow for some languages.
 % If you want to use another language, you must set new values
 % for the command |\cwdrafttitle|.
-% I really thought that it was possible to do something smarter with babel, for example using |\setlocalecaption|, but no attempt worked out was I wanted.
+% I really thought that it was possible to do something smarter with babel, for example using |\setlocalecaption|, but no attempt worked out as I wanted.
 %
 % There are some packages, as |translator| that can be useful
 % but up to now this seems to be the easiest way of doing it.
