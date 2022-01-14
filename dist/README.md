@@ -1,4 +1,4 @@
-# coop-writing LaTeX package v. 1.2.3
+# coop-writing LaTeX package v. 1.2.4
 
 Copyright (c) 2022 Geraldo Xexéo
 
