@@ -115,11 +115,13 @@
 %
 % \subsection{A bit of context}
 %
-% |coop-writing| was written to support my way of working, and received
-% suggestions from my students. The starting goal was to build only a front-end to put together other packages, mostly |ed| and |todonotes|, but with time, and the difficulty to make different packages with commands that have the same name to work together, it grow in scope.
+% I wrote|coop-writing| to support my way of writing papers in colaboration with my students, and also to comment on  thesis and dissertations I supervise. It received many
+% suggestions from my students.
 %
-% It picks ideas from different packages, such as |ed|\citep{ed}, |color-edits|\citep{color-edits}, and |todonotes|\citep{todonotes}, and from my practice writing papers and supervising thesis.
-% As it is my first package, \TeX\  and \LaTeX\  programming is sometimes naive. However, due to the large amount of available code, and sites as StackExchange, this is not a rule.
+%The starting goal was to build a front-end that would put together other packages, with the best behavior of each package, mostly |ed| and |todonotes|, but with time, and the difficulty to make different packages with commands that have the same name to coexist, it grew in scope.
+%
+% It picks ideas from different packages, such as |ed|\citep{ed}, |color-edits|\citep{color-edits}, and |todonotes|\citep{todonotes}.
+% As it is my first package, \TeX\  and \LaTeX\,  programming is sometimes naive. However, due to the large amount of available code, and sites as StackExchange, this is not a rule.
 %
 % \subsection{The Brazilian origin}
 %
@@ -132,7 +134,7 @@
 % The only file you really need, besides this manual, is
 % |coop-writing.sty|. This should be in your \LaTeX\   path, such as in the same folder that your main |.tex| file.
 %
-% If you are new to \LaTeX, just put one of these 3 lines in the preamble part of you document, i.e., before |\begin{document}|:
+% If you are new to \LaTeX, just put \textbf{one} of these 3 lines in the preamble part of you document, i.e., before |\begin{document}|:
 %
 % |\usepackage[editing]{coop-writing}|
 %
@@ -140,7 +142,7 @@
 %
 % |\usepackage[publish]{coop-writing}|
 %
-% After that, you can use |\cwauthor| or |\cweditor| to make commentaries, but you must
+% After that, you can use |\cwauthor| or |\cweditor| to make commentaries, but you should
 % look at the many options available that are described in section \ref{sec:edcom}. You will probably want to define authors as described in subsection \ref{sec:create}.
 %
 %\subsection{How to complain or make suggestions}
@@ -171,6 +173,7 @@
 %
 % The second type  represents a state
 % of the text, which can be |editing|, |submit|, or |publish|, and some minor variations. They are named \textit{state oriented options}.
+% They turn on and off different commands, according to the need described by the state.
 %
 % The third type control other behaviors. They are named
 % \textit{behavior oriented options}
@@ -261,7 +264,7 @@
 %
 % This is the main reason of this package.
 %
-% The idea is that not only users can make editorial comments on the
+% The idea is that  users not only can make editorial comments on the
 % text they are writing, but they can also establish a dialog through those comments.
 % In this package an editorial comment has 3 visual parts: an intervention in the
 % text, a margin note indicating this intervention, and a footnote explaining it\xexeo{This is the simplest form of an editorial note.}. Figure \ref{fig:editorialnotes} illustrate this behavior.
@@ -833,7 +836,12 @@
 % \end{itemize}
 %
 %
+%\section{Useful packages that work together with coop-writing}
+%
+% |lineno| is useful in editing mode, and works together with |coop-writing|, as our tests show.
+%
 % \section{Interaction with other packages}
+%
 %
 % This packages uses other packages, and this can cause
 % interaction with them and even other packages. \LaTeX\  is
