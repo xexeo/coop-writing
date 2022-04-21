@@ -10,8 +10,8 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.2.4}
-%<package>\ProvidesPackage{coop-writing}[2022/01/13 \cw@version dtx version of coop-writing]
+%<package>\def\cw@version{v1.3}
+%<package>\ProvidesPackage{coop-writing}[2022/04/21 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
@@ -73,7 +73,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{798}
+% \CheckSum{807}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -100,6 +100,7 @@
 % \changes{v1.2.2}{2021/06/06}{Memoir class, used by abnetex2, used by my department,  ``emulates'' tocloft, but not correctly. Many IFs were necessary}
 % \changes{v1.2.3}{2021/06/09}{CoppeTex class asks for LoF and etc... to appear in ToC. This is an option in tocloft, but Book does not behave like that}
 % \changes{v1.2.4}{2022/01/13}{Corrections for CTAN}
+% \changes{v1.3}{2022/04/21}{New macro cwblind}
 %\maketitle
 %
 % \tableofcontents
@@ -199,7 +200,7 @@
 % \item |noanonymize|, \DescribeMacro{noanonymize} disables |anonymize| even in |submit| and |editing| options.
 % \item |publish|, \DescribeMacro{publish} disables all command oriented options, ignore suggestions.
 % \item |acceptingpublish|, \DescribeMacro{acceptingpublish}  disables all command oriented options, accept suggestions
-% \item |editing|, \DescribeMacro{editing}  enables |subjects|, |comments|, |drafts|, |anonymize|, and |suggestions|.
+% \item |editing|, \DescribeMacro{editing}  enables |subjects|, |comments|, |drafts|, and |suggestions|; since version 1.3 it disables |anonymize|.
 % \end{itemize}
 %
 %\subsection{Behavior oriented options}
@@ -338,7 +339,7 @@
 %
 % This command will make a comment in the form of a labeled footnote\cwauthorr{labeled footnote comment}{FirstLabel}. It can also be used to \cwauthorr[highlight some text]{labeled
 % comment with highlighting}{OtherLabel}. The label must be unique, and usually a single word, since it is used as a \LaTeX\  |\label| too. You can refer to this command using |\ref{cw:|\meta{label}|}|. For example, the comment \ref{cw:FirstLabel} would
-% be referenced as |\ref{cw:FirstLabel}|, as in here \autoref{cw:FirstLabel}.
+% be referenced as |\ref{cw:FirstLabel}|, as in here Comment \ref{cw:FirstLabel}.
 %
 %
 %\subsection{Striked-throught comments}
@@ -506,13 +507,14 @@
 % names and references by anonymous names and references.
 % It will, by default, be enable only in the |submit| option
 %
-% There are 4 anonymization commands:
+% There are 5 anonymization commands:
 %
 % \begin{itemize}
 %   \item |\cwanon|\marg{text} \DescribeMacro{\cwanon}
 %   \item |\cwanoncite|\oarg{cite-compatible-oarg}\marg{cite-compatible-arg} \DescribeMacro{\cwanoncite}
 %   \item |\cwanoncitet|\oarg{citet-compatible-oarg}\marg{citet-compatible-arg} \DescribeMacro{\cwanoncitet}
 %   \item |\cwanoncitep|\oarg{citep-compatible-oarg}\marg{citep-compatible-arg} \DescribeMacro{\cwanoncitep}
+%   \item |\cwblind|\marg{command}\marg{open text}\marg{blind text} \DescribeMacro{\cwblind}
 %\end{itemize}
 %
 % The alternative text used by anonymization commands can be configured with other commands:
@@ -553,6 +555,10 @@
 % \cwdefanoncitettext{[Anon]}
 % My name is \cwanon{Geraldo Xexéo}, and I read \cwanoncite{ed},
 % \cwanoncitep[pags 1]{todonotes}, % \cwanoncitet{xcolor}.
+%
+% |cwblind| is a command that appeared in version 1.3. It works as a |\newcommand|
+% with two different definitions, the first for when anonymization is turned off, the second for when it is
+% turned on.
 %
 %
 %\section{Draft environment}
@@ -960,7 +966,7 @@
 \@showdrafttrue
 \@showcomentariotrue
 \@showsugestaotrue
-\@beanonymoustrue
+\@beanonymousfalse
 \@showtodotrue
 \fi
 \if@modosubmeter
@@ -1422,6 +1428,21 @@
 \ifdef{\citet}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}%
 \fi%|
 %    \end{macrocode}
+% \begin{macro}{\cwblind}
+% Defines a new macro for blind review commands
+% |\cwblind|\marg{command}\marg{open text}\marg{blind text}
+%    \begin{macrocode}
+\if@beanonymous%
+\newcommand{\cwblind}[3]{%
+\newcommand{#1}{#3}%
+}%
+\else%
+\newcommand{\cwblind}[3]{%
+\newcommand{#1}{#2}%
+}%
+\fi%
+%    \end{macrocode}
+% \end{macro}
 % \subsection{Subjects}
 % The idea of subjects is to have one subject for each paragraph.
 %
