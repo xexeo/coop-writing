@@ -10,8 +10,8 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.3}
-%<package>\ProvidesPackage{coop-writing}[2022/04/21 \cw@version dtx version of coop-writing]
+%<package>\def\cw@version{v1.3.1}
+%<package>\ProvidesPackage{coop-writing}[2022/05/13 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
@@ -73,7 +73,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{807}
+% \CheckSum{808}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -101,6 +101,7 @@
 % \changes{v1.2.3}{2021/06/09}{CoppeTex class asks for LoF and etc... to appear in ToC. This is an option in tocloft, but Book does not behave like that}
 % \changes{v1.2.4}{2022/01/13}{Corrections for CTAN}
 % \changes{v1.3}{2022/04/21}{New macro cwblind}
+% \changes{v1.3.1}{2022/05/13}{Fix bug on todo and publish}
 %\maketitle
 %
 % \tableofcontents
@@ -1804,8 +1805,8 @@
 \cw@todoauthor{#2}%
 }%
 }%
-\else%
-\newcommand{\todo}[2]{}%
+\else%\if@showtodo
+\newcommand{\todo}[2][]{}%
 \fi%
 %    \end{macrocode}
 % \end{macro}
