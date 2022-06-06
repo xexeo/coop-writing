@@ -10,8 +10,8 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.3.2}
-%<package>\ProvidesPackage{coop-writing}[2022/06/16 \cw@version dtx version of coop-writing]
+%<package>\def\cw@version{v1.3.3}
+%<package>\ProvidesPackage{coop-writing}[2022/06/06 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
@@ -73,7 +73,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{819}
+% \CheckSum{827}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -103,6 +103,7 @@
 % \changes{v1.3}{2022/04/21}{New macro cwblind}
 % \changes{v1.3.1}{2022/05/13}{Fix bug on todo and publish}
 % \changes{v1.3.2}{2022/06/06}{Fix bug on citation anonymous}
+% \changes{v1.3.3}{2022/06/06}{Fix behavior of anonymize and noanonymize to be stronger than modes}
 %\maketitle
 %
 % \tableofcontents
@@ -905,11 +906,15 @@
 \newif\ifednotebookmarks\ednotebookmarkstrue%
 % \subsubsection{Creating Original Options Variables}
 \newif\if@showcomentario\@showcomentariofalse%
-\newif\if@naoanonimizar\@naoanonimizarfalse%
+% as próximas duas variáveis controlam o \@beanonymous, por isso tem que ser duas
+% porque só são mexidas se chamadas, não pode chamar uma porque vai mudar sempre
+% a \@beanonymous
+\newif\if@anonimizar\@anonimizartrue% o default é anonimizar
+\newif\if@naoanonimizar\@naoanonimizarfalse% o default dessa variavel é anonimizar
+\newif\if@beanonymous\@beanonymousfalse%
 \newif\if@showdraft\@showdraftfalse%
 \newif\if@showsubjects\@showsubjectsfalse%
 \newif\if@showsugestao\@showsugestaofalse%
-\newif\if@beanonymous\@beanonymousfalse%
 \newif\if@showtodo\@showtodofalse%
 \newif\if@modoedicao\@modoedicaofalse%
 \newif\if@modosubmeter\@modosubmeterfalse%
@@ -921,7 +926,7 @@
 %    \begin{macrocode}
 \DeclareOption{rascunhos}{\@showdrafttrue}
 \DeclareOption{comentarios}{\@showcomentariotrue}
-\DeclareOption{anonimizar}{\@beanonymoustrue}
+\DeclareOption{anonimizar}{\@anonimizartrue} % isso vai se perder nos modos
 \DeclareOption{naoanonimizar}{\@naoanonimizartrue}
 \DeclareOption{sugestoes}{\@showsugestaotrue}
 \DeclareOption{assuntos}{\@showsubjectstrue}
@@ -942,7 +947,7 @@
 %
 %    \begin{macrocode}
 \DeclareOption{comments}{\@showcomentariotrue}
-\DeclareOption{anonymize}{\@beanonymoustrue}
+\DeclareOption{anonymize}{\@anonimizartrue}
 \DeclareOption{noanonymize}{\@naoanonimizartrue}
 \DeclareOption{suggestions}{\@showsugestaotrue}
 \DeclareOption{subjects}{\@showsubjectstrue}
@@ -979,9 +984,6 @@
 \@beanonymoustrue
 \@showtodofalse
 \fi
-\if@naoanonimizar
-\@beanonymousfalse
-\fi
 \if@modopublicar
 \@showsubjectsfalse
 \@showsugestaofalse
@@ -990,6 +992,14 @@
 \@beanonymousfalse
 \@showtodofalse
 \fi%
+% is explicitilly set, changes beanonymous
+\if@naoanonimizar
+\@beanonymousfalse
+\fi
+% is explicitilly set, changes beanonymous
+\if@anonimizar
+\@beanonymoustrue
+\fi
 \if@showtodo
 \@showcomentariotrue
 \fi
