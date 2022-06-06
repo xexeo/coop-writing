@@ -10,7 +10,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.3.1}
+%<package>\def\cw@version{v1.3.2}
 %<package>\ProvidesPackage{coop-writing}[2022/05/13 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
@@ -73,7 +73,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{808}
+% \CheckSum{818}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -102,6 +102,7 @@
 % \changes{v1.2.4}{2022/01/13}{Corrections for CTAN}
 % \changes{v1.3}{2022/04/21}{New macro cwblind}
 % \changes{v1.3.1}{2022/05/13}{Fix bug on todo and publish}
+% \changes{v1.3.2}{2022/06/06}{Fix bug on citation anonymous}
 %\maketitle
 %
 % \tableofcontents
@@ -1424,10 +1425,48 @@
 \newcommand{\cwanoncitet}[2][]{\cw@anoncitettext}%
 \else
 \newcommand{\cwanon}[1]{#1}%
-\newcommand{\cwanoncite}[2][]{\cite[#1]{#2}}%
-\ifdef{\citep}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}{\newcommand{\cwanoncitep}[2][]{\citep[#1]{#2}}}%
-\ifdef{\citet}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}{\newcommand{\cwanoncitet}[2][]{\citet[#1]{#2}}}%
+%
+\newcommand{\cwanoncite}[2][]%
+{%
+\ifstrempty{#1}%
+{\cite{#2}}%
+{\cite[#1]{#2}}%
+}%
+%
+\ifdef{\citep}%
+{%
+\newcommand{%
+\cwanoncitep}[2][]{%
+\ifstrempty{#1}%
+{\citep{#2}}%
+{\citep[#1]{#2}}%
+}%
+}%
+{%
+\newcommand{\cwanoncitep}[2][]
+\ifstrempty{#1}%
+{\cite{#2}}%
+{\cite[#1]{#2}}%
+}%
+
+\ifdef{\citet}%
+{%
+\newcommand{\cwanoncitet}[2][]%
+{%
+\ifstrempty{#1}%
+{\citet{#2}}%
+{\citet[#1]{#2}}%
+}
+}%
+{\newcommand{\cwanoncitet}[2][]
+{%
+\ifstrempty{#1}%
+{\cite{#2}}%
+{\cite[#1]{#2}}%
+}%
+}%
 \fi%|
+
 %    \end{macrocode}
 % \begin{macro}{\cwblind}
 % Defines a new macro for blind review commands
