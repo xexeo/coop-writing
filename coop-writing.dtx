@@ -11,7 +11,7 @@
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\def\cw@version{v1.3.2}
-%<package>\ProvidesPackage{coop-writing}[2022/05/13 \cw@version dtx version of coop-writing]
+%<package>\ProvidesPackage{coop-writing}[2022/06/16 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
@@ -73,7 +73,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{818}
+% \CheckSum{819}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -1008,7 +1008,7 @@
 \RequirePackage{xcolor}
 \RequirePackage{soulutf8}
 \RequirePackage[normalem]{ulem}
-\RequirePackage{etoolbox}
+\RequirePackage{etoolbox} % \ifdef comes from here
 \RequirePackage{environ}
 \RequirePackage{xstring}
 \RequirePackage{csquotes}
@@ -1432,11 +1432,11 @@
 {\cite{#2}}%
 {\cite[#1]{#2}}%
 }%
-%
+% where ifdef comes from?
 \ifdef{\citep}%
 {%
-\newcommand{%
-\cwanoncitep}[2][]{%
+\newcommand{\cwanoncitep}[2][]%
+{%
 \ifstrempty{#1}%
 {\citep{#2}}%
 {\citep[#1]{#2}}%
@@ -1444,11 +1444,11 @@
 }%
 {%
 \newcommand{\cwanoncitep}[2][]
-\ifstrempty{#1}%
+{\ifstrempty{#1}%
 {\cite{#2}}%
 {\cite[#1]{#2}}%
 }%
-
+}%
 \ifdef{\citet}%
 {%
 \newcommand{\cwanoncitet}[2][]%
