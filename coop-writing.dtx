@@ -10,8 +10,8 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.3.3}
-%<package>\ProvidesPackage{coop-writing}[2022/06/06 \cw@version dtx version of coop-writing]
+%<package>\def\cw@version{v1.4}
+%<package>\ProvidesPackage{coop-writing}[2022/06/17 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
@@ -73,7 +73,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{827}
+% \CheckSum{893}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -104,6 +104,7 @@
 % \changes{v1.3.1}{2022/05/13}{Fix bug on todo and publish}
 % \changes{v1.3.2}{2022/06/06}{Fix bug on citation anonymous}
 % \changes{v1.3.3}{2022/06/06}{Fix behavior of anonymize and noanonymize to be stronger than modes}
+% \changes{v1.4}{2022/06/17}{Now there are commands to include files in special situations}
 %\maketitle
 %
 % \tableofcontents
@@ -119,7 +120,7 @@
 %
 % \subsection{A bit of context}
 %
-% I wrote|coop-writing| to support my way of writing papers in colaboration with my students, and also to comment on  thesis and dissertations I supervise. It received many
+% I wrote |coop-writing|  to support my way of writing papers in colaboration with my students, and also to comment on  thesis and dissertations I supervise. It received many
 % suggestions from my students.
 %
 %The starting goal was to build a front-end that would put together other packages, with the best behavior of each package, mostly |ed| and |todonotes|, but with time, and the difficulty to make different packages with commands that have the same name to coexist, it grew in scope.
@@ -801,6 +802,38 @@
 %
 %    |\def\cwpleasecitemarginnote{Cite}|%
 %
+%\section{Optional Files (input and include)}
+%
+% Since version 1.4, it is possible to insert optional files accordingly to the current mode
+%
+% \DescribeMacro{\cwinput}
+% \DescribeMacro{\cwinclude}
+%  This first to commands allow to select which file will be displayed
+% in each mode.
+%
+%  |\cwinput|\marg{file-editing-mode}\marg{file-submit-mode}\marg{file-publish-mode}
+%
+% |\cwinclude|\marg{file-editing-mode}\marg{file-submit-mode}\marg{file-publish-mode}
+%
+% The next six commands work only in their specific mode.
+%
+% \DescribeMacro{\cwinputediting}
+% \DescribeMacro{\cwincludeediting}
+% \DescribeMacro{\cwinputsubmit}
+% \DescribeMacro{\cwincludesubmit}
+% \DescribeMacro{\cwinputpublish}
+% \DescribeMacro{\cwincludepublish}
+% |\cwinputediting|\marg{file-if-editing-mode}
+%
+% |\cwincludeediting|\marg{file-if-editing-mode}
+%
+% |\cwinputsubmit|\marg{file-if-submit-mode}
+%
+% |\cwincludesubmit|\marg{file-if-submit-mode}
+%
+% |\cwinputpublish|\marg{file-if-publish-mode}
+%
+% |\cwincludepublish|\marg{file-if-publish-mode}
 %
 %\section{Warnings}
 % This package uses another package that changes \LaTeX's standard behavior for summary and lists. When you use it, you must explicitly change pages with |\newpage|
@@ -830,6 +863,7 @@
 %\end{tabular}
 % \label{tab:e2p}
 % \end{table}
+%
 %
 % \subsection{Opções em Português}
 %
@@ -1703,6 +1737,56 @@
 \fi%
 \fi%
 %    \end{macrocode}
+% \subsection{File Control}
+% \begin{macro}{\cwinput}
+% \begin{macro}{\cwinclude}
+% \begin{macro}{\cwinputediting}
+% \begin{macro}{\cwincludeediting}
+% \begin{macro}{\cwinputsubmit}
+% \begin{macro}{\cwincludesubmit}
+% \begin{macro}{\cwinputpublish}
+% \begin{macro}{\cwincludepublish}
+%    \begin{macrocode}
+\if@modoedicao
+\newcommand{\cwinput}[3]{\input{#1}}
+\newcommand{\cwinclude}[3]{\include{#1}}
+\newcommand{\cwinputediting}[1]{\input{#1}}
+\newcommand{\cwincludeediting}[1]{\include{#1}}
+\newcommand{\cwinputsubmit}[1]{}
+\newcommand{\cwincludesubmit}[1]{}
+\newcommand{\cwinputpublish}[1]{}
+\newcommand{\cwincludepublish}[1]{}
+\fi
+\if@modopublicar
+\newcommand{\cwinput}[3]{\input{#3}}
+\newcommand{\cwinclude}[3]{\include{#3}}
+\newcommand{\cwinputediting}[1]{}
+\newcommand{\cwincludeediting}[1]{}
+\newcommand{\cwinputsubmit}[1]{}
+\newcommand{\cwincludesubmit}[1]{}
+\newcommand{\cwinputpublish}[1]{\input{#1}}
+\newcommand{\cwincludepublish}[1]{\include{#1}}
+\fi
+\if@modosubmeter
+\newcommand{\cwinput}[3]{\input{#2}}
+\newcommand{\cwinclude}[3]{\include{#2}}
+\newcommand{\cwinputediting}[1]{}
+\newcommand{\cwincludeediting}[1]{}
+\newcommand{\cwinputsubmit}[1]{\input{#1}}
+\newcommand{\cwincludesubmit}[1]{\include{#1}}
+\newcommand{\cwinputpublish}[1]{}
+\newcommand{\cwincludepublish}[1]{}
+\fi
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \DescribeMacro{\cwincludepublish}
 % \subsection{Citations Needed}
 % One common error of students is not to cite correctly.
 % Citation errors are so common that I decided to provide the option to have an optional list just for them.
