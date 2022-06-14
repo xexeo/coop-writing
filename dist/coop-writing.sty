@@ -13,8 +13,8 @@
 %% This file may be distributed and/or modified under the conditions of
 %% the MIT License
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.4}
-\ProvidesPackage{coop-writing}[2022/06/17 \cw@version dtx version of coop-writing]
+\def\cw@version{v1.4.1}
+\ProvidesPackage{coop-writing}[2022/06/14 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
 %% To use other language, or to use other texts instead of the standard ones, you should define these macros, as in:
 \newcommand{\coopwritingversion}{\cw@version}%
@@ -262,6 +262,8 @@
 %% CORES
 \newcommand{\cor@suavizacao}{40}%
 \newcommand{\corleve}[1]{#1!\cor@suavizacao!white}
+\newcommand{\cwsetanoncolor}[1]{\def\cw@editAnonColor{#1}}
+\cwsetanoncolor{blue}
 \newcommand{\cw@hll}[2]% % Depedendo do soulutf8
 {\colorlet{x@coraqui}{\corleve{#1}}%
 \sethlcolor{x@coraqui}%
@@ -287,7 +289,11 @@
 \newcommand{\cwanoncitep}[2][]{\cw@anonciteptext}%
 \newcommand{\cwanoncitet}[2][]{\cw@anoncitettext}%
 \else
+\if@modoedicao%
+\newcommand{\cwanon}[1]{\textcolor{\cw@editAnonColor}{#1}}%
+\else%
 \newcommand{\cwanon}[1]{#1}%
+\fi%
 \newcommand{\cwanoncite}[2][]%
 {%
 \ifstrempty{#1}%
@@ -329,8 +335,13 @@
 \fi%|
 
 \if@beanonymous%
+\if@modoedicao%
+\newcommand{\cwblind}[3]{%
+\newcommand{#1}{\textcolor{\cw@editAnonColor}{#3}}% AQUI
+\else
 \newcommand{\cwblind}[3]{%
 \newcommand{#1}{#3}%
+\fi
 }%
 \else%
 \newcommand{\cwblind}[3]{%

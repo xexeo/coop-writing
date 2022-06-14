@@ -10,8 +10,8 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.4}
-%<package>\ProvidesPackage{coop-writing}[2022/06/17 \cw@version dtx version of coop-writing]
+%<package>\def\cw@version{v1.4.1}
+%<package>\ProvidesPackage{coop-writing}[2022/06/14 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
@@ -73,7 +73,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{893}
+% \CheckSum{913}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -104,7 +104,8 @@
 % \changes{v1.3.1}{2022/05/13}{Fix bug on todo and publish}
 % \changes{v1.3.2}{2022/06/06}{Fix bug on citation anonymous}
 % \changes{v1.3.3}{2022/06/06}{Fix behavior of anonymize and noanonymize to be stronger than modes}
-% \changes{v1.4}{2022/06/17}{Now there are commands to include files in special situations}
+% \changes{v1.4}{2022/06/12}{Now there are commands to include files in special situations}
+% \changes{v1.4.1}{2022/06/14}{Text that will be anonimized will appear in a different color (defined in |cw@editAnonColor|)}
 %\maketitle
 %
 % \tableofcontents
@@ -507,9 +508,9 @@
 %
 %\section{Anonymization}
 %
-% Anonymization will provide commands to replace
+% Anonymization  provide commands to replace
 % names and references by anonymous names and references.
-% It will, by default, be enable only in the |submit| option
+% It,  by default, is enabled only in the |submit| option
 %
 % There are 5 anonymization commands:
 %
@@ -564,7 +565,8 @@
 % with two different definitions, the first for when anonymization is turned off, the second for when it is
 % turned on.
 %
-%
+% When in editing mode, text to be anonymized will be printed in
+% blue. This color can be changed with the command |\cwsetanoncolor|.
 %\section{Draft environment}
 %
 % \DescribeEnv{cwdraft}
@@ -1404,6 +1406,15 @@
 \newcommand{\corleve}[1]{#1!\cor@suavizacao!white}
 %    \end{macrocode}
 % \end{macro}
+% \begin{macro}{\cwsetanoncolor}
+%
+%  Sets the color used to indicate what will be anonymized
+%
+%    \begin{macrocode}
+\newcommand{\cwsetanoncolor}[1]{\def\cw@editAnonColor{#1}}
+\cwsetanoncolor{blue}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\cw@hll}
 % Light highlight makes a |\hl| that is lighter
 %    \begin{macrocode}
@@ -1468,7 +1479,11 @@
 \newcommand{\cwanoncitep}[2][]{\cw@anonciteptext}%
 \newcommand{\cwanoncitet}[2][]{\cw@anoncitettext}%
 \else
+\if@modoedicao%
+\newcommand{\cwanon}[1]{\textcolor{\cw@editAnonColor}{#1}}%
+\else%
 \newcommand{\cwanon}[1]{#1}%
+\fi%
 %
 \newcommand{\cwanoncite}[2][]%
 {%
@@ -1521,9 +1536,15 @@
 \newcommand{#1}{#3}%
 }%
 \else%
+\if@modoedicao%
+\newcommand{\cwblind}[3]{%
+\newcommand{#1}{\textcolor{\cw@editAnonColor}{#2}}% AQUI
+}%
+\else
 \newcommand{\cwblind}[3]{%
 \newcommand{#1}{#2}%
 }%
+\fi%
 \fi%
 %    \end{macrocode}
 % \end{macro}
