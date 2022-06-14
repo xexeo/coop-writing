@@ -335,18 +335,19 @@
 \fi%|
 
 \if@beanonymous%
-\if@modoedicao%
-\newcommand{\cwblind}[3]{%
-\newcommand{#1}{\textcolor{\cw@editAnonColor}{#3}}% AQUI
-\else
 \newcommand{\cwblind}[3]{%
 \newcommand{#1}{#3}%
-\fi
 }%
 \else%
+\if@modoedicao%
+\newcommand{\cwblind}[3]{%
+\newcommand{#1}{\textcolor{\cw@editAnonColor}{#2}}% AQUI
+}%
+\else
 \newcommand{\cwblind}[3]{%
 \newcommand{#1}{#2}%
 }%
+\fi%
 \fi%
 \newcommand{\cwsetsubjectcolor}[1]{\def\cor@subject{#1}}%
 \newcommand{\cwsetmaincolor}[1]{\def\cor@main{#1}}%
