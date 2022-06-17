@@ -10,7 +10,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.4.1}
+%<package>\def\cw@version{v1.4.2}
 %<package>\ProvidesPackage{coop-writing}[2022/06/14 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
@@ -105,7 +105,9 @@
 % \changes{v1.3.2}{2022/06/06}{Fix bug on citation anonymous}
 % \changes{v1.3.3}{2022/06/06}{Fix behavior of anonymize and noanonymize to be stronger than modes}
 % \changes{v1.4}{2022/06/12}{Now there are commands to include files in special situations}
-% \changes{v1.4.1}{2022/06/14}{Text that will be anonimized will appear in a different color (defined in |cw@editAnonColor|)}
+% \changes{v1.4.1}{2022/06/14}{Text that will be anonimized will appear in a different color}
+% \changes{v1.4.2}{2022/06/17}{Citation that will be anonimized will appear in a different color}
+%
 %\maketitle
 %
 % \tableofcontents
@@ -908,7 +910,9 @@
 % a new option |toclofttitles| to solve the general problem
 % of |tocloft| changing LoF and LoT definitions.
 %
+%
 % \StopEventually{End of Code}
+%
 %
 % \section{Implementation}
 % This package was initially written in Portuguese. As it become more
