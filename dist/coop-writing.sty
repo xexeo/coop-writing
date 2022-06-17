@@ -13,7 +13,7 @@
 %% This file may be distributed and/or modified under the conditions of
 %% the MIT License
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.4.2}
+\def\cw@version{v1.4.3}
 \ProvidesPackage{coop-writing}[2022/06/14 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
 %% To use other language, or to use other texts instead of the standard ones, you should define these macros, as in:
@@ -151,6 +151,7 @@
 \def\cwpleasecitetext{Plese cite}%
 \def\cwpleasecitemessage{something to support this information}%
 \def\cwpleasecitemarginnote{Cite}%
+\def\cw@attentiontext{Attention}%
 \@ifpackageloaded{babel}%
 {%
     \IfLanguageName{brazil}%
@@ -162,6 +163,7 @@
     \def\cwpleasecitetext{Favor citar}%
     \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
     \def\cwpleasecitemarginnote{Citar}%
+    \def\cw@attentiontext{Atenção}%
     }{}%
     \IfLanguageName{brazilian}%
     {%
@@ -172,6 +174,7 @@
         \def\cwpleasecitetext{Favor citar}%
         \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
         \def\cwpleasecitemarginnote{Citar}%
+        \def\cw@attentiontext{Atenção}%
     }{}%
     \IfLanguageName{portuguese}%
     {%
@@ -182,6 +185,7 @@
         \def\cwpleasecitetext{Favor citar}%
         \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
         \def\cwpleasecitemarginnote{Citar}%
+        \def\cw@attentiontext{Atenção}%
     }{}%
     \IfLanguageName{english}%
     {%
@@ -192,6 +196,7 @@
         \def\cwpleasecitetext{Plese cite}%
         \def\cwpleasecitemessage{something to support this information}%
         \def\cwpleasecitemarginnote{Cite}%
+        \def\cw@attentiontext{Attention}%
     }{}%
 }%
 {}%
@@ -499,12 +504,15 @@
 \fi%|
 %% comentário, cor, indicador, textovelho, cor velho, textonovo, cor novo
 %% Em modo publicar coloca o textovelho
+\newcommand{\cwdefattentiontext}[1]{\def\cw@attentiontext{#1}}
 \if@showsugestao
 \newcommand{\cw@gensug}[7][Uma proposta]{%
 \textcolor{#5}{\sout{#4}}% CORRIGINDO AQUI
 \textcolor{#7}{#6}%
 \if@showcomentario%
-\ifstrempty{#1}{}%
+\ifstrempty{#1}{%
+\cw@comentar{\cw@attentiontext}{#2}{#3}%% [rótulo], cor , footnote , indicador
+}%
 {\refstepcounter{comentario}%
 \cw@comentar{#1}{#2}{#3}%% [rótulo], cor , footnote , indicador
 }%

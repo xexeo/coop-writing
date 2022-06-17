@@ -10,7 +10,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.4.2}
+%<package>\def\cw@version{v1.4.3}
 %<package>\ProvidesPackage{coop-writing}[2022/06/14 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
@@ -73,7 +73,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{942}
+% \CheckSum{958}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -107,6 +107,7 @@
 % \changes{v1.4}{2022/06/12}{Now there are commands to include files in special situations}
 % \changes{v1.4.1}{2022/06/14}{Text that will be anonimized will appear in a different color}
 % \changes{v1.4.2}{2022/06/17}{Citation that will be anonimized will appear in a different color}
+% \changes{v1.4.3}{2022/06/17}{Suggestions, removal now have default commentaries}
 %
 %\maketitle
 %
@@ -1157,6 +1158,7 @@
 \def\cwpleasecitetext{Plese cite}%
 \def\cwpleasecitemessage{something to support this information}%
 \def\cwpleasecitemarginnote{Cite}%
+\def\cw@attentiontext{Attention}%
 %
 \@ifpackageloaded{babel}%
 {%
@@ -1169,6 +1171,7 @@
     \def\cwpleasecitetext{Favor citar}%
     \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
     \def\cwpleasecitemarginnote{Citar}%
+    \def\cw@attentiontext{Atenção}%
     }{}%
     \IfLanguageName{brazilian}%
     {%
@@ -1179,6 +1182,7 @@
         \def\cwpleasecitetext{Favor citar}%
         \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
         \def\cwpleasecitemarginnote{Citar}%
+        \def\cw@attentiontext{Atenção}%
     }{}%
 %
     \IfLanguageName{portuguese}%
@@ -1190,6 +1194,7 @@
         \def\cwpleasecitetext{Favor citar}%
         \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
         \def\cwpleasecitemarginnote{Citar}%
+        \def\cw@attentiontext{Atenção}%
     }{}%
 %
     \IfLanguageName{english}%
@@ -1201,6 +1206,7 @@
         \def\cwpleasecitetext{Plese cite}%
         \def\cwpleasecitemessage{something to support this information}%
         \def\cwpleasecitemarginnote{Cite}%
+        \def\cw@attentiontext{Attention}%
     }{}%
 }%
 {}%
@@ -1764,12 +1770,15 @@
 %    \begin{macrocode}
 %% comentário, cor, indicador, textovelho, cor velho, textonovo, cor novo
 %% Em modo publicar coloca o textovelho
+\newcommand{\cwdefattentiontext}[1]{\def\cw@attentiontext{#1}}
 \if@showsugestao
 \newcommand{\cw@gensug}[7][Uma proposta]{%
 \textcolor{#5}{\sout{#4}}% CORRIGINDO AQUI
 \textcolor{#7}{#6}%
 \if@showcomentario%
-\ifstrempty{#1}{}%
+\ifstrempty{#1}{%
+\cw@comentar{\cw@attentiontext}{#2}{#3}%% [rótulo], cor , footnote , indicador
+}%
 {\refstepcounter{comentario}%
 \cw@comentar{#1}{#2}{#3}%% [rótulo], cor , footnote , indicador
 }%
