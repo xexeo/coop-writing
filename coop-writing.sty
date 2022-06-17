@@ -288,52 +288,73 @@
 \newcommand{\cwanoncite}[2][]{\cw@anoncitetext}%
 \newcommand{\cwanoncitep}[2][]{\cw@anonciteptext}%
 \newcommand{\cwanoncitet}[2][]{\cw@anoncitettext}%
-\else
+\else% be anonymous
 \if@modoedicao%
 \newcommand{\cwanon}[1]{\textcolor{\cw@editAnonColor}{#1}}%
-\else%
+\newcommand{\cwanoncite}[2][]%
+{%
+\ifstrempty{#1}%
+{\textcolor{\cw@editAnonColor}{\cite{#2}}}%
+{\textcolor{\cw@editAnonColor}{\cite[#1]{#2}}}%
+}%
+\else% modo edicao
 \newcommand{\cwanon}[1]{#1}%
-\fi%
 \newcommand{\cwanoncite}[2][]%
 {%
 \ifstrempty{#1}%
 {\cite{#2}}%
 {\cite[#1]{#2}}%
 }%
+\fi% modoedicao
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ifdef{\citep}%
-{%
+{% tem citep
 \newcommand{\cwanoncitep}[2][]%
 {%
+\if@modoedicao%
+\ifstrempty{#1}%
+{\textcolor{\cw@editAnonColor}{\citep{#2}}}%
+{\textcolor{\cw@editAnonColor}{\citep[#1]{#2}}}%
+\else% modo edicao
 \ifstrempty{#1}%
 {\citep{#2}}%
 {\citep[#1]{#2}}%
+\fi% mode edicao
 }%
 }%
-{%
+{% não tem citep
 \newcommand{\cwanoncitep}[2][]
 {\ifstrempty{#1}%
-{\cite{#2}}%
-{\cite[#1]{#2}}%
+{\cwanoncite{#2}}%
+{\cwanoncite[#1]{#2}}%
 }%
 }%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ifdef{\citet}%
-{%
+{% tem citet
 \newcommand{\cwanoncitet}[2][]%
 {%
+\if@modoedicao%
+\ifstrempty{#1}%
+{\textcolor{\cw@editAnonColor}{\citet{#2}}}%
+{\textcolor{\cw@editAnonColor}{\citet[#1]{#2}}}%
+\else% modo edicao
 \ifstrempty{#1}%
 {\citet{#2}}%
 {\citet[#1]{#2}}%
-}
+\fi% mode edicao
 }%
-{\newcommand{\cwanoncitet}[2][]
+}%
+{% não tem citet
+\newcommand{\cwanoncitet}[2][]
 {%
 \ifstrempty{#1}%
-{\cite{#2}}%
-{\cite[#1]{#2}}%
+{\cwanoncite{#2}}%
+{\cwanoncite[#1]{#2}}%
 }%
 }%
-\fi%|
-
+\fi% be anonymous
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \if@beanonymous%
 \newcommand{\cwblind}[3]{%
 \newcommand{#1}{#3}%
