@@ -124,7 +124,7 @@
 %
 % \subsection{A bit of context}
 %
-% I wrote |coop-writing|  to support my way of writing papers in colaboration with my students, and also to comment on  thesis and dissertations I supervise. It received many
+% I wrote |coop-writing|  to support my way of writing papers in colaboration with my students, and also to comment on  theses and dissertations I supervise. It received many
 % suggestions from my students.
 %
 %The starting goal was to build a front-end that would put together other packages, with the best behavior of each package, mostly |ed| and |todonotes|, but with time, and the difficulty to make different packages with commands that have the same name to coexist, it grew in scope.
@@ -140,7 +140,7 @@
 %
 % |coop-writing| is available as open source at \url{https://github.com/xexeo/coop-writing}, using a MIT License. The stable distribution is in the folder |dist|, while the lastest, and unstable, will be in the root folder. A CTAN folder now contains the current submitted CTAN distribution.
 %
-% The only file you really need, besides this manual, is
+% The only file you really need, apart from this manual, is
 % |coop-writing.sty|. This should be in your \LaTeX\   path, such as in the same folder that your main |.tex| file.
 %
 % If you are new to \LaTeX, just put \textbf{one} of these 3 lines in the preamble part of you document, i.e., before |\begin{document}|:
@@ -175,7 +175,7 @@
 %\section{Package Options}
 %
 %
-% Using the package allows the use of all macros and environments described in this manual, however, \textbf{if the options are not turned on, there will be no effect on the generated |pdf|}, since, by default, all options are false.
+%"Using the package allows the use of all macros and environments described in this manual. However, if the options are not turned on, there will be no effect on the generated PDF because, by default, all options are false.
 %
 % There are three types of options. The first type enables the visualization of the result of specific macros or environments, such as
 % the |cwdraft| environment. They are named \textit{command oriented options}. You can use many of them in the same time.
@@ -224,8 +224,7 @@
 %
 % \subsection{General behavior}
 %
-% The general behavior of this package is to provide different
-% ways of marking your text, for example, with comments or to do notes, which can be totally supressed when desired. Mostly, this can be easilly done using one the the 3 main option states: |editing|, |submit|, and |publish|.
+% The general behavior of this package is to provide various ways of marking your text, such as with comments or 'to-do' notes, which can be completely suppressed if desired.. Mostly, this can be easilly done using one the the 3 main option states: |editing|, |submit|, and |publish|.
 %
 %
 % Users should use the |editing| state most of the time. In this state, all
@@ -271,7 +270,7 @@
 %\section{Editorial comments}
 %\label{sec:edcom}
 %
-% This is the main reason of this package.
+% This is the main purpose of this package.
 %
 % The idea is that  users not only can make editorial comments on the
 % text they are writing, but they can also establish a dialog through those comments.
@@ -352,8 +351,7 @@
 %
 %\subsection{Striked-throught comments}
 %
-% After using the editorial comments for a time we started to delete the old ones that
-% represented fixed problems. However, we notice that some comments should be kept,
+% After using the editorial comments for a time, we started to delete the old ones that represented fixed problems. However, we notice that some comments should be kept,
 % even if solved.
 % The solution was to create the striked-trought comments. They are easy to
 % use, just put an |x| after the command name.
@@ -384,9 +382,7 @@
 % This command will make a comment in the form of a labeled footnote\cwauthorrx{labeled footnote comment}{Second label}, however the comment is striked through. It can also be used to \cwauthorrx[highlight some text]{labeled comment with highlighting}{New label}. The label must be unique, since it is used as a \LaTeX\  |label| too.
 %
 %\subsection{Text Modification - Suggestions}
-% Sometimes one of the authors wants to insert, remove or edit some
-% text, but he or she is not sure that every one will agree, therefore
-% he or she can make a suggestion, that will appear with his or her color.
+% Sometimes, an author may want to insert, remove, or edit some text. If they are unsure whether everyone will agree, they can make a suggestion, which will appear in their chosen color.
 %
 % \DescribeMacro{\<name>sug}
 % \DescribeMacro{\cwauthorsug}
@@ -469,8 +465,7 @@
 %
 %\subsection{Putting more warning in text}
 %
-% It is possible to define a symbol, or any other thing, to appear
-% before the superscript number that indicates the comment.
+% It is possible to define a symbol, or any other character or text, to appear before the superscript number that indicates the comment
 %
 % This is done using \DescribeMacro{\cwsetcommwarn} the following command
 % and syntax:
