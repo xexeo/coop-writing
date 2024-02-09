@@ -1,6 +1,6 @@
-# coop-writing LaTeX package v. 1.3.3
+# coop-writing LaTeX package v. 1.4.4
 
-Copyright (c) 2022 Geraldo Xexéo
+Copyright (c) 2024 Geraldo Xexéo
 
 This package supports editorial comments and gives some extra support for writing papers, or any document that involves more than one author or editor.
 

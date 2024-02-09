@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% Copyright (C) 2022 by Geraldo Xexéo
+% Copyright (C) 2024 by Geraldo Xexéo
 %
 % This file may be distributed and/or modified under the
 % conditions of the MIT License
@@ -10,8 +10,8 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.4.3}
-%<package>\ProvidesPackage{coop-writing}[2022/06/14 \cw@version dtx version of coop-writing]
+%<package>\def\cw@version{v1.4.4}
+%<package>\ProvidesPackage{coop-writing}[2024/02/09 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
@@ -108,6 +108,7 @@
 % \changes{v1.4.1}{2022/06/14}{Text that will be anonimized will appear in a different color}
 % \changes{v1.4.2}{2022/06/17}{Citation that will be anonimized will appear in a different color}
 % \changes{v1.4.3}{2022/06/17}{Suggestions, removal now have default commentaries}
+% \changes{1.4.4}{2024/02/09}{soul substitutes soulutf8 that is now obsolete}
 %
 %\maketitle
 %
@@ -1044,7 +1045,8 @@
 % Packages that are always required
 %\begin{itemize}
 %    \item xcolor - used to support colors
-%    \item soulutf8 - this is a variation of soul, used for highlighting
+%    \item soul - substituted its now obsolete variation in 1.4.4, used for highlighting.
+%
 % \item ulem - used to support strikethrought\todo{I must complete this explanation list}
 % \item tocloft - used to support modifications in lists and tocs
 % \item mdframed - used to support boxes for todos and drafts
@@ -1052,7 +1054,7 @@
 %\end{itemize}
 %    \begin{macrocode}
 \RequirePackage{xcolor}
-\RequirePackage{soulutf8}
+\RequirePackage{soul}
 \RequirePackage[normalem]{ulem}
 \RequirePackage{etoolbox} % \ifdef comes from here
 \RequirePackage{environ}
