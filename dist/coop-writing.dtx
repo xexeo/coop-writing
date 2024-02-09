@@ -10,7 +10,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.5}
+%<package>\def\cw@version{v1.5.1}
 %<package>\ProvidesPackage{coop-writing}[2024/02/09 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc}
@@ -73,7 +73,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{968}
+% \CheckSum{985}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -110,6 +110,7 @@
 % \changes{v1.4.3}{2022/06/17}{Suggestions, removal now have default commentaries}
 % \changes{1.4.4}{2024/02/09}{soul substitutes soulutf8 that is now obsolete}
 % \changes{1.5}{2024/02/09}{Commands to change text color (and restore)}
+% \changes{1.5.1}{2024/02/09}{Coloring should only work in edit mode}
 %
 %\maketitle
 %
@@ -202,15 +203,16 @@
 %    \item |suggestions|, \DescribeMacro{suggestions}  enables the comments definided in the suggestion section of this text.
 %    \item |anonymize|, \DescribeMacro{anonymize}   enables anonymization commands, and
 %    \item |todos|, \DescribeMacro{todos}  enables the to do family of  commands.
+%    \item |changecolor|, \DescribeMacro{changecolor} enable the |cwcolor| family of commands
 %\end{itemize}
 %
 %\subsection{State oriented options}
 % \begin{itemize}
-% \item |submit|, \DescribeMacro{submit} enables the |submit| state. |anonymize| is on, |subjects|, |comments|, |drafts| and |suggestions| are off.
+% \item |submit|, \DescribeMacro{submit} enables the |submit| state. |anonymize| is on, |subjects|, |comments|, |drafts|, |changecolor| and |suggestions| are off.
 % \item |noanonymize|, \DescribeMacro{noanonymize} disables |anonymize| even in |submit| and |editing| options.
 % \item |publish|, \DescribeMacro{publish} disables all command oriented options, ignore suggestions.
 % \item |acceptingpublish|, \DescribeMacro{acceptingpublish}  disables all command oriented options, accept suggestions
-% \item |editing|, \DescribeMacro{editing}  enables |subjects|, |comments|, |drafts|, and |suggestions|; since version 1.3 it disables |anonymize|.
+% \item |editing|, \DescribeMacro{editing}  enables |subjects|, |comments|, |drafts|, |changecolor| and |suggestions|; since version 1.3 it disables |anonymize|.
 % \end{itemize}
 %
 %\subsection{Behavior oriented options}
@@ -986,6 +988,7 @@
 \newif\if@modopublicar\@modopublicarfalse%
 \newif\if@modopublicaraceitando\@modopublicaraceitandofalse%
 \newif\if@cwtoclofttitles\@cwtoclofttitlesfalse
+\newif\if@changecolor\@changecolorfalse
 %    \end{macrocode}
 % \subsubsection{Portuguese Options}
 %    \begin{macrocode}
@@ -1018,6 +1021,7 @@
 \DeclareOption{subjects}{\@showsubjectstrue}
 \DeclareOption{drafts}{\@showdrafttrue}
 \DeclareOption{todos}{\@showtodotrue}
+\DeclareOption{changecolor}{\@changecolortrue}
 \DeclareOption{editing}{\@modoedicaotrue}
 \DeclareOption{submit}{\@modosubmetertrue}
 \DeclareOption{publish}{\@modopublicartrue}
@@ -1040,6 +1044,7 @@
 \@showsugestaotrue
 \@beanonymousfalse
 \@showtodotrue
+\@changecolortrue
 \fi
 \if@modosubmeter
 \@showsubjectsfalse
@@ -1048,6 +1053,7 @@
 \@showsugestaofalse
 \@beanonymoustrue
 \@showtodofalse
+\@changecolorfalse
 \fi
 \if@modopublicar
 \@showsubjectsfalse
@@ -1056,6 +1062,7 @@
 \@showcomentariofalse
 \@beanonymousfalse
 \@showtodofalse
+\@changecolorfalse
 \fi%
 % is explicitilly set, changes beanonymous
 \if@naoanonimizar
@@ -2034,11 +2041,17 @@
 % color of the default text, but it could interact with other commands.
 %
 %    \begin{macrocode}
+\if@changecolor%
 \newcommand{\cwsavecolor}{\colorlet{savedcolor}{.}}
 \newcommand{\cwcolor}[1]{\cwsavecolor%
 \color{#1}
 }
 \newcommand{\cwrestorecolor}{\color{savedcolor}}
+\else%
+\newcommand{\cwsavecolor}{}
+\newcommand{\cwcolor}[1]{}
+\newcommand{\cwrestorecolor}{}
+\fi%
 %    \end{macrocode}
 %  \subsection{Portuguese/English, or inverse translation table}
 % These next lines of code made easy to convert this package to English, because it was written in Portuguese, for Brazilian researchers.

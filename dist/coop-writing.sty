@@ -13,7 +13,7 @@
 %% This file may be distributed and/or modified under the conditions of
 %% the MIT License
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.5}
+\def\cw@version{v1.5.1}
 \ProvidesPackage{coop-writing}[2024/02/09 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
 
@@ -38,6 +38,7 @@
 \newif\if@modopublicar\@modopublicarfalse%
 \newif\if@modopublicaraceitando\@modopublicaraceitandofalse%
 \newif\if@cwtoclofttitles\@cwtoclofttitlesfalse
+\newif\if@changecolor\@changecolorfalse
 \DeclareOption{rascunhos}{\@showdrafttrue}
 \DeclareOption{comentarios}{\@showcomentariotrue}
 \DeclareOption{anonimizar}{\@anonimizartrue} % isso vai se perder nos modos
@@ -59,6 +60,7 @@
 \DeclareOption{subjects}{\@showsubjectstrue}
 \DeclareOption{drafts}{\@showdrafttrue}
 \DeclareOption{todos}{\@showtodotrue}
+\DeclareOption{changecolor}{\@changecolortrue}
 \DeclareOption{editing}{\@modoedicaotrue}
 \DeclareOption{submit}{\@modosubmetertrue}
 \DeclareOption{publish}{\@modopublicartrue}
@@ -75,6 +77,7 @@
 \@showsugestaotrue
 \@beanonymousfalse
 \@showtodotrue
+\@changecolortrue
 \fi
 \if@modosubmeter
 \@showsubjectsfalse
@@ -83,6 +86,7 @@
 \@showsugestaofalse
 \@beanonymoustrue
 \@showtodofalse
+\@changecolorfalse
 \fi
 \if@modopublicar
 \@showsubjectsfalse
@@ -91,6 +95,7 @@
 \@showcomentariofalse
 \@beanonymousfalse
 \@showtodofalse
+\@changecolorfalse
 \fi%
 \if@naoanonimizar
 \@beanonymousfalse
@@ -656,11 +661,17 @@
 \newcommand{\todo}[2][]{}%
 \fi%
 \newcommand{\cwdefinetodocolor}[1]{\renewcommand{\cw@todobackgroundcolor}{#1}}%
+\if@changecolor%
 \newcommand{\cwsavecolor}{\colorlet{savedcolor}{.}}
 \newcommand{\cwcolor}[1]{\cwsavecolor%
 \color{#1}
 }
 \newcommand{\cwrestorecolor}{\color{savedcolor}}
+\else%
+\newcommand{\cwsavecolor}{}
+\newcommand{\cwcolor}[1]{}
+\newcommand{\cwrestorecolor}{}
+\fi%
 \let\rascunho=\cwdraft%
 \let\cwassunto=\cwsubject%
 \let\favorcitar=\pleasecite%
