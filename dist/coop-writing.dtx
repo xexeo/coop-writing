@@ -228,10 +228,15 @@
 %
 %
 % \begin{itemize}
-%\item |nopdfbookmarks| will avoid adding bookmarks in the |pdf| file for all comments. The default behavior of |coop-writing| is adding them.
+%\item |nopdfbookmarks| \DescribeMacro{nopdfbookmarks} will avoid adding bookmarks in the |pdf| file for all comments. The default behavior of |coop-writing| is adding them.
 %
-%   \item |toclofttitles| toggles the option |titles| in |tocloft|, that avoid the redefinition of |\listoffigures| and |\listoftables|. This fix the bug with |CoppeTeX| package, identified as |coppe|.
+%   \item |toclofttitles| \DescribeMacro{toclofttitles} toggles the option |titles| in |tocloft|, that avoid the redefinition of |\listoffigures| and |\listoftables|. This fix the bug with |CoppeTeX| package, identified as |coppe|.
+%
+%   \item|cwavoidhyperref| \DescribeMacro{cwavoidhyperref}  avoids loading |hyperref|. This can solve some interaction bugs, although
+%   |coop-writing| 1.5.2 and later do not reload |hyperref| if it is already loaded.
+%
 %\end{itemize}
+%
 %
 % \subsection{General behavior}
 %
