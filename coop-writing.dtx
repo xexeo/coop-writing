@@ -73,7 +73,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{979}
+% \CheckSum{980}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -111,7 +111,7 @@
 % \changes{1.4.4}{2024/02/09}{soul substitutes soulutf8 that is now obsolete}
 % \changes{1.5}{2024/02/09}{Commands to change text color (and restore)}
 % \changes{1.5.1}{2024/02/09}{Coloring should only work in edit mode}
-% \changes{1.5.2}{2024/11/18}{clash with mdpi option submit, make 2 options that should be excludent possible together, solving if nested ifs}
+% \changes{1.5.2}{2024/11/18}{clash with mdpi option submit, make 2 options that should be excludent possible together, solving if nested ifs, solving hyperref problem too }
 %\maketitle
 %
 % \tableofcontents
@@ -1133,7 +1133,11 @@
 %    \end{macrocode}
 % |hyperref| must always be the last
 %    \begin{macrocode}
-\ifednotebookmarks\RequirePackage{hyperref}\fi
+\ifednotebookmarks
+  \@ifpackageloaded{hyperref}{}{
+    \RequirePackage{hyperref}
+  }
+\fi
 %    \end{macrocode}
 %
 % \subsection{Solving problems with other packages}

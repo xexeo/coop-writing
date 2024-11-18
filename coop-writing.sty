@@ -135,7 +135,11 @@
 }{%
     \message{Babel not detected!}%
 }%
-\ifednotebookmarks\RequirePackage{hyperref}\fi
+\ifednotebookmarks
+  \@ifpackageloaded{hyperref}{}{
+    \RequirePackage{hyperref}
+  }
+\fi
 \@ifclassloaded{memoir}%
 {% TRUE
 \newif\if@cwmemoirdefense\@cwmemoirdefensetrue%
