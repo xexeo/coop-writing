@@ -49,8 +49,8 @@
 \DeclareOption{submeter}{\@modosubmetertrue}
 \DeclareOption{publicar}{\@modopublicartrue}
 \DeclareOption{publicaraceitando}{
-    \@modopublicartrue
-    \@modopublicaraceitandotrue
+\@modopublicartrue
+\@modopublicaraceitandotrue
 }
 \DeclareOption{nopdfbookmarks}{\ednotebookmarksfalse}
 \DeclareOption{comments}{\@showcomentariotrue}
@@ -65,8 +65,8 @@
 \DeclareOption{submit}{\@modosubmetertrue}
 \DeclareOption{publish}{\@modopublicartrue}
 \DeclareOption{acceptingpublish}{
-    \@modopublicartrue
-    \@modopublicaraceitandotrue
+\@modopublicartrue
+\@modopublicaraceitandotrue
 }
 \DeclareOption{toclofttitles}{\@cwtoclofttitlestrue}
 \ProcessOptions\relax
@@ -131,14 +131,14 @@
 }%
 \@ifpackageloaded{babel}%
 {%  \message{Babel Loaded!}%
-    \RequirePackage{iflang}%
+\RequirePackage{iflang}%
 }{%
-    \message{Babel not detected!}%
+\message{Babel not detected!}%
 }%
-\ifednotebookmarks
-  \@ifpackageloaded{hyperref}{}{
-    \RequirePackage{hyperref}
-  }
+\ifednotebookmarks%
+\@ifpackageloaded{hyperref}{}{%
+\RequirePackage{hyperref}%
+}%
 \fi
 \@ifclassloaded{memoir}%
 {% TRUE
@@ -164,50 +164,50 @@
 \def\cw@attentiontext{Attention}%
 \@ifpackageloaded{babel}%
 {%
-    \IfLanguageName{brazil}%
-    {%
-    \def\cwdrafttitle{Rascunho}%
-    \def\cwcommentstitle{Lista de Comentários}%
-    \def\cwsubjtitle{Lista de Assuntos}%
-    \def\cwcitationstitle{Necessidades de Citação}%
-    \def\cwpleasecitetext{Favor citar}%
-    \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-    \def\cwpleasecitemarginnote{Citar}%
-    \def\cw@attentiontext{Atenção}%
-    }{}%
-    \IfLanguageName{brazilian}%
-    {%
-        \def\cwdrafttitle{Rascunho}%
-        \def\cwcommentstitle{Lista de Comentários}%
-        \def\cwsubjtitle{Lista de Assuntos}%
-        \def\cwcitationstitle{Necessidades de Citação}%
-        \def\cwpleasecitetext{Favor citar}%
-        \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-        \def\cwpleasecitemarginnote{Citar}%
-        \def\cw@attentiontext{Atenção}%
-    }{}%
-    \IfLanguageName{portuguese}%
-    {%
-        \def\cwdrafttitle{Rascunho}%
-        \def\cwcommentstitle{Lista de Comentários}%
-        \def\cwsubjtitle{Lista de Assuntos}%
-        \def\cwcitationstitle{Necessidades de Citação}%
-        \def\cwpleasecitetext{Favor citar}%
-        \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-        \def\cwpleasecitemarginnote{Citar}%
-        \def\cw@attentiontext{Atenção}%
-    }{}%
-    \IfLanguageName{english}%
-    {%
-        \def\cwdrafttitle{Draft}%
-        \def\cwcommentstitle{List of Comments}%
-        \def\cwsubjtitle{List of Subjects}%
-        \def\cwcitationstitle{List of Citation Needs}%
-        \def\cwpleasecitetext{Plese cite}%
-        \def\cwpleasecitemessage{something to support this information}%
-        \def\cwpleasecitemarginnote{Cite}%
-        \def\cw@attentiontext{Attention}%
-    }{}%
+\IfLanguageName{brazil}%
+{%
+\def\cwdrafttitle{Rascunho}%
+\def\cwcommentstitle{Lista de Comentários}%
+\def\cwsubjtitle{Lista de Assuntos}%
+\def\cwcitationstitle{Necessidades de Citação}%
+\def\cwpleasecitetext{Favor citar}%
+\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+\def\cwpleasecitemarginnote{Citar}%
+\def\cw@attentiontext{Atenção}%
+}{}%
+\IfLanguageName{brazilian}%
+{%
+\def\cwdrafttitle{Rascunho}%
+\def\cwcommentstitle{Lista de Comentários}%
+\def\cwsubjtitle{Lista de Assuntos}%
+\def\cwcitationstitle{Necessidades de Citação}%
+\def\cwpleasecitetext{Favor citar}%
+\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+\def\cwpleasecitemarginnote{Citar}%
+\def\cw@attentiontext{Atenção}%
+}{}%
+\IfLanguageName{portuguese}%
+{%
+\def\cwdrafttitle{Rascunho}%
+\def\cwcommentstitle{Lista de Comentários}%
+\def\cwsubjtitle{Lista de Assuntos}%
+\def\cwcitationstitle{Necessidades de Citação}%
+\def\cwpleasecitetext{Favor citar}%
+\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+\def\cwpleasecitemarginnote{Citar}%
+\def\cw@attentiontext{Atenção}%
+}{}%
+\IfLanguageName{english}%
+{%
+\def\cwdrafttitle{Draft}%
+\def\cwcommentstitle{List of Comments}%
+\def\cwsubjtitle{List of Subjects}%
+\def\cwcitationstitle{List of Citation Needs}%
+\def\cwpleasecitetext{Plese cite}%
+\def\cwpleasecitemessage{something to support this information}%
+\def\cwpleasecitemarginnote{Cite}%
+\def\cw@attentiontext{Attention}%
+}{}%
 }%
 {}%
 \newcounter{cwnotecounter}%
@@ -413,14 +413,14 @@
 }%
 \newcommand{\cwmainemphasis}[1]{\hl{#1}}
 \newcommand{\cwmain}[2][\cor@main]{%
-    \refstepcounter{subject}%
-    \sethlcolor{#1}%
-    \cwmainemphasis{#2}%
-    \if@cwmemoirdefense%
-    \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
-    \else%
-    \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
-    \fi%
+\refstepcounter{subject}%
+\sethlcolor{#1}%
+\cwmainemphasis{#2}%
+\if@cwmemoirdefense%
+\addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
+\else%
+\addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+\fi%
 }%
 \if@cwmemoirdefense%
 \else%

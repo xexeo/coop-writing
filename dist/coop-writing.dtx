@@ -35,9 +35,9 @@
 \usepackage{hyperref}
 \makeatletter
 \ifednotebookmarks
-  \@ifpackageloaded{hyperref}{}{
-    \usepackage{hyperref}
-  }
+\@ifpackageloaded{hyperref}{}{
+\usepackage{hyperref}
+}
 \fi
 \makeatother
 \cwnamedef{xexeo}{red}{Xexéo}
@@ -64,18 +64,18 @@
 \makeindex
 \MakeShortVerb{\|}
 \begin{document}
-    \DocInput{coop-writing.dtx}
-    \printbibliography
-    \newpage
-    \PrintChanges
-    \newpage
-    \PrintIndex
-    \newpage
-    \listofcomments
-    \newpage
-    \listofcitationneeds
-    \newpage
-    \listofsubjects
+\DocInput{coop-writing.dtx}
+\printbibliography
+\newpage
+\PrintChanges
+\newpage
+\PrintIndex
+\newpage
+\listofcomments
+\newpage
+\listofcitationneeds
+\newpage
+\listofsubjects
 \end{document}
 %</driver>
 % \fi
@@ -118,7 +118,7 @@
 % \changes{1.4.4}{2024/02/09}{soul substitutes soulutf8 that is now obsolete}
 % \changes{1.5}{2024/02/09}{Commands to change text color (and restore)}
 % \changes{1.5.1}{2024/02/09}{Coloring should only work in edit mode}
-% \changes{1.5.2}{2024/11/18}{clash with mdpi option submit, make 2 options that should be excludent possible together, solving if nested ifs, solving hyperref problem too }
+% \changes{1.5.2}{2024/11/18}{clash with mdpi option submit, make 2 options that should be excludent possible together, solving if nested ifs, solving hyperref problem too}
 %\maketitle
 %
 % \tableofcontents
@@ -175,10 +175,10 @@
 % the distributed style file through its URL. To do that, inside your project, select first ``Upload''. An ``Add files'' window will appear, then select ``From External URL'' and enter \url{https://raw.githubusercontent.com/xexeo/coop-writing/main/dist/coop-writing.sty} as ``URL to fetch the file from'' and ``coop-writing'' as ``File Name in This Project'', as in Figure \ref{fig:overleaffileurl}.
 %
 %\begin{figure}[tbh]
-%    \centering
-%    \includegraphics[width=0.9\linewidth]{images/overleaffileurl}
-%    \caption{How to link a coop-writing.sty file in your project folder in Overleaf to the official distribution.}
-%    \label{fig:overleaffileurl}
+%\centering
+%\includegraphics[width=0.9\linewidth]{images/overleaffileurl}
+%\caption{How to link a coop-writing.sty file in your project folder in Overleaf to the official distribution.}
+%\label{fig:overleaffileurl}
 %\end{figure}
 %
 %
@@ -204,13 +204,13 @@
 %
 % \subsection{Command oriented options}
 % \begin{itemize}
-%    \item |subjects|, \DescribeMacro{subjects}  enables the use of |\subject|, which is proposed as a paragraph heading describing its subject;
-%    \item |comments|, \DescribeMacro{comments}  enables all editorial comments and the command |\pleasecite|;
-%    \item |drafts|, \DescribeMacro{drafts}  enables the |\cwdraft| command;
-%    \item |suggestions|, \DescribeMacro{suggestions}  enables the comments definided in the suggestion section of this text.
-%    \item |anonymize|, \DescribeMacro{anonymize}   enables anonymization commands, and
-%    \item |todos|, \DescribeMacro{todos}  enables the to do family of  commands.
-%    \item |changecolor|, \DescribeMacro{changecolor} enable the |cwcolor| family of commands
+%\item |subjects|, \DescribeMacro{subjects}  enables the use of |\subject|, which is proposed as a paragraph heading describing its subject;
+%\item |comments|, \DescribeMacro{comments}  enables all editorial comments and the command |\pleasecite|;
+%\item |drafts|, \DescribeMacro{drafts}  enables the |\cwdraft| command;
+%\item |suggestions|, \DescribeMacro{suggestions}  enables the comments definided in the suggestion section of this text.
+%\item |anonymize|, \DescribeMacro{anonymize}   enables anonymization commands, and
+%\item |todos|, \DescribeMacro{todos}  enables the to do family of  commands.
+%\item |changecolor|, \DescribeMacro{changecolor} enable the |cwcolor| family of commands
 %\end{itemize}
 %
 %\subsection{State oriented options}
@@ -228,7 +228,7 @@
 %
 %
 % \begin{itemize}
-%    \item |nopdfbookmarks| will avoid adding bookmarks in the |pdf| file for all comments. The default behavior of |coop-writing| is adding them.
+%\item |nopdfbookmarks| will avoid adding bookmarks in the |pdf| file for all comments. The default behavior of |coop-writing| is adding them.
 %
 %   \item |toclofttitles| toggles the option |titles| in |tocloft|, that avoid the redefinition of |\listoffigures| and |\listoftables|. This fix the bug with |CoppeTeX| package, identified as |coppe|.
 %\end{itemize}
@@ -290,10 +290,10 @@
 %
 %
 %\begin{figure}[tbh]
-%    \centering
-%    \includegraphics[width=0.8\linewidth]{images/editorialnotes}
-%    \caption{How comments appear in the document when \texttt{editing} option is on.}
-%    \label{fig:editorialnotes}
+%\centering
+%\includegraphics[width=0.8\linewidth]{images/editorialnotes}
+%\caption{How comments appear in the document when \texttt{editing} option is on.}
+%\label{fig:editorialnotes}
 %\end{figure}
 %
 %
@@ -533,9 +533,9 @@
 %
 % The alternative text used by anonymization commands can be configured with other commands:
 %\begin{itemize}
-%    \item |\cwdefanontext|\marg{replacement-text} \DescribeMacro{\cwdefanontext}
-%    \item |\cwdefanoncitetext|\marg{replacement-text} \DescribeMacro{\cwdefanoncitetext}%
-%    \item |\cwdefanoncitettext|\marg{replacement-text} \DescribeMacro{\cwdefanoncitettext}
+%\item |\cwdefanontext|\marg{replacement-text} \DescribeMacro{\cwdefanontext}
+%\item |\cwdefanoncitetext|\marg{replacement-text} \DescribeMacro{\cwdefanoncitetext}%
+%\item |\cwdefanoncitettext|\marg{replacement-text} \DescribeMacro{\cwdefanoncitettext}
 %\item|\cwdefanonciteptext|\marg{replacement-text} \DescribeMacro{\cwdefanonciteptext}
 %\end{itemize}
 %
@@ -811,10 +811,10 @@
 %
 % This style supports the following |babel| defined languages:
 % \begin{itemize}
-%    \item brazil,
-%    \item brazilian,
-%    \item portuguese, and
-%    \item english.
+%\item brazil,
+%\item brazilian,
+%\item portuguese, and
+%\item english.
 %\end{itemize}
 %
 % \DescribeMacro{\cwcommentstitle}
@@ -826,19 +826,19 @@
 % \DescribeMacro{\cwpleasecitemarginnote}
 %% To use other language, or to use other texts instead of the standard ones, you should define these macros, as in:
 %
-%    |\def\cwdrafttitle{Draft}|%
+%|\def\cwdrafttitle{Draft}|%
 %
-%    |\def\cwcommentstitle{List of Comments}|%
+%|\def\cwcommentstitle{List of Comments}|%
 %
-%    |\def\cwsubjtitle{List of Subjects}|%
+%|\def\cwsubjtitle{List of Subjects}|%
 %
-%    |\def\cwcitationstitle{List of Citation Needs}|%
+%|\def\cwcitationstitle{List of Citation Needs}|%
 %
-%    |\def\cwpleasecitetext{Plese cite}|%
+%|\def\cwpleasecitetext{Plese cite}|%
 %
-%    |\def\cwpleasecitemessage{something to support this information}|%
+%|\def\cwpleasecitemessage{something to support this information}|%
 %
-%    |\def\cwpleasecitemarginnote{Cite}|%
+%|\def\cwpleasecitemarginnote{Cite}|%
 %
 %\section{Optional Files (input and include)}
 %
@@ -887,17 +887,17 @@
 % \begin{table}[htb]
 % \caption{Tradução dos comandos para português.}
 %\begin{tabular}{ccc}
-%    \hline
-%    Tipo & Inglês & Português \\
-%    \hline
-%    environment & |cwdraft| &|rascunho|\\
-%    macro & |\cwnamedef| &|\cwautor|  \\
-%    macro & |\cwsubject| & |\cwassunto|\\
-%    macro & |\listofcomments| & |\listofcomentario|\\
-%    macro & |\listofsubjects| & |\listofassunto|\\
-%    macro & |\listofcitationneeds| & |\listofcomentarioref|\\
-%    macro & |\todo| & |\todo| \\
-%    \hline
+%\hline
+%Tipo & Inglês & Português \\
+%\hline
+%environment & |cwdraft| &|rascunho|\\
+%macro & |\cwnamedef| &|\cwautor|  \\
+%macro & |\cwsubject| & |\cwassunto|\\
+%macro & |\listofcomments| & |\listofcomentario|\\
+%macro & |\listofsubjects| & |\listofassunto|\\
+%macro & |\listofcitationneeds| & |\listofcomentarioref|\\
+%macro & |\todo| & |\todo| \\
+%\hline
 %\end{tabular}
 % \label{tab:e2p}
 % \end{table}
@@ -911,7 +911,7 @@
 %
 % It is interesting to compare this package with other 3:
 % \begin{itemize}
-%    \item |ed| has more features for commenting, and is more configurable, however it does not have colors.
+%\item |ed| has more features for commenting, and is more configurable, however it does not have colors.
 % \item |todonotes| it does not have the identification of the commentator, which must be put by hand. It has more options too.
 % \item |color-edits| does not support to do notes and drafts.
 % \end{itemize}
@@ -1009,8 +1009,8 @@
 \DeclareOption{submeter}{\@modosubmetertrue}
 \DeclareOption{publicar}{\@modopublicartrue}
 \DeclareOption{publicaraceitando}{
-    \@modopublicartrue
-    \@modopublicaraceitandotrue
+\@modopublicartrue
+\@modopublicaraceitandotrue
 }
 %    \end{macrocode}
 % \subsubsection{English Options, inspired on ed package}
@@ -1033,8 +1033,8 @@
 \DeclareOption{submit}{\@modosubmetertrue}
 \DeclareOption{publish}{\@modopublicartrue}
 \DeclareOption{acceptingpublish}{
-    \@modopublicartrue
-    \@modopublicaraceitandotrue
+\@modopublicartrue
+\@modopublicaraceitandotrue
 }
 %    \end{macrocode}
 % New option to titles in tocloft
@@ -1133,17 +1133,17 @@
 %    \begin{macrocode}
 \@ifpackageloaded{babel}%
 {%  \message{Babel Loaded!}%
-    \RequirePackage{iflang}%
+\RequirePackage{iflang}%
 }{%
-    \message{Babel not detected!}%
+\message{Babel not detected!}%
 }%
 %    \end{macrocode}
 % |hyperref| must always be the last
 %    \begin{macrocode}
-\ifednotebookmarks
-  \@ifpackageloaded{hyperref}{}{
-    \RequirePackage{hyperref}
-  }
+\ifednotebookmarks%
+\@ifpackageloaded{hyperref}{}{%
+\RequirePackage{hyperref}%
+}%
 \fi
 %    \end{macrocode}
 %
@@ -1205,52 +1205,52 @@
 %
 \@ifpackageloaded{babel}%
 {%
-    \IfLanguageName{brazil}%
-    {%
-    \def\cwdrafttitle{Rascunho}%
-    \def\cwcommentstitle{Lista de Comentários}%
-    \def\cwsubjtitle{Lista de Assuntos}%
-    \def\cwcitationstitle{Necessidades de Citação}%
-    \def\cwpleasecitetext{Favor citar}%
-    \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-    \def\cwpleasecitemarginnote{Citar}%
-    \def\cw@attentiontext{Atenção}%
-    }{}%
-    \IfLanguageName{brazilian}%
-    {%
-        \def\cwdrafttitle{Rascunho}%
-        \def\cwcommentstitle{Lista de Comentários}%
-        \def\cwsubjtitle{Lista de Assuntos}%
-        \def\cwcitationstitle{Necessidades de Citação}%
-        \def\cwpleasecitetext{Favor citar}%
-        \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-        \def\cwpleasecitemarginnote{Citar}%
-        \def\cw@attentiontext{Atenção}%
-    }{}%
+\IfLanguageName{brazil}%
+{%
+\def\cwdrafttitle{Rascunho}%
+\def\cwcommentstitle{Lista de Comentários}%
+\def\cwsubjtitle{Lista de Assuntos}%
+\def\cwcitationstitle{Necessidades de Citação}%
+\def\cwpleasecitetext{Favor citar}%
+\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+\def\cwpleasecitemarginnote{Citar}%
+\def\cw@attentiontext{Atenção}%
+}{}%
+\IfLanguageName{brazilian}%
+{%
+\def\cwdrafttitle{Rascunho}%
+\def\cwcommentstitle{Lista de Comentários}%
+\def\cwsubjtitle{Lista de Assuntos}%
+\def\cwcitationstitle{Necessidades de Citação}%
+\def\cwpleasecitetext{Favor citar}%
+\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+\def\cwpleasecitemarginnote{Citar}%
+\def\cw@attentiontext{Atenção}%
+}{}%
 %
-    \IfLanguageName{portuguese}%
-    {%
-        \def\cwdrafttitle{Rascunho}%
-        \def\cwcommentstitle{Lista de Comentários}%
-        \def\cwsubjtitle{Lista de Assuntos}%
-        \def\cwcitationstitle{Necessidades de Citação}%
-        \def\cwpleasecitetext{Favor citar}%
-        \def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-        \def\cwpleasecitemarginnote{Citar}%
-        \def\cw@attentiontext{Atenção}%
-    }{}%
+\IfLanguageName{portuguese}%
+{%
+\def\cwdrafttitle{Rascunho}%
+\def\cwcommentstitle{Lista de Comentários}%
+\def\cwsubjtitle{Lista de Assuntos}%
+\def\cwcitationstitle{Necessidades de Citação}%
+\def\cwpleasecitetext{Favor citar}%
+\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
+\def\cwpleasecitemarginnote{Citar}%
+\def\cw@attentiontext{Atenção}%
+}{}%
 %
-    \IfLanguageName{english}%
-    {%
-        \def\cwdrafttitle{Draft}%
-        \def\cwcommentstitle{List of Comments}%
-        \def\cwsubjtitle{List of Subjects}%
-        \def\cwcitationstitle{List of Citation Needs}%
-        \def\cwpleasecitetext{Plese cite}%
-        \def\cwpleasecitemessage{something to support this information}%
-        \def\cwpleasecitemarginnote{Cite}%
-        \def\cw@attentiontext{Attention}%
-    }{}%
+\IfLanguageName{english}%
+{%
+\def\cwdrafttitle{Draft}%
+\def\cwcommentstitle{List of Comments}%
+\def\cwsubjtitle{List of Subjects}%
+\def\cwcitationstitle{List of Citation Needs}%
+\def\cwpleasecitetext{Plese cite}%
+\def\cwpleasecitemessage{something to support this information}%
+\def\cwpleasecitemarginnote{Cite}%
+\def\cw@attentiontext{Attention}%
+}{}%
 }%
 {}%
 %    \end{macrocode}
@@ -1701,14 +1701,14 @@
 \newcommand{\cwmainemphasis}[1]{\hl{#1}}
 %
 \newcommand{\cwmain}[2][\cor@main]{%
-    \refstepcounter{subject}%
-    \sethlcolor{#1}%
-    \cwmainemphasis{#2}%
-    \if@cwmemoirdefense%
-    \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
-    \else%
-    \addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
-    \fi%
+\refstepcounter{subject}%
+\sethlcolor{#1}%
+\cwmainemphasis{#2}%
+\if@cwmemoirdefense%
+\addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}#2}%
+\else%
+\addcontentsline{aaa}{subject}{\protect\numberline{\thesubject}{#2}}%
+\fi%
 }%
 %
 \if@cwmemoirdefense%
