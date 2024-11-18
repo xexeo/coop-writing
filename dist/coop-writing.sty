@@ -13,8 +13,8 @@
 %% This file may be distributed and/or modified under the conditions of
 %% the MIT License
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.5.1}
-\ProvidesPackage{coop-writing}[2024/02/09 \cw@version dtx version of coop-writing]
+\def\cw@version{v1.5.2}
+\ProvidesPackage{coop-writing}[2024/11/18 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
 
 %% To use other language, or to use other texts instead of the standard ones, you should define these macros, as in:
@@ -531,35 +531,33 @@
 \newcommand{\cw@gensug}[7][]{#4}%
 \fi%
 \fi%
-\if@modoedicao
-\newcommand{\cwinput}[3]{\input{#1}}
-\newcommand{\cwinclude}[3]{\include{#1}}
-\newcommand{\cwinputediting}[1]{\input{#1}}
-\newcommand{\cwincludeediting}[1]{\include{#1}}
-\newcommand{\cwinputsubmit}[1]{}
-\newcommand{\cwincludesubmit}[1]{}
-\newcommand{\cwinputpublish}[1]{}
-\newcommand{\cwincludepublish}[1]{}
-\fi
-\if@modopublicar
-\newcommand{\cwinput}[3]{\input{#3}}
-\newcommand{\cwinclude}[3]{\include{#3}}
+\newcommand{\cwinput}[3]{} %% blank commands first
+\newcommand{\cwinclude}[3]{}
 \newcommand{\cwinputediting}[1]{}
 \newcommand{\cwincludeediting}[1]{}
 \newcommand{\cwinputsubmit}[1]{}
 \newcommand{\cwincludesubmit}[1]{}
-\newcommand{\cwinputpublish}[1]{\input{#1}}
-\newcommand{\cwincludepublish}[1]{\include{#1}}
-\fi
-\if@modosubmeter
-\newcommand{\cwinput}[3]{\input{#2}}
-\newcommand{\cwinclude}[3]{\include{#2}}
-\newcommand{\cwinputediting}[1]{}
-\newcommand{\cwincludeediting}[1]{}
-\newcommand{\cwinputsubmit}[1]{\input{#1}}
-\newcommand{\cwincludesubmit}[1]{\include{#1}}
 \newcommand{\cwinputpublish}[1]{}
 \newcommand{\cwincludepublish}[1]{}
+\if@modoedicao %% redefine only the necessary commands
+    \renewcommand{\cwinput}[3]{\input{#1}}
+    \renewcommand{\cwinclude}[3]{\include{#1}}
+    \renewcommand{\cwinputediting}[1]{\input{#1}}
+    \renewcommand{\cwincludeediting}[1]{\include{#1}}
+\else
+    \if@modopublicar
+        \renewcommand{\cwinput}[3]{\input{#3}}
+        \renewcommand{\cwinclude}[3]{\include{#3}}
+        \renewcommand{\cwinputpublish}[1]{\input{#1}}
+        \renewcommand{\cwincludepublish}[1]{\include{#1}}
+    \else
+        \if@modosubmeter
+            \renewcommand{\cwinput}[3]{\input{#2}}
+            \renewcommand{\cwinclude}[3]{\include{#2}}
+            \renewcommand{\cwinputsubmit}[1]{\input{#1}}
+            \renewcommand{\cwincludesubmit}[1]{\include{#1}}
+        \fi
+    \fi
 \fi
 \if@showcomentario%
 \newcommand{\listcomentarioref}{\cwcitationstitle}%
