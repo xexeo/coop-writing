@@ -80,7 +80,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{980}
+% \CheckSum{989}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -976,6 +976,7 @@
 % \label{code:option}
 %    \begin{macrocode}
 \newif\ifshowednotes\showednotestrue%
+\newif\ifcw@avoidhyperref\cw@avoidhyperreffalse
 \newif\ifmargins\marginstrue%
 \newif\ifednotebookmarks\ednotebookmarkstrue%
 % \subsubsection{Creating Original Options Variables}
@@ -1000,6 +1001,7 @@
 % \subsubsection{Portuguese Options}
 %    \begin{macrocode}
 \DeclareOption{rascunhos}{\@showdrafttrue}
+\DeclareOption{cwavoidhyperref}{cw@avoidhyperreftrue}
 \DeclareOption{comentarios}{\@showcomentariotrue}
 \DeclareOption{anonimizar}{\@anonimizartrue} % isso vai se perder nos modos
 \DeclareOption{naoanonimizar}{\@naoanonimizartrue}
@@ -1141,9 +1143,20 @@
 % |hyperref| must always be the last
 %    \begin{macrocode}
 \ifednotebookmarks%
-\@ifpackageloaded{hyperref}{}{%
-\RequirePackage{hyperref}%
-}%
+\@ifpackageloaded{hyperref}%
+  {
+    \message{Hyperref loaded before coop-writing}
+  }
+  { \message{Hyperref loaded before coop-writing}
+    \ifcw@avoidhyperref
+       {
+         \message{coop-writing must avoid hyperref}
+       }%
+       {
+         \message{Hyperref called by coop-writing}
+         \RequirePackage{hyperref}
+       }%
+  }
 \fi
 %    \end{macrocode}
 %

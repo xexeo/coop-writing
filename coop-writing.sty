@@ -23,6 +23,7 @@
 %%
 %%
 \newif\ifshowednotes\showednotestrue%
+\newif\ifcw@avoidhyperref\cw@avoidhyperreffalse
 \newif\ifmargins\marginstrue%
 \newif\ifednotebookmarks\ednotebookmarkstrue%
 \newif\if@showcomentario\@showcomentariofalse%
@@ -40,6 +41,7 @@
 \newif\if@cwtoclofttitles\@cwtoclofttitlesfalse
 \newif\if@changecolor\@changecolorfalse
 \DeclareOption{rascunhos}{\@showdrafttrue}
+\DeclareOption{cwavoidhyperref}{cw@avoidhyperreftrue}
 \DeclareOption{comentarios}{\@showcomentariotrue}
 \DeclareOption{anonimizar}{\@anonimizartrue} % isso vai se perder nos modos
 \DeclareOption{naoanonimizar}{\@naoanonimizartrue}
@@ -136,9 +138,20 @@
 \message{Babel not detected!}%
 }%
 \ifednotebookmarks%
-\@ifpackageloaded{hyperref}{}{%
-\RequirePackage{hyperref}%
-}%
+\@ifpackageloaded{hyperref}%
+  {
+    \message{Hyperref loaded before coop-writing}
+  }
+  { \message{Hyperref loaded before coop-writing}
+    \ifcw@avoidhyperref
+       {
+         \message{coop-writing must avoid hyperref}
+       }%
+       {
+         \message{Hyperref called by coop-writing}
+         \RequirePackage{hyperref}
+       }%
+  }
 \fi
 \@ifclassloaded{memoir}%
 {% TRUE
