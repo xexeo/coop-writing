@@ -261,3 +261,5 @@ TSWLatexianTemp*
 *.syx
 tests/Bug Tadeu/testebugpagezero.zip
 coop-writing.hd
+*.bak1
+*.bak0

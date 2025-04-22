@@ -10,55 +10,55 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.5.2}
+%<package>\def\cw@version{v1.5.3}
 %<package>\ProvidesPackage{coop-writing}[2024/11/18 \cw@version dtx version of coop-writing]
 %<*driver>
-\documentclass{ltxdoc}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{csquotes}
-\usepackage[brazilian,english]{babel}
-\usepackage{datetime}
-\usepackage{indentfirst}
-\usepackage{enumitem}
-\usepackage{graphicx}
-\setlist{noitemsep}
-\setlength{\parskip}{0.5em}
-\usepackage{marvosym}
-\usepackage[backend=biber,style=alphabetic,natbib]{biblatex}
-\addbibresource{coop-writing.bib}
-\usepackage[editing]{coop-writing}
-%%\usepackage{textcomp,url,a4wide,array}
-%%\usepackage[eso-foot,today,draft]{svninfo}
-%%\usepackage{xcolor}
-\usepackage{marvosym}
-\usepackage{hyperref}
-\makeatletter
-\ifednotebookmarks
-\@ifpackageloaded{hyperref}{}{
-\usepackage{hyperref}
-}
-\fi
-\makeatother
-\cwnamedef{xexeo}{red}{Xexéo}
+\documentclass{ltxdoc} % Sets the document class
+\usepackage[T1]{fontenc} % Configures T1 font encoding
+\usepackage[utf8]{inputenc} % Sets input encoding to UTF-8
+\usepackage{csquotes} % Loads csquotes package
+\usepackage[brazilian,english]{babel} % Supports multiple languages
+\usepackage{datetime} % Loads datetime package
+\usepackage{indentfirst} % Indents first paragraph
+\usepackage{enumitem} % Controls enumerate/itemize
+\usepackage{graphicx} % Allows including graphics
+\setlist{noitemsep} % No item separation
+\setlength{\parskip}{0.5em} % Sets paragraph skip
+\usepackage{marvosym} % Loads marvosym symbols
+\usepackage[backend=biber,style=alphabetic,natbib]{biblatex} % Manages bibliography
+\addbibresource{coop-writing.bib} % Adds bibliography file
+\usepackage[editing]{coop-writing} % Uses coop-writing in editing mode
+%%\usepackage{textcomp,url,a4wide,array} % Commented out
+%%\usepackage[eso-foot,today,draft]{svninfo} % Commented out
+%%\usepackage{xcolor} % Commented out
+\usepackage{marvosym} % Loads marvosym again
+\usepackage{hyperref} % Adds hyperlink support
+\makeatletter % Begin special @ region
+\ifednotebookmarks % Checks ednotebookmarks
+\@ifpackageloaded{hyperref}{}{ % Condition for hyperref
+\usepackage{hyperref} % Adds hyperlink support if not loaded
+} % End condition
+\fi % End ifednotebookmarks
+\makeatother % End special @ region
+\cwnamedef{xexeo}{red}{Xexéo} % Defines xexeo alias
 %
 %
 %
 %
-\EnableCrossrefs
-\CodelineIndex
-\RecordChanges
+\EnableCrossrefs % Enables crossrefs
+\CodelineIndex % Adds code line indices
+\RecordChanges % Records changes
 %
-\DoNotIndex{\def,\long,\edef,\xdef,\gdef,\let,\global}
-\DoNotIndex{\begin,\AtEndDocument,\newcommand,\newcounter,\stepcounter}
-\DoNotIndex{\immediate,\openout,\closeout,\message,\typeout}
-\DoNotIndex{\section,\scshape,\arabic}
+\DoNotIndex{\def,\long,\edef,\xdef,\gdef,\let,\global} % Excludes indexing
+\DoNotIndex{\begin,\AtEndDocument,\newcommand,\newcounter,\stepcounter} % Excludes indexing
+\DoNotIndex{\immediate,\openout,\closeout,\message,\typeout} % Excludes indexing
+\DoNotIndex{\section,\scshape,\arabic} % Excludes indexing
 %
 %
 %
-\title{coop-writing \coopwritingversion}
-\author{Geraldo Xexéo}
-\date{\today\ - \ \currenttime}
+\title{coop-writing \coopwritingversion} % Sets the document title
+\author{Geraldo Xexéo} % Sets the author name
+\date{\today\ - \ \currenttime} % Sets the current date/time
 \GetFileInfo{coop-writing.sty}
 %
 \makeindex
@@ -80,7 +80,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{989}
+% \CheckSum{1001}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -119,6 +119,7 @@
 % \changes{1.5}{2024/02/09}{Commands to change text color (and restore)}
 % \changes{1.5.1}{2024/02/09}{Coloring should only work in edit mode}
 % \changes{1.5.2}{2024/11/18}{clash with mdpi option submit, make 2 options that should be excludent possible together, solving if nested ifs, solving hyperref problem too}
+% \changes{1.5.3}{2024/11/18}{colors in cwinput and cwinclude (only for editing)}
 %\maketitle
 %
 % \tableofcontents
@@ -1872,10 +1873,10 @@
 \newcommand{\cwinputpublish}[1]{}%
 \newcommand{\cwincludepublish}[1]{}%
 \if@modoedicao %% redefine only the necessary commands
-\renewcommand{\cwinput}[3]{\input{#1}}%
-\renewcommand{\cwinclude}[3]{\include{#1}}%
-\renewcommand{\cwinputediting}[1]{\input{#1}}%
-\renewcommand{\cwincludeediting}[1]{\include{#1}}%
+\renewcommand{\cwinput}[3]{\cwcolor{\cw@editAnonColor}\input{#1}\cwrestorecolor}%
+\renewcommand{\cwinclude}[3]{\cwcolor{\cw@editAnonColor}\include{#1}\cwrestorecolor}%
+\renewcommand{\cwinputediting}[1]{\cwcolor{\cw@editAnonColor}\input{#1}\cwrestorecolor}%
+\renewcommand{\cwincludeediting}[1]{\cwcolor{\cw@editAnonColor}\include{#1}\cwrestorecolor}%
 \else%
 \if@modopublicar%
 \renewcommand{\cwinput}[3]{\input{#3}}%
