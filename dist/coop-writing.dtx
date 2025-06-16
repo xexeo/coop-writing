@@ -130,13 +130,13 @@
 % This package supports editorial comments and gives some extra support for writing papers, or any document that involves more than one author or editor.
 %
 % Usually, a final version of a  document would be printed with the |publish| option turned on, and no editorial comments would appear.
-% In this document \xexeo[the reader will see some uses]{This is an exemple of using this package to make a comment with highlighted text} of the package, since it is distributted with the |editing| option turned on.
+% In this document \xexeo[the reader will see some uses]{This is an exemple of using this package to make a comment with highlighted text} of the package, since it is distributed with the |editing| option turned on.
 % This is done to provide the examples of use.
 %
 %
 % \subsection{A bit of context}
 %
-% I wrote |coop-writing|  to support my way of writing papers in colaboration with my students, and also to comment on  theses and dissertations I supervise. It received many
+% I wrote |coop-writing|  to support my way of writing papers in collaboration with my students, and also to comment on  theses and dissertations I supervise. It received many
 % suggestions from my students.
 %
 %The starting goal was to build a front-end that would put together other packages, with the best behavior of each package, mostly |ed| and |todonotes|, but with time, and the difficulty to make different packages with commands that have the same name to coexist, it grew in scope.
@@ -187,7 +187,7 @@
 %\section{Package Options}
 %
 %
-%"Using the package allows the use of all macros and environments described in this manual. However, if the options are not turned on, there will be no effect on the generated PDF because, by default, all options are false.
+%Using the package allows the use of all macros and environments described in this manual. However, if the options are not turned on, there will be no effect on the generated PDF because, by default, all options are false.
 %
 % There are three types of options. The first type enables the visualization of the result of specific macros or environments, such as
 % the |cwdraft| environment. They are named \textit{command oriented options}. You can use many of them in the same time.
@@ -202,14 +202,14 @@
 %
 % If they appear together, state oriented commands have precedence over the others. However, the user should avoid mixing command and state oriented options. Also, you should \textbf{use only one of the state oriented options.}
 %
-% It should be clear that the options have no impact on the availability of the macros and enviroments, they will be there for you to use, but the deeply affect their behavior. A macro that is very complex, such as |\cwauthor|, if one of the options |comments| or |editing| is selected, is replaced by a simple version that do almost nothing.
+% It should be clear that the options have no impact on the availability of the macros and environments, they will be there for you to use, but the deeply affect their behavior. A macro that is very complex, such as |\cwauthor|, if one of the options |comments| or |editing| is selected, is replaced by a simple version that does almost nothing.
 %
 % \subsection{Command oriented options}
 % \begin{itemize}
 %\item |subjects|, \DescribeMacro{subjects}  enables the use of |\subject|, which is proposed as a paragraph heading describing its subject;
 %\item |comments|, \DescribeMacro{comments}  enables all editorial comments and the command |\pleasecite|;
 %\item |drafts|, \DescribeMacro{drafts}  enables the |\cwdraft| command;
-%\item |suggestions|, \DescribeMacro{suggestions}  enables the comments definided in the suggestion section of this text.
+%\item |suggestions|, \DescribeMacro{suggestions}  enables the comments defined in the suggestion section of this text.
 %\item |anonymize|, \DescribeMacro{anonymize}   enables anonymization commands, and
 %\item |todos|, \DescribeMacro{todos}  enables the to do family of  commands.
 %\item |changecolor|, \DescribeMacro{changecolor} enable the |cwcolor| family of commands
@@ -242,7 +242,7 @@
 %
 % \subsection{General behavior}
 %
-% The general behavior of this package is to provide various ways of marking your text, such as with comments or 'to-do' notes, which can be completely suppressed if desired.. Mostly, this can be easilly done using one the the 3 main option states: |editing|, |submit|, and |publish|.
+% The general behavior of this package is to provide various ways of marking your text, such as with comments or 'to-do' notes, which can be completely suppressed if desired.. Mostly, this can be easily done using one the the 3 main option states: |editing|, |submit|, and |publish|.
 %
 %
 % Users should use the |editing| state most of the time. In this state, all
@@ -316,7 +316,7 @@
 %|\cwnamedef| \marg{name}\marg{color}\marg{author-name}
 %
 %
-% Where \meta{name} will be the base command name, which generates different commands, by receiving sufixes, \meta{color} is the color to be used by all
+% Where \meta{name} will be the base command name, which generates different commands, by receiving suffixes, \meta{color} is the color to be used by all
 % comments and suggestions made by this author, and \meta{author-name} is the string to be used to represent the collaborator.
 %
 % As an example, I usually declare myself as:
@@ -324,7 +324,7 @@
 % |\cwnamedef{xexeo}{red}{Xexéo}|
 %
 % And, among other commands, |\xexeo| will be defined in such a way that it generates
-% a footnote written in red, with a indicative margin note in the same color. Both will
+% a footnote written in red, with an indicating margin note in the same color. Both will
 % be identified with ``Xexéo''\xexeo{This is the example of the minimal use of an editorial command}.
 %
 %
@@ -367,7 +367,7 @@
 % be referenced as |\ref{cw:FirstLabel}|, as in here Comment \ref{cw:FirstLabel}.
 %
 %
-%\subsection{Striked-throught comments}
+%\subsection{Strikedthrought comments}
 %
 % After using the editorial comments for a time, we started to delete the old ones that represented fixed problems. However, we notice that some comments should be kept,
 % even if solved.
@@ -415,16 +415,16 @@
 % by the author. It is also possible to make a comment, but in this command the command
 % is the optional argument.
 %
-% As example, in this paragraph the following text:
+% As example, in this paragraph, the following text:
 %
 % \begin{verbatim}
-%  \cwauthorsug{inserted text} will appears in the red, and it is
+%  \cwauthorsug{inserted text} will appear in red, and it is
 % possible to \cweditorsug[I want to insert this]{use a comment}.
 % \end{verbatim}
 %
 % generates:
 %
-%  \cwauthorsug{inserted text} will appears in the red, and it is
+%  \cwauthorsug{inserted text} will appear in red, and it is
 % possible to \cweditorsug[I want to insert this]{use a comment}.
 %
 % \DescribeMacro{\<name>rem}
@@ -749,7 +749,7 @@
 %
 % |\todo|[inline]\marg{text}
 %
-% A todo without a inline option is equivent to a comment of
+% A todo without a inline option is equivalent to a comment of
 % author ``To do''\todo{This is how it works without the inline option}. With the option, the text will appear inside an orange box, as in the example below.
 %
 %
@@ -788,7 +788,7 @@
 %
 % \section{Coloring Text}
 %
-%  Sometimes we want to color text. As for version 1.5 we have the neew
+%  Sometimes we want to color text. As for version 1.5 we have the new
 %  \verb|\cwcolor| and \verb|\cwrestore| color commands.
 %
 %\DescribeMacro{\cwcolor}
