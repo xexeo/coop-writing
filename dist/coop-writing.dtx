@@ -10,7 +10,7 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.5.3}
+%<package>\def\cw@version{v1.5.4}
 %<package>\ProvidesPackage{coop-writing}[2024/11/18 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc} % Sets the document class
@@ -114,12 +114,13 @@
 % \changes{v1.4}{2022/06/12}{Now there are commands to include files in special situations}
 % \changes{v1.4.1}{2022/06/14}{Text that will be anonimized will appear in a different color}
 % \changes{v1.4.2}{2022/06/17}{Citation that will be anonimized will appear in a different color}
-% \changes{v1.4.3}{2022/06/17}{Suggestions, removal now have default commentaries}
+% \changes{v1.4.3}{2022/06/17}{Suggestions, removal now have default comments}
 % \changes{1.4.4}{2024/02/09}{soul substitutes soulutf8 that is now obsolete}
 % \changes{1.5}{2024/02/09}{Commands to change text color (and restore)}
 % \changes{1.5.1}{2024/02/09}{Coloring should only work in edit mode}
 % \changes{1.5.2}{2024/11/18}{clash with mdpi option submit, make 2 options that should be excludent possible together, solving if nested ifs, solving hyperref problem too}
 % \changes{1.5.3}{2024/11/18}{colors in cwinput and cwinclude (only for editing)}
+% \changes{1.5.4}{2025/06/16}{inline todo appear in list of comments}
 %\maketitle
 %
 % \tableofcontents
@@ -162,7 +163,7 @@
 %
 % |\usepackage[publish]{coop-writing}|
 %
-% After that, you can use |\cwauthor| or |\cweditor| to make commentaries, but you should
+% After that, you can use |\cwauthor| or |\cweditor| to make comments, but you should
 % look at the many options available that are described in section \ref{sec:edcom}. You will probably want to define authors as described in subsection \ref{sec:create}.
 %
 %\subsection{How to complain or make suggestions}
@@ -1905,7 +1906,7 @@
 % \subsection{Citations Needed}
 % One common error of students is not to cite correctly.
 % Citation errors are so common that I decided to provide the option to have an optional list just for them.
-% They are enable together with commentaries, users can use them or not.
+% They are enable together with comments, users can use them or not.
 %    \begin{macrocode}
 \if@showcomentario%
 \newcommand{\listcomentarioref}{\cwcitationstitle}%
@@ -2037,7 +2038,7 @@
 % an editorial comment for a user called ``To do''. If it is used, it tries to simulate
 % the simplest behavior of |todonotes| package.
 % In the future this can be enhanced, since package |mdframe| is very powerful.
-% If the non-inline version is used, the to do note will not appear in the List of Commentaries.\xexeo{It would be nice to check if todonotes is load and just use it}
+% If the non-inline version is used, the to do note will now (since 1.5.4) appear in the List of Comments.\xexeo{It would be nice to check if todonotes is loaded and just use it}
 %    \begin{macrocode}
 \newcommand{\cw@todobackgroundcolor}{orange}%
 \cwnamedef{cw@todoauthor}{orange}{To do}%
