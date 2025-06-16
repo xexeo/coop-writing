@@ -666,6 +666,11 @@
 {%
 \begin{mdframed}[backgroundcolor=\cw@todobackgroundcolor]
 #2%
+\if@cwmemoirdefense%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}To do: #2}%
+\else%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{To do: #2}}%
+\fi%
 \end{mdframed}%
 }%
 {%

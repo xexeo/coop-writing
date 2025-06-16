@@ -80,7 +80,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1001}
+% \CheckSum{1012}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -2047,6 +2047,11 @@
 {%
 \begin{mdframed}[backgroundcolor=\cw@todobackgroundcolor]
 #2%
+\if@cwmemoirdefense%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}To do: #2}%
+\else%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{To do: #2}}%
+\fi%
 \end{mdframed}%
 }%
 {%
