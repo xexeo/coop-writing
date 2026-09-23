@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% Copyright (C) 2024 by Geraldo Xexéo
+% Copyright (C) 2024--2026 by Geraldo Xexéo
 %
 % This file may be distributed and/or modified under the
 % conditions of the MIT License
@@ -10,12 +10,14 @@
 %
 %\iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}
-%<package>\def\cw@version{v1.5.4}
-%<package>\ProvidesPackage{coop-writing}[2024/11/18 \cw@version dtx version of coop-writing]
+%<package>\def\cw@version{v1.5.5}
+%<package>\ProvidesPackage{coop-writing}[2026/09/23 \cw@version dtx version of coop-writing]
 %<*driver>
 \documentclass{ltxdoc} % Sets the document class
-\usepackage[T1]{fontenc} % Configures T1 font encoding
-\usepackage[utf8]{inputenc} % Sets input encoding to UTF-8
+\usepackage{iftex} % Detects the TeX engine
+\ifPDFTeX
+  \usepackage[T1]{fontenc} % T1 font encoding for pdfLaTeX
+\fi
 \usepackage{csquotes} % Loads csquotes package
 \usepackage[brazilian,english]{babel} % Supports multiple languages
 \usepackage{datetime} % Loads datetime package
@@ -31,7 +33,6 @@
 %%\usepackage{textcomp,url,a4wide,array} % Commented out
 %%\usepackage[eso-foot,today,draft]{svninfo} % Commented out
 %%\usepackage{xcolor} % Commented out
-\usepackage{marvosym} % Loads marvosym again
 \usepackage{hyperref} % Adds hyperlink support
 \makeatletter % Begin special @ region
 \ifednotebookmarks % Checks ednotebookmarks
@@ -121,6 +122,7 @@
 % \changes{1.5.2}{2024/11/18}{clash with mdpi option submit, make 2 options that should be excludent possible together, solving if nested ifs, solving hyperref problem too}
 % \changes{1.5.3}{2024/11/18}{colors in cwinput and cwinclude (only for editing)}
 % \changes{1.5.4}{2025/06/16}{inline todo appear in list of comments}
+% \changes{v1.5.5}{2026/09/23}{Fix TODO default behavior, hyperref conditional handling, UTF-8 documentation setup, and release documentation}
 %\maketitle
 %
 % \tableofcontents
