@@ -1109,7 +1109,6 @@
 \RequirePackage[normalem]{ulem}
 \RequirePackage{etoolbox} % \ifdef comes from here
 \RequirePackage{environ}
-\RequirePackage{xstring}
 \RequirePackage{csquotes}
 \RequirePackage{mdframed}
 %    \end{macrocode}
@@ -2043,9 +2042,10 @@
 \newcommand{\cw@todobackgroundcolor}{orange}%
 \cwnamedef{cw@todoauthor}{orange}{To do}%
 \if@showtodo%
-\newcommand{\todo}[2][comentar]{%
-\IfEq{inline}{#1}%
+\newcommand{\todo}[2][]{%
+\ifstrequal{#1}{inline}%
 {%
+\refstepcounter{comentario}%
 \begin{mdframed}[backgroundcolor=\cw@todobackgroundcolor]
 #2%
 \if@cwmemoirdefense%
@@ -2056,6 +2056,9 @@
 \end{mdframed}%
 }%
 {%
+\ifstrempty{#1}{}{%
+\PackageWarning{coop-writing}{Unknown todo option '#1'; using default comment style}%
+}%
 \cw@todoauthor{#2}%
 }%
 }%
