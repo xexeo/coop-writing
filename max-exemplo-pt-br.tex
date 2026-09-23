@@ -43,10 +43,6 @@
   {Projeto Editorial Aberto da Universidade de Exemplo}
   {Projeto anônimo}
 
-% Na v1.5.4 existe \rascunho, mas não \endrascunho.
-% Esta linha de compatibilidade pode ser removida depois da issue #40.
-\providecommand{\endrascunho}{\endcwdraft}
-
 % Configurações de cor disponíveis na v1.5.4.
 \cwsetanoncolor{violet}
 \cwsetsubjectcolor{cyan}
@@ -177,8 +173,7 @@ O alias português também funciona.\favorcitar[O alias deve gerar o mesmo tipo 
 Este bloco é provisório. Ele aparece em edição e deve desaparecer dos modos limpos.
 \end{cwdraft}
 
-O alias português do ambiente é demonstrado usando a linha temporária
-de compatibilidade definida no preâmbulo:
+O alias português do ambiente é demonstrado diretamente:
 
 \begin{rascunho}[Alias em português]
 Este é o mesmo mecanismo de rascunho acessado pelo alias em português.
