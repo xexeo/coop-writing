@@ -1,0 +1,296 @@
+% !TeX program = pdflatex
+% UTF-8
+%
+% Exemplo máximo do coop-writing, PT-BR.
+% Este arquivo exercita intencionalmente a API pública/documentada da v1.5.4.
+% O exemplo principal usa o modo EDIÇÃO.
+%
+% Modos principais:
+%   edicao | submeter | publicar | publicaraceitando
+% Equivalentes em inglês:
+%   editing | submit | publish | acceptingpublish
+%
+% Opções de recurso/comportamento atuais incluem:
+% comentarios, anonimizar, naoanonimizar, sugestoes, assuntos, rascunhos,
+% todos, changecolor, nopdfbookmarks, cwavoidhyperref, toclofttitles.
+%
+\documentclass[11pt]{article}
+
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \newcommand{\CWEngine}{pdfLaTeX}
+\else
+  \ifLuaTeX
+    \newcommand{\CWEngine}{LuaLaTeX}
+  \else
+    \newcommand{\CWEngine}{outro engine TeX}
+  \fi
+\fi
+
+\usepackage[brazilian]{babel}
+\usepackage[a4paper,margin=28mm]{geometry}
+\usepackage{lipsum}
+\usepackage[edicao]{coop-writing}
+
+% Famílias de colaboradores. cwautor é o alias português de cwnamedef.
+\cwnamedef{alice}{blue}{Alice}
+\cwautor{bruno}{teal}{Bruno}
+
+% Comando reutilizável dependente da anonimização.
+\cwblind{\nomedoprojeto}
+  {Projeto Editorial Aberto da Universidade de Exemplo}
+  {Projeto anônimo}
+
+% Na v1.5.4 existe \rascunho, mas não \endrascunho.
+% Esta linha de compatibilidade pode ser removida depois da issue #40.
+\providecommand{\endrascunho}{\endcwdraft}
+
+% Configurações de cor disponíveis na v1.5.4.
+\cwsetanoncolor{violet}
+\cwsetsubjectcolor{cyan}
+\cwsetmaincolor{yellow}
+\cwsetdraftcolor{green}
+\cwdefinetodocolor{yellow}
+
+% Textos usados na saída anônima.
+\cwdefanontext{Instituição anônima}
+\cwdefanoncitetext{(Anônimo, Ano)}
+\cwdefanonciteptext{(Anônimo, Ano)}
+\cwdefanoncitettext{Anônimo (Ano)}
+
+% Texto usado quando uma sugestão não tem comentário explícito.
+\cwdefattentiontext{Alteração proposta}
+
+\title{Exemplo máximo do coop-writing\\PT-BR}
+\author{Autor de Exemplo}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Versão, codificação e engine}
+
+Este fonte é UTF-8 e está sendo compilado com \CWEngine.
+O pacote informa a versão \coopwritingversion, enquanto
+\printcoopwritingversion\ imprime nome e versão juntos.
+
+Este parágrafo contém UTF-8 real: Xexéo, São Paulo, revisão, informação,
+edição, colaboração, ação e não. Esses casos devem fazer parte dos testes
+com pdfLaTeX e LuaLaTeX propostos nas issues \#34 e \#42.
+
+\section{Strings localizadas atuais}
+
+As strings a seguir podem ser configuradas pelo usuário na implementação atual:
+
+\begin{itemize}
+  \item Título de rascunho: \cwdrafttitle.
+  \item Título da lista de comentários: \cwcommentstitle.
+  \item Título da lista de assuntos: \cwsubjtitle.
+  \item Título da lista de necessidades de citação: \cwcitationstitle.
+  \item Texto de pedido de citação: \cwpleasecitetext.
+  \item Mensagem padrão de pedido de citação: \cwpleasecitemessage.
+  \item Rótulo marginal de citação: \cwpleasecitemarginnote.
+\end{itemize}
+
+\section{Comentários básicos}
+
+A família predefinida de autor cria um comentário aqui
+\cwauthor{Comentário da família predefinida Author}.
+A família predefinida de editor cria outro
+\cweditor[este trecho foi selecionado]{Comentário da família predefinida Editor}.
+
+A família de Alice foi criada por \texttt{\string\cwnamedef}. Primeiro,
+um comentário simples aparece aqui\alice{Comentário simples de Alice}. Um
+trecho selecionado pode ser anotado assim:
+\alice[este texto está selecionado]{Comentário ligado ao trecho selecionado}.
+
+Um comentário rotulado é
+\alicer[trecho rotulado]{Este comentário possui um label LaTeX}{alice-rotulado}.
+O mecanismo atual produz a referência Comentário~\ref{cw:alice-rotulado};
+as issues \#19, \#20 e \#38 discutem um modelo melhor com ID semântico.
+
+Um comentário antigo pode ser mantido riscado
+\alicex{Este comentário antigo aparece como resolvido}.
+A forma rotulada também existe:
+\alicerx[trecho antigo]{Comentário rotulado resolvido}{alice-resolvido}.
+
+\cwsetcommwarn{!}
+Este comentário possui um aviso extra\alice{O ponto de exclamação foi configurado globalmente}.
+\cwsetcommwarn{}
+
+\section{Sugestões, remoções e trocas}
+
+A família completa gerada para Alice é exercitada abaixo.
+
+Alice propõe uma inserção: \alicesug{novo texto proposto}.
+
+Alice propõe uma remoção:
+\alicerem[Esta expressão é redundante]{redação antiga redundante}.
+
+Alice propõe uma substituição:
+\aliceswap[Melhorar a precisão]{uma afirmação imprecisa}{uma afirmação mais precisa}.
+
+O sinônimo em português gerado para cada colaborador também é usado:
+\alicetroca[Mesma operação, nome português]
+{outra formulação antiga}{outra formulação nova}.
+
+Bruno foi definido por \texttt{\string\cwautor}; seus comandos derivados
+funcionam da mesma forma. Por exemplo,
+\brunosug[Sugestão de Bruno]{uma sugestão feita por Bruno}.
+
+\section{API de compatibilidade de baixo nível}
+
+Os comandos desta seção não contêm \texttt{@} e são tecnicamente chamáveis,
+mas usuários normais devem preferir os comandos associados a colaboradores.
+
+\cwnotelabel{Revisor}
+\cwnotemargin{Rv}
+Uma nota de baixo nível aparece aqui\Cwnote{Nota criada diretamente com \string\Cwnote}.
+
+Outra nota, com cor explícita, aparece aqui
+\cwnote[nota-baixo-nivel]{Nota criada diretamente com \string\cwnote}{brown}.
+
+\section{Comportamento de TODO}
+
+O TODO sem opção deve ser o comentário editorial compacto:
+\todo{Este TODO não deve virar uma caixa inline por padrão.}
+
+A forma inline é explicitamente solicitada:
+\todo[inline]{Esta é a caixa grande de TODO pedida com a opção inline.}
+
+A issue \#45 registra esse comportamento como requisito regressivo.
+
+\section{Necessidade de citação}
+
+Esta afirmação factual precisa de apoio.\pleasecite
+
+Esta segunda pede um tipo específico de fonte.
+\pleasecite[Preferir uma revisão sistemática recente.]
+
+O alias português também funciona.\favorcitar[O alias deve gerar o mesmo tipo de item editorial.]
+
+\section{Material de rascunho}
+
+\begin{cwdraft}[Argumento alternativo]
+Este bloco é provisório. Ele aparece em edição e deve desaparecer dos modos limpos.
+\end{cwdraft}
+
+O alias português do ambiente é demonstrado usando a linha temporária
+de compatibilidade definida no preâmbulo:
+
+\begin{rascunho}[Alias em português]
+Este é o mesmo mecanismo de rascunho acessado pelo alias em português.
+\end{rascunho}
+
+\section{Anonimização}
+
+A instituição é protegida diretamente como
+\cwanon{Universidade Federal de Exemplo}.
+
+O comando reutilizável de revisão cega aparece como \nomedoprojeto.
+
+O wrapper genérico de citação produz \cwanoncite{demo-ref}.
+O wrapper compatível com citação parentética produz
+\cwanoncitep[p.~42]{demo-ref}.
+O wrapper compatível com citação textual produz \cwanoncitet{demo-ref}.
+
+No modo de edição, esses elementos aparecem com a cor de anonimização
+configurada; no modo de submissão, usam os textos substitutos do preâmbulo.
+
+\section{Assuntos e ideias principais}
+
+\cwsubject{Primeiro assunto}
+Este parágrafo começa com um marcador de assunto usando o comando canônico.
+
+\cwassunto{Assunto pelo alias em português}
+Este parágrafo demonstra \texttt{\string\cwassunto}.
+
+\cwmain{Esta frase explicita a ideia principal do parágrafo.}
+O restante do parágrafo explica e sustenta essa ideia.
+
+O renderer de ênfase também pode ser usado diretamente:
+\cwmainemphasis{uso direto do renderer atual de ideia principal}.
+
+Ele pode ser redefinido com LaTeX normal:
+\renewcommand{\cwmainemphasis}[1]{\textbf{#1}}
+\cwmain{Esta ideia principal aparece em negrito após redefinir o hook de ênfase.}
+
+\section{Arquivos dependentes do modo}
+
+O seletor de três arquivos aparece abaixo. Nesta compilação em edição,
+o primeiro é usado:
+
+\cwinput
+  {example-fragments/editing-input}
+  {example-fragments/submit-input}
+  {example-fragments/publish-input}
+
+Todos os comandos específicos de \texttt{input} aparecem no fonte:
+
+\cwinputediting{example-fragments/editing-input}
+\cwinputsubmit{example-fragments/submit-input}
+\cwinputpublish{example-fragments/publish-input}
+
+O seletor de três arquivos por \texttt{include} aparece abaixo:
+
+\cwinclude
+  {example-fragments/editing-include}
+  {example-fragments/submit-include}
+  {example-fragments/publish-include}
+
+Todos os comandos específicos de \texttt{include} aparecem no fonte. Apenas
+o de edição executa nesta compilação:
+
+\cwincludeediting{example-fragments/editing-input}
+\cwincludesubmit{example-fragments/submit-input}
+\cwincludepublish{example-fragments/publish-input}
+
+\section{Auxiliares de cor}
+
+Cor normal. \cwcolor{blue}Este texto muda com
+\texttt{\string\cwcolor}.\cwrestorecolor\ A cor normal retorna.
+
+O auxiliar de baixo nível pode ser usado separadamente:
+\cwsavecolor
+\color{magenta}magenta depois de um \texttt{\string\color} explícito;
+\cwrestorecolor
+a cor salva é restaurada.
+
+\section{Conteúdo LaTeX comum}
+
+O pacote deve coexistir com estruturas normais, equações, floats, citações e
+prosa longa. Por exemplo,
+\[
+  f(x)=x^2+1
+\]
+é matemática comum e não deve ser afetada pela camada editorial.
+
+\lipsum[2]
+
+\begin{thebibliography}{1}
+\bibitem{demo-ref}
+A. Autor.
+\newblock Uma referência de demonstração.
+\newblock \emph{Revista de Exemplos}, 1(1):1--10, 2026.
+\end{thebibliography}
+
+\clearpage
+\section*{Listas editoriais: comandos canônicos}
+
+\listofcomments
+\listofcitationneeds
+\listofsubjects
+
+\clearpage
+\section*{Listas editoriais: aliases de compatibilidade}
+
+As chamadas abaixo duplicam intencionalmente as listas anteriores para que
+o exemplo máximo exercite também os aliases históricos/subjacentes.
+
+\listofcomentario
+\listofcomentarioref
+\listofsubject
+\listofassunto
+
+\end{document}
