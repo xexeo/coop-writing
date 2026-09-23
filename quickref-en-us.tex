@@ -1,0 +1,234 @@
+% !TeX program = pdflatex
+% UTF-8
+\documentclass[11pt]{article}
+
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+\fi
+\usepackage[english]{babel}
+\usepackage[a4paper,margin=24mm]{geometry}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage[publish]{coop-writing}
+
+\newcommand{\pkg}{\texttt{coop-writing}}
+\newcommand{\cmd}[1]{\texttt{\textbackslash#1}}
+\newcommand{\opt}[1]{\texttt{#1}}
+
+\title{\pkg\ \coopwritingversion\\Quick Reference (EN-US)}
+\author{Geraldo Xexéo}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Purpose}
+
+\pkg\ is a LaTeX front end for the editorial life cycle of a document. Editorial information stays in the source instead of depending on an editing interface such as Overleaf. The same project can therefore be edited in Overleaf, locally, or through Git while comments, proposed changes, drafts, anonymization, TODOs, and publication behavior remain controlled by LaTeX.
+
+\section*{UTF-8 and engines}
+
+All project sources should be UTF-8. Current LaTeX uses UTF-8 as its default input encoding, so this example does not load \texttt{inputenc}. With pdfLaTeX it selects T1 font encoding; LuaLaTeX uses its native Unicode model.
+
+Explicit engine detection and regression coverage for pdfLaTeX and LuaLaTeX are tracked in issue \#34.
+
+\section*{Start here}
+
+For normal collaborative writing:
+
+\begin{verbatim}
+\usepackage[editing]{coop-writing}
+\cwnamedef{alice}{blue}{Alice}
+\cwnamedef{bob}{red}{Bob}
+\end{verbatim}
+
+Then write, for example:
+
+\begin{verbatim}
+This claim \alice{Check the evidence.} needs revision.
+
+\alice[This sentence]{Please simplify the wording.}
+
+\bobsug{This sentence is a proposed insertion.}
+
+\bobswap{old wording}{new wording}
+\end{verbatim}
+
+\section*{Editorial modes}
+
+Use one main mode per compilation.
+
+\begin{longtable}{>{\ttfamily}p{0.20\linewidth}p{0.72\linewidth}}
+editing &
+Working mode. Shows comments, suggestions, TODOs, subjects, and drafts. Material that would be anonymized is marked rather than hidden.\\
+submit &
+Submission mode. Hides editorial marks and anonymizes protected material by default.\\
+publish &
+Clean publication mode. Hides editorial marks, does not anonymize, and keeps the old side of unresolved suggestions.\\
+acceptingpublish &
+Clean publication mode that globally accepts suggestions and replacements.\\
+\end{longtable}
+
+Use \opt{noanonymize} together with \opt{submit} when a submission is not blind. Lower-level feature options also exist: \opt{comments}, \opt{suggestions}, \opt{subjects}, \opt{drafts}, \opt{todos}, \opt{anonymize}, and \opt{changecolor}. Prefer a main editorial mode for ordinary projects.
+
+A future \texttt{key=value} configuration interface is proposed in issues \#32, \#33, and \#46.
+
+\section*{Collaborators}
+
+\begin{verbatim}
+\cwnamedef{alice}{blue}{Alice}
+\end{verbatim}
+
+For each collaborator stem \texttt{name}, \pkg\ creates:
+
+\begin{longtable}{>{\ttfamily}p{0.28\linewidth}p{0.64\linewidth}}
+\textbackslash name\{comment\} & Comment without selected text.\\
+\textbackslash name[selection]\{comment\} & Comment attached to highlighted text.\\
+\textbackslash name r[selection]\{comment\}\{label\} & Labeled comment.\\
+\textbackslash name x[...] & Struck-through comment.\\
+\textbackslash name rx[...] & Labeled struck-through comment.\\
+\textbackslash name sug[comment]\{new\} & Proposed insertion.\\
+\textbackslash name rem[comment]\{old\} & Proposed removal.\\
+\textbackslash name swap[comment]\{old\}\{new\} & Proposed replacement.\\
+\textbackslash name troca[comment]\{old\}\{new\} & Portuguese synonym of \texttt{swap}.\\
+\end{longtable}
+
+Two collaborator families are predefined: \cmd{cwauthor} and \cmd{cweditor}.
+
+Use \cmd{cwsetcommwarn}\{symbol\} to place a symbol before comment marks.
+
+\section*{TODOs}
+
+The intended default is a short editorial comment:
+
+\begin{verbatim}
+\todo{Check this argument.}
+\end{verbatim}
+
+The large inline box is explicitly opt-in:
+
+\begin{verbatim}
+\todo[inline]{Rewrite this paragraph before submission.}
+\end{verbatim}
+
+Its background can be changed with \cmd{cwdefinetodocolor}. Issue \#45 tracks the regression test and implementation cleanup for this distinction.
+
+\section*{Citation needed}
+
+\begin{verbatim}
+This quantitative claim needs a source.\pleasecite
+
+Another claim.\pleasecite[prefer a recent systematic review]
+\end{verbatim}
+
+\section*{Draft blocks}
+
+\begin{verbatim}
+\begin{cwdraft}[Alternative explanation]
+This paragraph is deliberately provisional.
+\end{cwdraft}
+
+\cwsetdraftcolor{cyan}
+\end{verbatim}
+
+Draft material is visible while editing and suppressed in clean modes.
+
+\section*{Anonymization}
+
+\begin{verbatim}
+\cwanon{University of Example}
+\cwanoncite{key}
+\cwanoncitep[chap.~2]{key}
+\cwanoncitet{key}
+\end{verbatim}
+
+Customize replacements with:
+
+\begin{verbatim}
+\cwsetanoncolor{violet}
+\cwdefanontext{Anonymous institution}
+\cwdefanoncitetext{(Anonymous, Year)}
+\cwdefanonciteptext{(Anonymous, Year)}
+\cwdefanoncitettext{Anonymous (Year)}
+\end{verbatim}
+
+For repeated named material:
+
+\begin{verbatim}
+\cwblind{\myinstitution}
+        {Federal University of Example}
+        {Anonymous institution}
+\end{verbatim}
+
+\section*{Subjects and main ideas}
+
+\begin{verbatim}
+\cwsubject{Motivation}
+This paragraph explains why the work is necessary.
+
+\cwmain{The package separates editorial state from document content.}
+The rest of the paragraph supports that main idea.
+
+\cwsetsubjectcolor{cyan}
+\cwsetmaincolor{yellow}
+\end{verbatim}
+
+The rendering of \cmd{cwmain} can be customized by redefining \cmd{cwmainemphasis}.
+
+\section*{Mode-dependent files}
+
+\begin{verbatim}
+\cwinput{editing-version}{submit-version}{publish-version}
+\cwinclude{editing-chapter}{submit-chapter}{publish-chapter}
+
+\cwinputediting{editing-only}
+\cwinputsubmit{submit-only}
+\cwinputpublish{publish-only}
+
+\cwincludeediting{editing-only-chapter}
+\cwincludesubmit{submit-only-chapter}
+\cwincludepublish{publish-only-chapter}
+\end{verbatim}
+
+\section*{Lists}
+
+\begin{verbatim}
+\listofcomments
+\listofcitationneeds
+\listofsubjects
+\end{verbatim}
+
+The planned unified report is described in issue \#49.
+
+\section*{Text color helpers}
+
+In editing mode:
+
+\begin{verbatim}
+\cwcolor{blue}
+This text is blue.
+\cwrestorecolor
+\end{verbatim}
+
+The low-level \cmd{cwsavecolor} helper is also available. Issue \#54 proposes making every package color configurable from one user-facing interface.
+
+\section*{Portuguese aliases}
+
+Compatibility aliases include \cmd{cwautor}, \cmd{cwassunto}, \cmd{favorcitar}, and \cmd{listofassunto}, together with Portuguese package options. In v1.5.4 the \texttt{rascunho} environment alias is incomplete because only its begin macro is aliased; use \texttt{cwdraft} until issue \#40 is resolved.
+
+\section*{Known v1.5.4 limitations}
+
+\begin{itemize}
+\item \texttt{tocloft} is a major compatibility risk; removal is proposed in \#36.
+\item \texttt{hyperref} is currently loaded automatically in normal configurations; making it optional and sanitizing PDF strings is proposed in \#37.
+\item Moving arguments/headings need explicit safe behavior; see \#26.
+\item Generated copies in the repository have diverged historically; see \#43.
+\item A formal compatibility matrix for standard, publisher, UFRJ, COPPE, and Poli classes is proposed in \#55.
+\end{itemize}
+
+\section*{Recommended workflow}
+
+Use \opt{editing} while writing, \opt{submit} for a blind submission when required, and \opt{publish} or \opt{acceptingpublish} only after editorial decisions are resolved. Keep the source as the authoritative record of the editorial process.
+
+\end{document}
