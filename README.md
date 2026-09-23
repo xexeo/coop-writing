@@ -1,39 +1,69 @@
-# coop-writing LaTeX package v. 1.5.4
+# coop-writing LaTeX package v1.5.4
 
-Copyright (c) 2024,2025 Geraldo Xexéo
+Copyright (c) 2024–2026 Geraldo Xexéo
 
-This package supports editorial comments and gives some extra support for writing papers, or any document that involves more than one author or editor.
+**coop-writing** is a LaTeX package for managing the editorial life cycle of a document independently of the editing interface. Comments, proposed insertions/removals/replacements, TODOs, draft material, anonymization, and mode-dependent content remain in the LaTeX source, so the same workflow can be used in Overleaf, a local editor, or a Git-based collaboration process.
 
-Please read the manual in file [coop-writing.pdf](coop-writing.pdf).
+The package is designed around editorial modes such as `editing`, `submit`, `publish`, and `acceptingpublish`. The source remains authoritative while the generated document changes according to the stage of the editorial process.
 
-## Folders
+## Documentation
 
-The root folder is the newer and unstable version, while the dist folder should always contain a stable version. The current CTAN version is also in its own folder.
+For first use, start with:
 
-## How to use it
+- [Quick Reference — English (EN-US)](quickref-en-us.tex)
+- [Maximal Example — English (EN-US)](max-example-en-us.tex)
 
-You need coop-writing.sty to use the package and [coop-writing.pdf](coop-writing.pdf) to understand it.
+Portuguese documentation:
 
-This package is in active evolution.
+- [Referência Rápida — Português do Brasil (PT-BR)](quickref-pt-br.tex)
+- [Exemplo Máximo — Português do Brasil (PT-BR)](max-exemplo-pt-br.tex)
 
-# Contact
+The full documented source/manual is available as [coop-writing.pdf](coop-writing.pdf), generated from [coop-writing.dtx](coop-writing.dtx).
 
-Owner: Geraldo Xexéo
+## Minimal use
 
-Contact: xexeo at cos.ufrj.br
+```latex
+\usepackage[editing]{coop-writing}
 
-or via GitHub
+\cwnamedef{alice}{blue}{Alice}
 
-[https://github.com/xexeo/coop-writing](https://github.com/xexeo/coop-writing)
+This sentence \alice{Please check this claim.} is being reviewed.
 
-Please use issues to complain, suggest or to request features:
+\aliceswap[Improve precision]
+  {old wording}
+  {new wording}
+```
 
-[https://github.com/xexeo/coop-writing/issues](https://github.com/xexeo/coop-writing/issues)
+For a clean submission or publication build, change the main package mode rather than deleting editorial commands from the source.
 
-Discussions:
+## UTF-8 and engines
 
-[https://github.com/xexeo/coop-writing/discussions](https://github.com/xexeo/coop-writing/discussions)
+Project sources should be UTF-8. Current LaTeX uses UTF-8 as its default input encoding. The project is being organized to test **pdfLaTeX** and **LuaLaTeX** explicitly and to avoid deprecated interfaces where current LaTeX provides a maintained alternative.
 
-# License
+## Repository layout
 
-This package is distributed under MIT License.
+The root contains the current development source. Historically, `dist/`, `CTAN/`, and `tests/` have also contained generated or copied package files. The project is moving toward a single canonical source and reproducible generated artifacts; see the project issues for the proposed release/test refactoring.
+
+## Development and compatibility
+
+Compatibility with document classes is a primary project requirement. The proposed test matrix covers the standard LaTeX classes, `memoir`, KOMA-Script, major publisher templates, and the UFRJ/COPPE/Poli classes maintained on GitHub.
+
+Please report incompatibilities with a minimal example and include:
+
+- coop-writing version;
+- LaTeX engine and TeX distribution;
+- document class and version;
+- package mode;
+- the smallest source that reproduces the problem.
+
+## Issues, suggestions, and discussions
+
+Repository: https://github.com/xexeo/coop-writing
+
+Issues: https://github.com/xexeo/coop-writing/issues
+
+Discussions: https://github.com/xexeo/coop-writing/discussions
+
+## License
+
+This package is distributed under the MIT License.
