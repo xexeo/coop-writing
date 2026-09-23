@@ -3,7 +3,7 @@ name: Documentation smoke test
 on:
   push:
     branches:
-      - docs/quickref-max-examples
+      - main
   pull_request:
 
 concurrency:
@@ -19,7 +19,7 @@ jobs:
       matrix:
         engine: [pdflatex, lualatex]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Compile quick reference and maximal examples
         uses: xu-cheng/latex-action@v4
