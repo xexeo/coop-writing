@@ -1,0 +1,29 @@
+name: Documentation smoke test
+
+on:
+  push:
+    branches:
+      - docs/quickref-max-examples
+  pull_request:
+
+jobs:
+  compile:
+    name: ${{ matrix.engine }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [pdflatex, lualatex]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile quick reference and maximal examples
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: |
+            quickref-en-us.tex
+            quickref-pt-br.tex
+            max-example-en-us.tex
+            max-exemplo-pt-br.tex
+          latexmk_use_lualatex: ${{ matrix.engine == 'lualatex' }}
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
