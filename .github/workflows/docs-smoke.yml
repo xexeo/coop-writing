@@ -6,6 +6,10 @@ on:
       - docs/quickref-max-examples
   pull_request:
 
+concurrency:
+  group: docs-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   compile:
     name: ${{ matrix.engine }}
