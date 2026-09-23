@@ -1,4 +1,4 @@
-# pacote LaTeX coop-writing v1.5.4
+# pacote LaTeX coop-writing v1.5.5
 
 Copyright (c) 2024–2026 Geraldo Xexéo
 
