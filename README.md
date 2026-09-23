@@ -36,6 +36,12 @@ This sentence \alice{Please check this claim.} is being reviewed.
 
 For a clean submission or publication build, change the main package mode rather than deleting editorial commands from the source.
 
+## Installation
+
+For normal use, install `coop-writing` through your TeX distribution (TeX Live or MiKTeX). To install directly from the documented source, run LaTeX on `coop-writing.ins`; this extracts `coop-writing.sty` from `coop-writing.dtx`. Place the generated style file in a directory searched by TeX or beside the document that uses it.
+
+To rebuild the full manual from source, compile `coop-writing.dtx` with a current LaTeX installation including Biber and MakeIndex.
+
 ## UTF-8 and engines
 
 Project sources should be UTF-8. Current LaTeX uses UTF-8 as its default input encoding. The project is being organized to test **pdfLaTeX** and **LuaLaTeX** explicitly and to avoid deprecated interfaces where current LaTeX provides a maintained alternative.
@@ -56,12 +62,13 @@ Please report incompatibilities with a minimal example and include:
 - package mode;
 - the smallest source that reproduces the problem.
 
-## Issues, suggestions, and discussions
+## Maintainer and support
 
-Repository: https://github.com/xexeo/coop-writing
+Maintainer: Geraldo Xexéo  
+Contact: `xexeo at cos.ufrj.br`
 
-Issues: https://github.com/xexeo/coop-writing/issues
-
+Repository: https://github.com/xexeo/coop-writing  
+Bug tracker: https://github.com/xexeo/coop-writing/issues  
 Discussions: https://github.com/xexeo/coop-writing/discussions
 
 ## License
