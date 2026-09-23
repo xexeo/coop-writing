@@ -43,10 +43,6 @@
   {Open Editorial Project at Example University}
   {Anonymous project}
 
-% Current v1.5.4 defines \rascunho but not \endrascunho.
-% This compatibility line can be removed after issue #40 is fixed.
-\providecommand{\endrascunho}{\endcwdraft}
-
 % User-facing color configuration available in v1.5.4.
 \cwsetanoncolor{violet}
 \cwsetsubjectcolor{cyan}
@@ -179,8 +175,7 @@ This block is provisional. It is visible in editing mode and should disappear
 from clean modes.
 \end{cwdraft}
 
-The Portuguese environment alias is demonstrated with the temporary
-v1.5.4 end-macro compatibility line from the preamble:
+The Portuguese environment alias is demonstrated directly:
 
 \begin{rascunho}[Portuguese alias]
 This is the same draft mechanism reached through the Portuguese alias.
