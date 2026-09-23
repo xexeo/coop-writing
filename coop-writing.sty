@@ -41,7 +41,7 @@
 \newif\if@cwtoclofttitles\@cwtoclofttitlesfalse
 \newif\if@changecolor\@changecolorfalse
 \DeclareOption{rascunhos}{\@showdrafttrue}
-\DeclareOption{cwavoidhyperref}{cw@avoidhyperreftrue}
+\DeclareOption{cwavoidhyperref}{\cw@avoidhyperreftrue}
 \DeclareOption{comentarios}{\@showcomentariotrue}
 \DeclareOption{anonimizar}{\@anonimizartrue} % isso vai se perder nos modos
 \DeclareOption{naoanonimizar}{\@naoanonimizartrue}
@@ -138,19 +138,17 @@
 }%
 \ifednotebookmarks%
 \@ifpackageloaded{hyperref}%
-  {
-    \message{Hyperref loaded before coop-writing}
-  }
-  { \message{Hyperref loaded before coop-writing}
+  {%
+    \message{Hyperref loaded before coop-writing}%
+  }%
+  {%
     \ifcw@avoidhyperref
-       {
-         \message{coop-writing must avoid hyperref}
-       }%
-       {
-         \message{Hyperref called by coop-writing}
-         \RequirePackage{hyperref}
-       }%
-  }
+      \message{coop-writing is configured not to load hyperref}%
+    \else
+      \message{Hyperref called by coop-writing}%
+      \RequirePackage{hyperref}%
+    \fi
+  }%
 \fi
 \@ifclassloaded{memoir}%
 {% TRUE
