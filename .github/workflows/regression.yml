@@ -16,6 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Test external tools
+        run: python3 tools/test_tools.py
+
       - name: Run l3build regression suite
         uses: xu-cheng/latex-action@v4
         with:
