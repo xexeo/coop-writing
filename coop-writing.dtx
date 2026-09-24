@@ -1010,48 +1010,137 @@
 %    \end{macrocode}
 % \subsubsection{Portuguese Options}
 %    \begin{macrocode}
-\DeclareOption{rascunhos}{\@showdrafttrue}
-\DeclareOption{cwavoidhyperref}{\cw@avoidhyperreftrue}
-\DeclareOption{comentarios}{\@showcomentariotrue}
-\DeclareOption{anonimizar}{\@anonimizartrue} % isso vai se perder nos modos
-\DeclareOption{naoanonimizar}{\@naoanonimizartrue}
-\DeclareOption{sugestoes}{\@showsugestaotrue}
-\DeclareOption{assuntos}{\@showsubjectstrue}
-\DeclareOption{edicao}{\@modoedicaotrue}
-\DeclareOption{submeter}{\@modosubmetertrue}
-\DeclareOption{publicar}{\@modopublicartrue}
-\DeclareOption{publicaraceitando}{
-\@modopublicartrue
-\@modopublicaraceitandotrue
-}
-%    \end{macrocode}
-% \subsubsection{English Options, inspired on ed package}
-%    \begin{macrocode}
-\DeclareOption{nopdfbookmarks}{\ednotebookmarksfalse}
-%    \end{macrocode}
-%
-% \subsubsection{Original English Options}
-%
-%    \begin{macrocode}
-\DeclareOption{comments}{\@showcomentariotrue}
-\DeclareOption{anonymize}{\@anonimizartrue}
-\DeclareOption{noanonymize}{\@naoanonimizartrue}
-\DeclareOption{suggestions}{\@showsugestaotrue}
-\DeclareOption{subjects}{\@showsubjectstrue}
-\DeclareOption{drafts}{\@showdrafttrue}
-\DeclareOption{todos}{\@showtodotrue}
-\DeclareOption{changecolor}{\@changecolortrue}
-\DeclareOption{editing}{\@modoedicaotrue}
-\DeclareOption{submit}{\@modosubmetertrue}
-\DeclareOption{publish}{\@modopublicartrue}
-\DeclareOption{acceptingpublish}{
-\@modopublicartrue
-\@modopublicaraceitandotrue
-}
-%    \end{macrocode}
-% New option to titles in tocloft
-%    \begin{macrocode}
-\DeclareOption{toclofttitles}{\@cwtoclofttitlestrue}
+% All package options are processed locally through the wildcard handler.
+% This intentionally avoids declaring generic names such as "submit" and
+% "publish": a class option with the same name is therefore not consumed by
+% coop-writing unless it is explicitly passed to this package.
+\def\cw@modename{publish}
+\def\cw@initialview{default}
+\ExplSyntaxOn
+\tl_new:N \g__cw_comments_override_tl
+\tl_new:N \g__cw_suggestions_override_tl
+\tl_new:N \g__cw_subjects_override_tl
+\tl_new:N \g__cw_drafts_override_tl
+\tl_new:N \g__cw_todos_override_tl
+\tl_new:N \g__cw_changecolor_override_tl
+\tl_gset:Nn \g__cw_comments_override_tl { unset }
+\tl_gset:Nn \g__cw_suggestions_override_tl { unset }
+\tl_gset:Nn \g__cw_subjects_override_tl { unset }
+\tl_gset:Nn \g__cw_drafts_override_tl { unset }
+\tl_gset:Nn \g__cw_todos_override_tl { unset }
+\tl_gset:Nn \g__cw_changecolor_override_tl { unset }
+
+\cs_new_protected:Npn \__cw_set_mode:n #1
+  {
+    \@modoedicaofalse
+    \@modosubmeterfalse
+    \@modopublicarfalse
+    \@modopublicaraceitandofalse
+    \str_case:nnF {#1}
+      {
+        {editing}{\@modoedicaotrue}
+        {submit}{\@modosubmetertrue}
+        {publish}{\@modopublicartrue}
+        {acceptingpublish}{\@modopublicartrue\@modopublicaraceitandotrue}
+      }
+      { \PackageError{coop-writing}{Unknown editorial mode '#1'}{Use editing, submit, publish, or acceptingpublish.} }
+    \def\cw@modename{#1}
+  }
+\__cw_set_mode:n { publish }
+
+\cs_new_protected:Npn \__cw_set_override:Nn #1#2
+  { \tl_gset:Nn #1 {#2} }
+
+\keys_define:nn { cw/package }
+  {
+    mode .choice:,
+    mode / editing .code:n = { \__cw_set_mode:n {editing} },
+    mode / submit .code:n = { \__cw_set_mode:n {submit} },
+    mode / publish .code:n = { \__cw_set_mode:n {publish} },
+    mode / acceptingpublish .code:n = { \__cw_set_mode:n {acceptingpublish} },
+    comments .choice:,
+    comments / true .code:n = { \__cw_set_override:Nn \g__cw_comments_override_tl {true} },
+    comments / false .code:n = { \__cw_set_override:Nn \g__cw_comments_override_tl {false} },
+    suggestions .choice:,
+    suggestions / true .code:n = { \__cw_set_override:Nn \g__cw_suggestions_override_tl {true} },
+    suggestions / false .code:n = { \__cw_set_override:Nn \g__cw_suggestions_override_tl {false} },
+    subjects .choice:,
+    subjects / true .code:n = { \__cw_set_override:Nn \g__cw_subjects_override_tl {true} },
+    subjects / false .code:n = { \__cw_set_override:Nn \g__cw_subjects_override_tl {false} },
+    drafts .choice:,
+    drafts / true .code:n = { \__cw_set_override:Nn \g__cw_drafts_override_tl {true} },
+    drafts / false .code:n = { \__cw_set_override:Nn \g__cw_drafts_override_tl {false} },
+    todos .choice:,
+    todos / true .code:n = { \__cw_set_override:Nn \g__cw_todos_override_tl {true} },
+    todos / false .code:n = { \__cw_set_override:Nn \g__cw_todos_override_tl {false} },
+    changecolor .choice:,
+    changecolor / true .code:n = { \__cw_set_override:Nn \g__cw_changecolor_override_tl {true} },
+    changecolor / false .code:n = { \__cw_set_override:Nn \g__cw_changecolor_override_tl {false} },
+    anonymize .choice:,
+    anonymize / true .code:n =
+      { \@anonimizartrue \@naoanonimizarfalse },
+    anonymize / false .code:n =
+      { \@anonimizarfalse \@naoanonimizartrue },
+    bookmarks .choice:,
+    bookmarks / auto .code:n = { \ednotebookmarkstrue },
+    bookmarks / true .code:n = { \ednotebookmarkstrue },
+    bookmarks / false .code:n = { \ednotebookmarksfalse },
+    view .code:n = { \def\cw@initialview{#1} },
+  }
+
+\cs_new_protected:Npn \cw_process_package_option:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        {editing}{\__cw_set_mode:n{editing}}
+        {edicao}{\__cw_set_mode:n{editing}}
+        {submit}{\__cw_set_mode:n{submit}}
+        {submeter}{\__cw_set_mode:n{submit}}
+        {publish}{\__cw_set_mode:n{publish}}
+        {publicar}{\__cw_set_mode:n{publish}}
+        {acceptingpublish}{\__cw_set_mode:n{acceptingpublish}}
+        {publicaraceitando}{\__cw_set_mode:n{acceptingpublish}}
+        {comments}{\__cw_set_override:Nn \g__cw_comments_override_tl {true}}
+        {comentarios}{\__cw_set_override:Nn \g__cw_comments_override_tl {true}}
+        {suggestions}{\__cw_set_override:Nn \g__cw_suggestions_override_tl {true}}
+        {sugestoes}{\__cw_set_override:Nn \g__cw_suggestions_override_tl {true}}
+        {subjects}{\__cw_set_override:Nn \g__cw_subjects_override_tl {true}}
+        {assuntos}{\__cw_set_override:Nn \g__cw_subjects_override_tl {true}}
+        {drafts}{\__cw_set_override:Nn \g__cw_drafts_override_tl {true}}
+        {rascunhos}{\__cw_set_override:Nn \g__cw_drafts_override_tl {true}}
+        {todos}{\__cw_set_override:Nn \g__cw_todos_override_tl {true}}
+        {changecolor}{\__cw_set_override:Nn \g__cw_changecolor_override_tl {true}}
+        {anonymize}{\@anonimizartrue\@naoanonimizarfalse}
+        {anonimizar}{\@anonimizartrue\@naoanonimizarfalse}
+        {noanonymize}{\@anonimizarfalse\@naoanonimizartrue}
+        {naoanonimizar}{\@anonimizarfalse\@naoanonimizartrue}
+        {nopdfbookmarks}{\ednotebookmarksfalse}
+        {cwavoidhyperref}{\cw@avoidhyperreftrue}
+        {toclofttitles}
+          {\PackageWarning{coop-writing}{Option 'toclofttitles' is obsolete; coop-writing no longer loads tocloft}}
+      }
+      { \keys_set:nn { cw/package } {#1} }
+  }
+\cs_new_eq:NN \cwprocesspackageoption \cw_process_package_option:n
+
+\cs_new_protected:Npn \cw_apply_feature_overrides:
+  {
+    \tl_if_eq:NnT \g__cw_comments_override_tl {true} {\@showcomentariotrue}
+    \tl_if_eq:NnT \g__cw_comments_override_tl {false} {\@showcomentariofalse}
+    \tl_if_eq:NnT \g__cw_suggestions_override_tl {true} {\@showsugestaotrue}
+    \tl_if_eq:NnT \g__cw_suggestions_override_tl {false} {\@showsugestaofalse}
+    \tl_if_eq:NnT \g__cw_subjects_override_tl {true} {\@showsubjectstrue}
+    \tl_if_eq:NnT \g__cw_subjects_override_tl {false} {\@showsubjectsfalse}
+    \tl_if_eq:NnT \g__cw_drafts_override_tl {true} {\@showdrafttrue}
+    \tl_if_eq:NnT \g__cw_drafts_override_tl {false} {\@showdraftfalse}
+    \tl_if_eq:NnT \g__cw_todos_override_tl {true} {\@showtodotrue}
+    \tl_if_eq:NnT \g__cw_todos_override_tl {false} {\@showtodofalse}
+    \tl_if_eq:NnT \g__cw_changecolor_override_tl {true} {\@changecolortrue}
+    \tl_if_eq:NnT \g__cw_changecolor_override_tl {false} {\@changecolorfalse}
+  }
+\cs_new_eq:NN \cwapplyfeatureoverrides \cw_apply_feature_overrides:
+\ExplSyntaxOff
+\DeclareOption*{\cwprocesspackageoption{\CurrentOption}}
 \ProcessOptions\relax
 %    \end{macrocode}
 % \subsubsection{Fixing the Super Options}
@@ -1093,7 +1182,7 @@
 \fi
 \if@showtodo
 \@showcomentariotrue
-\fi
+\fi\n\cwapplyfeatureoverrides
 %    \end{macrocode}
 % \subsection{Required Packages}
 % Packages that are always required
@@ -1110,9 +1199,7 @@
 \RequirePackage{xcolor}
 \RequirePackage{soul}
 \RequirePackage[normalem]{ulem}
-\RequirePackage{etoolbox} % \ifdef comes from here
-\RequirePackage{environ}
-\RequirePackage{csquotes}
+\RequirePackage{etoolbox}
 \RequirePackage{mdframed}
 %    \end{macrocode}
 % \subsection{Optional Packages}
@@ -1128,42 +1215,12 @@
 % LoF, LoT and etc... appears in ToC. In default Book, they
 % do not appear
 %    \begin{macrocode}
-\@ifclassloaded{coppe}%
-{%
-\RequirePackage[titles]{tocloft}%
-}%
-{%
-\if@cwtoclofttitles%
-\RequirePackage[titles]{tocloft}%
-\else%
-\RequirePackage{tocloft}%
-\fi%
-}%
-%    \end{macrocode}
-% Checking if babel is loaded, use iflang
-%    \begin{macrocode}
-\@ifpackageloaded{babel}%
-{%  \message{Babel Loaded!}%
-\RequirePackage{iflang}%
-}{%
-\message{Babel not detected!}%
-}%
-%    \end{macrocode}
-% |hyperref| must always be the last
-%    \begin{macrocode}
-\ifednotebookmarks%
-\@ifpackageloaded{hyperref}%
-  {%
-    \message{Hyperref loaded before coop-writing}%
-  }%
-  {%
-    \ifcw@avoidhyperref
-      \message{coop-writing is configured not to load hyperref}%
-    \else
-      \message{Hyperref called by coop-writing}%
-      \RequirePackage{hyperref}%
-    \fi
-  }%
+% coop-writing deliberately does not load tocloft or hyperref.
+% Editorial lists use private auxiliary files, so document classes remain
+% sovereign over ToC/LoF/LoT.  If hyperref is present (before or after this
+% package), bookmarks are used opportunistically.
+\ifcw@avoidhyperref
+  \PackageInfo{coop-writing}{cwavoidhyperref retained for compatibility; hyperref is never auto-loaded}
 \fi
 %    \end{macrocode}
 %
