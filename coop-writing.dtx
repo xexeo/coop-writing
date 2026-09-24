@@ -2837,7 +2837,9 @@
   {
     \iow_open:Nn \l__cw_export_iow {#1}
     \iow_now:Nx \l__cw_export_iow
-      {\c_hash_str~coop-writing-meta-v1^^Iid^^Itype^^Iauthor^^Istatus^^Iseverity^^Ifile^^Ipage^^Iparent^^Ibody^^Iold^^Inew}
+      {\c_hash_str~coop-writing-meta-v1}
+    \iow_now:Nn \l__cw_export_iow
+      {id^^Itype^^Iauthor^^Istatus^^Iseverity^^Ifile^^Ipage^^Iparent^^Ibody^^Iold^^Inew}
     \seq_map_inline:Nn \g__cw_item_seq
       {
         \__cw_get_field:nnN {##1}{type}\l_tmpa_tl
