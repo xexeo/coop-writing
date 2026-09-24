@@ -18,6 +18,8 @@ ZIP="$OUTROOT/$PACKAGE-$VERSION.zip"
 
 required=(
   README.md
+  changes.md
+  new.md
   LICENSE
   coop-writing.dtx
   coop-writing.ins
@@ -48,10 +50,10 @@ for f in "${required[@]}"; do
   fi
 done
 
-rm -rf "$OUT" "$ZIP"
+rm -rf "$OUT" "$OUTROOT"/"$PACKAGE"-*.zip
 mkdir -p "$OUT/images" "$OUT/example-fragments"
 
-cp README.md LICENSE coop-writing.dtx coop-writing.ins coop-writing.bib coop-writing.pdf "$OUT/"
+cp README.md changes.md new.md LICENSE coop-writing.dtx coop-writing.ins coop-writing.bib coop-writing.pdf "$OUT/"
 cp quickref-en-us.tex quickref-en-us.pdf quickref-pt-br.tex quickref-pt-br.pdf "$OUT/"
 cp max-example-en-us.tex max-example-en-us.pdf max-exemplo-pt-br.tex max-exemplo-pt-br.pdf "$OUT/"
 cp images/overleaffileurl.png images/editorialnotes.png "$OUT/images/"
