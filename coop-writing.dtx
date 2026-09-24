@@ -1326,9 +1326,9 @@
 \ExplSyntaxOn
 \tl_new:N \g__cw_language_tl
 \tl_gset:Nn \g__cw_language_tl { auto }
-\prop_new:N \g__cw_i18n_en_prop
-\prop_new:N \g__cw_i18n_pt_prop
-\prop_gput_from_keyval:Nn \g__cw_i18n_en_prop
+\prop_new:N \g__cw_trans_en_prop
+\prop_new:N \g__cw_trans_pt_prop
+\prop_gput_from_keyval:Nn \g__cw_trans_en_prop
   {
     draft = {Draft},
     comments = {List of Comments},
@@ -1342,7 +1342,7 @@
     report = {Editorial Report},
     errata = {Errata}
   }
-\prop_gput_from_keyval:Nn \g__cw_i18n_pt_prop
+\prop_gput_from_keyval:Nn \g__cw_trans_pt_prop
   {
     draft = {Rascunho},
     comments = {Lista de Comentários},
@@ -1370,13 +1370,13 @@
   {
     \str_case_e:nnF { \__cw_effective_language: }
       {
-        {brazil}{\prop_item:Nn \g__cw_i18n_pt_prop {#1}}
-        {brazilian}{\prop_item:Nn \g__cw_i18n_pt_prop {#1}}
-        {portuguese}{\prop_item:Nn \g__cw_i18n_pt_prop {#1}}
-        {pt-BR}{\prop_item:Nn \g__cw_i18n_pt_prop {#1}}
-        {pt-br}{\prop_item:Nn \g__cw_i18n_pt_prop {#1}}
+        {brazil}{\prop_item:Nn \g__cw_trans_pt_prop {#1}}
+        {brazilian}{\prop_item:Nn \g__cw_trans_pt_prop {#1}}
+        {portuguese}{\prop_item:Nn \g__cw_trans_pt_prop {#1}}
+        {pt-BR}{\prop_item:Nn \g__cw_trans_pt_prop {#1}}
+        {pt-br}{\prop_item:Nn \g__cw_trans_pt_prop {#1}}
       }
-      { \prop_item:Nn \g__cw_i18n_en_prop {#1} }
+      { \prop_item:Nn \g__cw_trans_en_prop {#1} }
   }
 \cs_new_protected:Npn \cw_set_language:n #1
   { \tl_gset:Nn \g__cw_language_tl {#1} }
