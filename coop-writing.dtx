@@ -2197,6 +2197,16 @@
 \tl_new:N \l__cw_item_page_tl
 \bool_new:N \l__cw_item_pdf_bool
 \bool_new:N \l__cw_item_visible_bool
+\tl_new:N \l__cw_tmpc_tl
+\tl_new:N \l__cw_tmpd_tl
+\tl_new:N \l__cw_tmpe_tl
+\tl_new:N \l__cw_tmpf_tl
+\tl_new:N \l__cw_tmpg_tl
+\tl_new:N \l__cw_tmph_tl
+\tl_new:N \l__cw_tmpi_tl
+\tl_new:N \l__cw_tmpj_tl
+\cs_generate_variant:Nn \keys_set:nn { nV }
+\cs_generate_variant:Nn \clist_if_in:NnTF { NVTF }
 
 \keys_define:nn { cw/item }
   {
@@ -2249,14 +2259,14 @@
     \__cw_item_reset:
     \tl_set_eq:NN \l__cw_item_type_tl \l_tmpa_tl
     \exp_args:NNx \prop_get:NnNTF \g__cw_type_prop
-      { \tl_use:N \l_tmpa_tl } \l_tmpc_tl
-      { \keys_set:nV { cw/item } \l_tmpc_tl }
+      { \tl_use:N \l_tmpa_tl } \l__cw_tmpc_tl
+      { \keys_set:nV { cw/item } \l__cw_tmpc_tl }
       { }
     \tl_if_blank:VF \l_tmpb_tl
       {
         \exp_args:NNx \prop_get:NnNTF \g__cw_style_prop
-          { \tl_use:N \l_tmpb_tl } \l_tmpc_tl
-          { \keys_set:nV { cw/item } \l_tmpc_tl }
+          { \tl_use:N \l_tmpb_tl } \l__cw_tmpc_tl
+          { \keys_set:nV { cw/item } \l__cw_tmpc_tl }
           { \PackageWarning{coop-writing}{Unknown editorial style '\tl_use:N \l_tmpb_tl'} }
       }
     \keys_set:nn { cw/item } {#1}
@@ -2295,13 +2305,15 @@
       { }
     \clist_if_empty:NF \g__cw_author_include_clist
       {
-        \exp_args:NNV \clist_if_in:NnF \g__cw_author_include_clist
+        \clist_if_in:NVTF \g__cw_author_include_clist
           \l__cw_item_author_tl
+          { }
           { \bool_set_false:N \l__cw_item_visible_bool }
       }
-    \exp_args:NNV \clist_if_in:NnT \g__cw_author_exclude_clist
+    \clist_if_in:NVTF \g__cw_author_exclude_clist
       \l__cw_item_author_tl
       { \bool_set_false:N \l__cw_item_visible_bool }
+      { }
     \tl_set:Nx \l__cw_item_file_tl { \cwcurrentfile }
     \tl_set:Nx \l__cw_item_page_tl { \thepage }
   }
@@ -2678,10 +2690,12 @@
 \NewDocumentCommand{\cwshowdocumentstatus}{}
   {
     \par\noindent\textbf{Status:}~\cwdocumentstatus
-    \tl_if_blank:eF {\cwdocumentsubmittedto}
-      {;~\textbf{Submitted~to:}~\cwdocumentsubmittedto}
-    \tl_if_blank:eF {\cwdocumentrestricted}
-      {;~\textbf{Restricted:}~\cwdocumentrestricted}
+    \tl_set:Nx \l_tmpa_tl {\cwdocumentsubmittedto}
+    \tl_if_blank:VF \l_tmpa_tl
+      {;~\textbf{Submitted~to:}~\l_tmpa_tl}
+    \tl_set:Nx \l_tmpa_tl {\cwdocumentrestricted}
+    \tl_if_blank:VF \l_tmpa_tl
+      {;~\textbf{Restricted:}~\l_tmpa_tl}
     \par
   }
 
@@ -2700,19 +2714,19 @@
   {
     \__cw_get_field:nnN {#1}{author}\l_tmpa_tl
     \__cw_get_field:nnN {#1}{type}\l_tmpb_tl
-    \__cw_get_field:nnN {#1}{status}\l_tmpc_tl
-    \exp_args:NNn \prop_get:NnNT \g__cw_decision_prop {#1} \l_tmpd_tl
-      {\tl_set_eq:NN \l_tmpc_tl \l_tmpd_tl}
-    \__cw_get_field:nnN {#1}{severity}\l_tmpe_tl
+    \__cw_get_field:nnN {#1}{status}\l__cw_tmpc_tl
+    \exp_args:NNn \prop_get:NnNT \g__cw_decision_prop {#1} \l__cw_tmpd_tl
+      {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
+    \__cw_get_field:nnN {#1}{severity}\l__cw_tmpe_tl
     \bool_set_true:N \l_tmpa_bool
     \tl_if_blank:VF \l__cw_report_author_tl
       {\tl_if_eq:NNTF \l__cw_report_author_tl \l_tmpa_tl {}{\bool_set_false:N \l_tmpa_bool}}
     \tl_if_blank:VF \l__cw_report_type_tl
       {\tl_if_eq:NNTF \l__cw_report_type_tl \l_tmpb_tl {}{\bool_set_false:N \l_tmpa_bool}}
     \tl_if_blank:VF \l__cw_report_status_tl
-      {\tl_if_eq:NNTF \l__cw_report_status_tl \l_tmpc_tl {}{\bool_set_false:N \l_tmpa_bool}}
+      {\tl_if_eq:NNTF \l__cw_report_status_tl \l__cw_tmpc_tl {}{\bool_set_false:N \l_tmpa_bool}}
     \tl_if_blank:VF \l__cw_report_severity_tl
-      {\tl_if_eq:NNTF \l__cw_report_severity_tl \l_tmpe_tl {}{\bool_set_false:N \l_tmpa_bool}}
+      {\tl_if_eq:NNTF \l__cw_report_severity_tl \l__cw_tmpe_tl {}{\bool_set_false:N \l_tmpa_bool}}
     \bool_if:NTF \l_tmpa_bool {\prg_return_true:}{\prg_return_false:}
   }
 
@@ -2731,19 +2745,19 @@
           {
             \__cw_get_field:nnN {##1}{type}\l_tmpa_tl
             \__cw_get_field:nnN {##1}{author}\l_tmpb_tl
-            \__cw_get_field:nnN {##1}{status}\l_tmpc_tl
-            \prop_get:NnNT \g__cw_decision_prop {##1} \l_tmpd_tl
-              {\tl_set_eq:NN \l_tmpc_tl \l_tmpd_tl}
-            \__cw_get_field:nnN {##1}{severity}\l_tmpd_tl
-            \__cw_get_field:nnN {##1}{file}\l_tmpe_tl
-            \__cw_get_field:nnN {##1}{page}\l_tmpf_tl
-            \__cw_get_field:nnN {##1}{body}\l_tmpg_tl
+            \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
+            \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
+              {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
+            \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
+            \__cw_get_field:nnN {##1}{file}\l__cw_tmpe_tl
+            \__cw_get_field:nnN {##1}{page}\l__cw_tmpf_tl
+            \__cw_get_field:nnN {##1}{body}\l__cw_tmpg_tl
             \par\noindent
             \textbf{##1}~
-            [\l_tmpa_tl/\l_tmpc_tl/\l_tmpd_tl]
+            [\l_tmpa_tl/\l__cw_tmpc_tl/\l__cw_tmpd_tl]
             \tl_if_blank:VF \l_tmpb_tl {~\textit{\l_tmpb_tl}}
-            ~---~\l_tmpg_tl
-            \hfill{\footnotesize \l_tmpe_tl:~\l_tmpf_tl}\par
+            ~---~\l__cw_tmpg_tl
+            \hfill{\footnotesize \l__cw_tmpe_tl:~\l__cw_tmpf_tl}\par
           }
       }
     \group_end:
@@ -2775,35 +2789,35 @@
 \cs_new_protected:Npn \__cw_export_tsv:n #1
   {
     \iow_open:Nn \l__cw_export_iow {#1}
-    \iow_now:Nn \l__cw_export_iow
-      {#~coop-writing-meta-v1^^Iid^^Itype^^Iauthor^^Istatus^^Iseverity^^Ifile^^Ipage^^Iparent^^Ibody^^Iold^^Inew}
+    \iow_now:Nx \l__cw_export_iow
+      {\c_hash_str~coop-writing-meta-v1^^Iid^^Itype^^Iauthor^^Istatus^^Iseverity^^Ifile^^Ipage^^Iparent^^Ibody^^Iold^^Inew}
     \seq_map_inline:Nn \g__cw_item_seq
       {
         \__cw_get_field:nnN {##1}{type}\l_tmpa_tl
         \__cw_get_field:nnN {##1}{author}\l_tmpb_tl
-        \__cw_get_field:nnN {##1}{status}\l_tmpc_tl
-        \prop_get:NnNT \g__cw_decision_prop {##1} \l_tmpd_tl
-          {\tl_set_eq:NN \l_tmpc_tl \l_tmpd_tl}
-        \__cw_get_field:nnN {##1}{severity}\l_tmpd_tl
-        \__cw_get_field:nnN {##1}{file}\l_tmpe_tl
-        \__cw_get_field:nnN {##1}{page}\l_tmpf_tl
-        \__cw_get_field:nnN {##1}{parent}\l_tmpg_tl
-        \__cw_get_field:nnN {##1}{body}\l_tmph_tl
-        \__cw_get_field:nnN {##1}{old}\l_tmpi_tl
-        \__cw_get_field:nnN {##1}{new}\l_tmpj_tl
+        \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
+        \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
+          {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
+        \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
+        \__cw_get_field:nnN {##1}{file}\l__cw_tmpe_tl
+        \__cw_get_field:nnN {##1}{page}\l__cw_tmpf_tl
+        \__cw_get_field:nnN {##1}{parent}\l__cw_tmpg_tl
+        \__cw_get_field:nnN {##1}{body}\l__cw_tmph_tl
+        \__cw_get_field:nnN {##1}{old}\l__cw_tmpi_tl
+        \__cw_get_field:nnN {##1}{new}\l__cw_tmpj_tl
         \iow_now:Nx \l__cw_export_iow
           {
             ##1^^I
             \tl_to_str:V \l_tmpa_tl^^I
             \tl_to_str:V \l_tmpb_tl^^I
-            \tl_to_str:V \l_tmpc_tl^^I
-            \tl_to_str:V \l_tmpd_tl^^I
-            \tl_to_str:V \l_tmpe_tl^^I
-            \tl_to_str:V \l_tmpf_tl^^I
-            \tl_to_str:V \l_tmpg_tl^^I
-            \tl_to_str:V \l_tmph_tl^^I
-            \tl_to_str:V \l_tmpi_tl^^I
-            \tl_to_str:V \l_tmpj_tl
+            \tl_to_str:V \l__cw_tmpc_tl^^I
+            \tl_to_str:V \l__cw_tmpd_tl^^I
+            \tl_to_str:V \l__cw_tmpe_tl^^I
+            \tl_to_str:V \l__cw_tmpf_tl^^I
+            \tl_to_str:V \l__cw_tmpg_tl^^I
+            \tl_to_str:V \l__cw_tmph_tl^^I
+            \tl_to_str:V \l__cw_tmpi_tl^^I
+            \tl_to_str:V \l__cw_tmpj_tl
           }
       }
     \iow_close:N \l__cw_export_iow
@@ -2818,11 +2832,12 @@
             \__cw_get_field:nnN {##1}{status}\l_tmpa_tl
             \prop_get:NnNT \g__cw_decision_prop {##1} \l_tmpb_tl
               {\tl_set_eq:NN \l_tmpa_tl \l_tmpb_tl}
-            \str_case_e:nnT {\tl_use:N \l_tmpa_tl}
+            \str_case_e:nnF {\tl_use:N \l_tmpa_tl}
               {
                 {open}{\PackageWarning{coop-writing}{Editorial item '##1' is still open}}
                 {pending}{\PackageWarning{coop-writing}{Editorial change '##1' is still pending}}
               }
+              { }
           }
       }
   }
