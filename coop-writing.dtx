@@ -2108,6 +2108,11 @@
 \int_new:N \g__cw_author_color_int
 \bool_new:N \g__cw_pending_warnings_bool
 \bool_new:N \g__cw_export_sensitive_bool
+\prop_new:N \g__cw_pdf_type_prop
+\tl_new:N \g__cw_log_policy_tl
+\tl_new:N \g__cw_pdf_comments_tl
+\tl_new:N \g__cw_addition_color_tl
+\tl_new:N \g__cw_deletion_color_tl
 \tl_new:N \g__cw_mode_tl
 \tl_new:N \g__cw_view_tl
 \tl_new:N \g__cw_layout_tl
@@ -2121,6 +2126,10 @@
 \tl_gset:Nn \g__cw_theme_tl { color }
 \tl_gset:Nn \g__cw_pdf_backend_tl { none }
 \tl_gset:Nn \g__cw_placeholder_policy_tl { warning }
+\tl_gset:Nn \g__cw_log_policy_tl { summary }
+\tl_gset:Nn \g__cw_pdf_comments_tl { false }
+\tl_gset:Nn \g__cw_addition_color_tl { blue }
+\tl_gset:Nn \g__cw_deletion_color_tl { red }
 \bool_gset_true:N \g__cw_pending_warnings_bool
 \bool_gset_false:N \g__cw_export_sensitive_bool
 \clist_gset:Nn \g__cw_color_palette_clist
@@ -2142,6 +2151,16 @@
   { label={Placeholder},severity=warning,color=orange }
 \prop_gput:Nnn \g__cw_type_prop { erratum }
   { label={Erratum},severity=warning,color=red,status=accepted }
+\prop_gput:Nnn \g__cw_type_prop { needs-info }
+  { label={Needs information},severity=warning,color=orange }
+\prop_gput:Nnn \g__cw_type_prop { needs-justification }
+  { label={Needs justification},severity=warning,color=orange }
+\prop_gput:Nnn \g__cw_type_prop { needs-explanation }
+  { label={Needs explanation},severity=warning,color=orange }
+\prop_gput:Nnn \g__cw_type_prop { needs-image }
+  { label={Needs image},severity=warning,color=purple }
+\prop_gput:Nnn \g__cw_type_prop { needs-english }
+  { label={Needs English revision},severity=warning,color=teal }
 
 \tl_new:N \l__cw_item_id_tl
 \tl_new:N \l__cw_item_type_tl
@@ -2159,7 +2178,7 @@
 \tl_new:N \l__cw_item_version_tl
 \tl_new:N \l__cw_item_file_tl
 \tl_new:N \l__cw_item_page_tl
-\bool_new:N \l__cw_item_pdf_bool
+\tl_new:N \l__cw_item_pdf_tl
 \bool_new:N \l__cw_item_visible_bool
 \tl_new:N \l__cw_tmpc_tl
 \tl_new:N \l__cw_tmpd_tl
@@ -2178,9 +2197,23 @@
     type .tl_set:N = \l__cw_item_type_tl,
     label .tl_set:N = \l__cw_item_label_tl,
     author .tl_set:N = \l__cw_item_author_tl,
-    status .tl_set:N = \l__cw_item_status_tl,
+    status .choice:,
+    status / open .code:n = { \tl_set:Nn \l__cw_item_status_tl {open} },
+    status / pending .code:n = { \tl_set:Nn \l__cw_item_status_tl {pending} },
+    status / accepted .code:n = { \tl_set:Nn \l__cw_item_status_tl {accepted} },
+    status / rejected .code:n = { \tl_set:Nn \l__cw_item_status_tl {rejected} },
+    status / resolved .code:n = { \tl_set:Nn \l__cw_item_status_tl {resolved} },
     decision .meta:n = { status = #1 },
-    severity .tl_set:N = \l__cw_item_severity_tl,
+    severity .choice:,
+    severity / info .code:n = { \tl_set:Nn \l__cw_item_severity_tl {info} },
+    severity / note .code:n = { \tl_set:Nn \l__cw_item_severity_tl {note} },
+    severity / warning .code:n = { \tl_set:Nn \l__cw_item_severity_tl {warning} },
+    severity / error .code:n = { \tl_set:Nn \l__cw_item_severity_tl {error} },
+    severity / fatal .code:n = { \tl_set:Nn \l__cw_item_severity_tl {fatal} },
+    severity / low .code:n = { \tl_set:Nn \l__cw_item_severity_tl {low} },
+    severity / normal .code:n = { \tl_set:Nn \l__cw_item_severity_tl {normal} },
+    severity / high .code:n = { \tl_set:Nn \l__cw_item_severity_tl {high} },
+    severity / critical .code:n = { \tl_set:Nn \l__cw_item_severity_tl {critical} },
     parent .tl_set:N = \l__cw_item_parent_tl,
     style .tl_set:N = \l__cw_item_style_tl,
     layout .tl_set:N = \l__cw_item_layout_tl,
@@ -2190,8 +2223,9 @@
     date .tl_set:N = \l__cw_item_date_tl,
     version .tl_set:N = \l__cw_item_version_tl,
     pdf .choice:,
-    pdf / true .code:n = { \bool_set_true:N \l__cw_item_pdf_bool },
-    pdf / false .code:n = { \bool_set_false:N \l__cw_item_pdf_bool },
+    pdf / auto .code:n = { \tl_set:Nn \l__cw_item_pdf_tl {auto} },
+    pdf / true .code:n = { \tl_set:Nn \l__cw_item_pdf_tl {true} },
+    pdf / false .code:n = { \tl_set:Nn \l__cw_item_pdf_tl {false} },
   }
 
 \cs_new_protected:Npn \__cw_item_reset:
@@ -2210,7 +2244,7 @@
     \tl_clear:N \l__cw_item_comment_tl
     \tl_clear:N \l__cw_item_date_tl
     \tl_clear:N \l__cw_item_version_tl
-    \bool_set_false:N \l__cw_item_pdf_bool
+    \tl_set:Nn \l__cw_item_pdf_tl {auto}
     \bool_set_true:N \l__cw_item_visible_bool
   }
 
@@ -2321,6 +2355,7 @@
     \__cw_store_var:nN {version} \l__cw_item_version_tl
     \__cw_store_var:nN {file} \l__cw_item_file_tl
     \__cw_store_var:nN {page} \l__cw_item_page_tl
+    \__cw_store_var:nN {pdf} \l__cw_item_pdf_tl
     \__cw_store_tokens:nn {body} {#1}
   }
 
@@ -2332,6 +2367,30 @@
         \exp_args:NNx \prop_get:NnNTF \g__cw_author_name_prop
           { \tl_use:N \l__cw_item_author_tl } #1
           { } { \tl_set_eq:NN #1 \l__cw_item_author_tl }
+      }
+  }
+
+\prg_new_conditional:Npnn \__cw_item_pdf_enabled: {T,F,TF}
+  {
+    \tl_if_eq:NnTF \l__cw_item_pdf_tl {true}
+      { \prg_return_true: }
+      {
+        \tl_if_eq:NnTF \l__cw_item_pdf_tl {false}
+          { \prg_return_false: }
+          {
+            \exp_args:NNx \prop_get:NnNTF \g__cw_pdf_type_prop
+              { \tl_use:N \l__cw_item_type_tl } \l_tmpa_tl
+              {
+                \tl_if_eq:NnTF \l_tmpa_tl {true}
+                  { \prg_return_true: }
+                  { \prg_return_false: }
+              }
+              {
+                \tl_if_eq:NnTF \g__cw_pdf_comments_tl {true}
+                  { \prg_return_true: }
+                  { \prg_return_false: }
+              }
+          }
       }
   }
 
@@ -2367,11 +2426,20 @@
                   {\belowpdfbookmark{Editorial item \l__cw_item_id_tl}{cwitem.\l__cw_item_id_tl}}
                   {}
               }
-            \tl_if_eq:NnT \g__cw_pdf_backend_tl { pdfcomment }
+            \__cw_item_pdf_enabled:T
               {
                 \@ifpackageloaded{pdfcomment}
                   {\pdfcomment[author={\l_tmpa_tl}]{#1}}
-                  {\PackageWarning{coop-writing}{pdf-backend=pdfcomment requested but pdfcomment is not loaded}}
+                  {\PackageWarning{coop-writing}{PDF annotation requested for type '\l__cw_item_type_tl' but pdfcomment is not loaded}}
+              }
+            \tl_if_eq:NnT \g__cw_pdf_backend_tl { pdfcomment }
+              {
+                \__cw_item_pdf_enabled:F
+                  {
+                    \@ifpackageloaded{pdfcomment}
+                      {\pdfcomment[author={\l_tmpa_tl}]{#1}}
+                      {\PackageWarning{coop-writing}{pdf-backend=pdfcomment requested but pdfcomment is not loaded}}
+                  }
               }
           }
       }
@@ -2440,7 +2508,7 @@
         \tl_if_eq:NnTF \g__cw_mode_tl { editing }
           {
             \tl_if_eq:NnTF \g__cw_theme_tl { color }
-              {\textcolor{\l__cw_item_color_tl}{\sout{#1}}\textcolor{\l__cw_item_color_tl}{#2}}
+              {\textcolor{\g__cw_deletion_color_tl}{\sout{#1}}\textcolor{\g__cw_addition_color_tl}{#2}}
               {\sout{#1}#2}
             \tl_if_blank:VF \l__cw_item_comment_tl
               {\__cw_render_generic:n {\l__cw_item_comment_tl}}
@@ -2572,8 +2640,15 @@
     placeholder-policy / error .code:n = {\tl_gset:Nn \g__cw_placeholder_policy_tl {error}},
     placeholder-policy / suppress .code:n = {\tl_gset:Nn \g__cw_placeholder_policy_tl {suppress}},
     warnings .choice:,
-    warnings / true .code:n = {\bool_gset_true:N \g__cw_pending_warnings_bool},
-    warnings / false .code:n = {\bool_gset_false:N \g__cw_pending_warnings_bool},
+    warnings / true .code:n = {\tl_gset:Nn \g__cw_log_policy_tl {summary}},
+    warnings / false .code:n = {\tl_gset:Nn \g__cw_log_policy_tl {none}},
+    log .choice:,
+    log / none .code:n = {\tl_gset:Nn \g__cw_log_policy_tl {none}},
+    log / summary .code:n = {\tl_gset:Nn \g__cw_log_policy_tl {summary}},
+    log / each .code:n = {\tl_gset:Nn \g__cw_log_policy_tl {each}},
+    pdf-comments .choice:,
+    pdf-comments / true .code:n = {\tl_gset:Nn \g__cw_pdf_comments_tl {true}},
+    pdf-comments / false .code:n = {\tl_gset:Nn \g__cw_pdf_comments_tl {false}},
     export-sensitive .choice:,
     export-sensitive / true .code:n = {\bool_gset_true:N \g__cw_export_sensitive_bool},
     export-sensitive / false .code:n = {\bool_gset_false:N \g__cw_export_sensitive_bool},
@@ -2588,6 +2663,12 @@
     colors/main .code:n = {\cwsetmaincolor{#1}},
     colors/draft .code:n = {\cwsetdraftcolor{#1}},
     colors/todo .code:n = {\def\cw@todobackgroundcolor{#1}},
+    colors/comment .code:n =
+      {\prop_gput:Nnn \g__cw_type_prop {comment}{label={Comment},severity=info,color={#1}}},
+    colors/citation .code:n =
+      {\def\cor@citar{#1}\prop_gput:Nnn \g__cw_type_prop {citation}{label={Citation},severity=warning,color={#1}}},
+    colors/addition .tl_gset:N = \g__cw_addition_color_tl,
+    colors/deletion .tl_gset:N = \g__cw_deletion_color_tl,
     style .code:n =
       {
         \prop_get:NnNTF \g__cw_style_prop {#1} \l_tmpa_tl
@@ -2601,6 +2682,8 @@
   {\prop_gput:Nnn \g__cw_type_prop {#1}{#2}}
 \NewDocumentCommand{\cwdefinestyle}{m m}
   {\prop_gput:Nnn \g__cw_style_prop {#1}{#2}}
+\NewDocumentCommand{\cwsettypepdf}{m m}
+  {\prop_gput:Nnn \g__cw_pdf_type_prop {#1}{#2}}
 
 \cs_new_protected:Npn \__cw_register_author:nnn #1#2#3
   {
