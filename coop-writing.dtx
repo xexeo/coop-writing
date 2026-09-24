@@ -1281,24 +1281,23 @@
 \newif\if@cwmemoirdefense\@cwmemoirdefensefalse%
 }%
 %
-% Private editorial lists without tocloft. memoir already provides a
-% compatible \newlistof implementation, so this fallback is only installed
-% when the class does not provide one.
+% Private editorial lists.  They intentionally do not call tocloft,
+% memoir's \newlistof, KOMA's tocbasic helpers, or any class-owned list API.
+% This keeps coop-writing out of the document class's ToC/LoF/LoT machinery.
 \newcommand{\cw@listheading}[1]{%
   \@ifundefined{chapter}{\section*{#1}}{\chapter*{#1}}%
 }%
-\@ifundefined{newlistof}{%
-  \NewDocumentCommand{\newlistof}{o m m m}{%
-    \@ifundefined{c@#2}{\newcounter{#2}}{}%
-    \expandafter\newlength\csname cft#2numwidth\endcsname
-    \setlength{\csname cft#2numwidth\endcsname}{2.3em}%
-    \expandafter\newcommand\csname l@#2\endcsname[2]{%
-      \@dottedtocline{1}{1.5em}{\csname cft#2numwidth\endcsname}{####1}{####2}}%
-    \expandafter\newcommand\csname listof#2\endcsname{%
-      \cw@listheading{#4}\@starttoc{#3}}%
-  }%
-}{}%
-%
+\newcommand{\cw@newlist}[3]{%
+  \@ifundefined{c@#1}{\newcounter{#1}}{}%
+  \@ifundefined{cft#1numwidth}{%
+    \expandafter\newlength\csname cft#1numwidth\endcsname
+  }{}%
+  \setlength{\csname cft#1numwidth\endcsname}{\cw@cftnumwidth}%
+  \expandafter\def\csname l@#1\endcsname##1##2{%
+    \@dottedtocline{1}{1.5em}{\csname cft#1numwidth\endcsname}{##1}{##2}}%
+  \expandafter\def\csname listof#1\endcsname{%
+    \cw@listheading{#3}\@starttoc{#2}}%
+}%
 %    \end{macrocode}
 %
 % \subsection{Color related variables}
@@ -1804,16 +1803,8 @@
 % Memoir class needs 2 commands to really define a list
 % It also changes the  |\newlistof| arguments' meaning
 %    \begin{macrocode}
-\if@cwmemoirdefense%
-\@ifundefined{chapter}%
-{\newlistentry[section]{subject}{aaa}{0}}
-{\newlistentry[chapter]{subject}{aaa}{0}}
-\newlistof{listofsubject}{aaa}{\listsubject}
-\else%
-\@ifundefined{chapter}%
-{\newlistof[section]{subject}{aaa}{\listsubject}}%
-{\newlistof[chapter]{subject}{aaa}{\listsubject}}%
-\fi%
+\cw@newlist{subject}{aaa}{\listsubject}%
+%
 %
 %
 \newcommand{\cwsubject}[2][\cor@subject]{%
@@ -1858,10 +1849,7 @@
 \fi%
 }%
 %
-\if@cwmemoirdefense%
-\else%
 \setlength{\cftsubjectnumwidth}{\cw@cftnumwidth}%
-\fi%
 \else%
 \newcommand{\listofsubject}{}%
 \newcommand{\cwsubject}[2][]{}%
@@ -1876,17 +1864,7 @@
 \if@showcomentario
 %% Resolve a lista de comentários
 \newcommand{\listcomentario}{\cwcommentstitle}%
-%% cria a lista
-\if@cwmemoirdefense%
-\@ifundefined{chapter}%
-{\newlistentry[section]{comentario}{ccc}{0}}
-{\newlistentry[chapter]{comentario}{ccc}{0}}
-\newlistof{listofcomentario}{ccc}{\listcomentario}%
-\else%
-\@ifundefined{chapter}
-{\newlistof[section]{comentario}{ccc}{\listcomentario}}
-{\newlistof[chapter]{comentario}{ccc}{\listcomentario}}%%
-\fi%
+\cw@newlist{comentario}{ccc}{\listcomentario}%
 %%
 %% Comentador genérico - parte I
 %% faz o cwnote e soma na lista
@@ -1942,10 +1920,7 @@
 \cw@comentar[#5]{\sout{#2}}{#3}{#4}%
 }%
 %%
-\if@cwmemoirdefense%
-\else%
 \setlength{\cftcomentarionumwidth}{\cw@cftnumwidth}%
-\fi%
 \else
 \newcommand{\cw@comentar}[4][]{}%
 \newcommand{\listofcomentario}{}%
@@ -2037,16 +2012,7 @@
 %    \begin{macrocode}
 \if@showcomentario%
 \newcommand{\listcomentarioref}{\cwcitationstitle}%
-\if@cwmemoirdefense%
-\@ifundefined{chapter}%
-{\newlistentry[section]{comentarioref}{ccr}{0}}
-{\newlistentry[chapter]{comentarioref}{ccr}{0}}
-\newlistof{listofcomentarioref}{ccr}{\listcomentarioref}
-\else%
-\@ifundefined{chapter}%
-{\newlistof[section]{comentarioref}{ccr}{\listcomentarioref}}
-{\newlistof[chapter]{comentarioref}{ccr}{\listcomentarioref}}%
-\fi%
+\cw@newlist{comentarioref}{ccr}{\listcomentarioref}%
 \else%
 \newcommand{\listofcomentarioref}{}%
 \fi%
@@ -2064,10 +2030,7 @@
 \addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#2}}%
 \fi%
 }%
-\if@cwmemoirdefense%
-\else%
 \setlength{\cftcomentariorefnumwidth}{\cw@cftnumwidth}%
-\fi%
 \else%
 \newcommand{\cw@commentref}[3]{}%
 \fi%
@@ -2932,16 +2895,7 @@
 \newcommand{\cw@todobackgroundcolor}{orange}%
 \cwnamedef{cw@todoauthor}{orange}{To do}%
 \newcommand{\listtodo}{\cwtodostitle}%
-\if@cwmemoirdefense%
-  \@ifundefined{chapter}%
-    {\newlistentry[section]{cwtodo}{cwt}{0}}%
-    {\newlistentry[chapter]{cwtodo}{cwt}{0}}%
-  \newlistof{listofcwtodo}{cwt}{\listtodo}%
-\else%
-  \@ifundefined{chapter}%
-    {\newlistof[section]{cwtodo}{cwt}{\listtodo}}%
-    {\newlistof[chapter]{cwtodo}{cwt}{\listtodo}}%
-\fi%
+\cw@newlist{cwtodo}{cwt}{\listtodo}%
 \let\listoftodos=\listofcwtodo%
 \if@showtodo%
 \newcommand{\todo}[2][]{%
