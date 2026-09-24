@@ -2750,12 +2750,20 @@
 \tl_new:N \l__cw_report_type_tl
 \tl_new:N \l__cw_report_status_tl
 \tl_new:N \l__cw_report_severity_tl
+\tl_new:N \l__cw_report_mode_tl
+\prop_new:N \l__cw_report_author_prop
+\prop_new:N \l__cw_report_type_prop
+\prop_new:N \l__cw_report_status_prop
+\prop_new:N \l__cw_report_severity_prop
 \keys_define:nn {cw/report}
   {
     author .tl_set:N = \l__cw_report_author_tl,
     type .tl_set:N = \l__cw_report_type_tl,
     status .tl_set:N = \l__cw_report_status_tl,
     severity .tl_set:N = \l__cw_report_severity_tl,
+    mode .choice:,
+    mode / detailed .code:n = {\tl_set:Nn \l__cw_report_mode_tl {detailed}},
+    mode / summary .code:n = {\tl_set:Nn \l__cw_report_mode_tl {summary}},
   }
 \prg_new_conditional:Npnn \__cw_report_match:n #1 {T,F,TF}
   {
@@ -2766,6 +2774,13 @@
       {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
     \__cw_get_field:nnN {#1}{severity}\l__cw_tmpe_tl
     \bool_set_true:N \l_tmpa_bool
+    \clist_if_empty:NF \g__cw_author_include_clist
+      {
+        \clist_if_in:NVTF \g__cw_author_include_clist \l_tmpa_tl
+          { } {\bool_set_false:N \l_tmpa_bool}
+      }
+    \clist_if_in:NVTF \g__cw_author_exclude_clist \l_tmpa_tl
+      {\bool_set_false:N \l_tmpa_bool}{}
     \tl_if_blank:VF \l__cw_report_author_tl
       {\tl_if_eq:NNTF \l__cw_report_author_tl \l_tmpa_tl {}{\bool_set_false:N \l_tmpa_bool}}
     \tl_if_blank:VF \l__cw_report_type_tl
@@ -2777,6 +2792,19 @@
     \bool_if:NTF \l_tmpa_bool {\prg_return_true:}{\prg_return_false:}
   }
 
+\cs_new_protected:Npn \__cw_report_increment:Nn #1#2
+  {
+    \prop_get:NnNTF #1 {#2} \l_tmpa_tl
+      {\prop_put:Nnx #1 {#2}{\int_eval:n{\l_tmpa_tl+1}}}
+      {\prop_put:Nnn #1 {#2}{1}}
+  }
+\cs_new_protected:Npn \__cw_report_print_prop:nN #1#2
+  {
+    \par\noindent\textbf{#1}\par
+    \prop_map_inline:Nn #2
+      {\noindent ##1:~##2\par}
+  }
+
 \NewDocumentCommand{\cwreport}{O{}}
   {
     \group_begin:
@@ -2784,27 +2812,62 @@
     \tl_clear:N \l__cw_report_type_tl
     \tl_clear:N \l__cw_report_status_tl
     \tl_clear:N \l__cw_report_severity_tl
+    \tl_set:Nn \l__cw_report_mode_tl {detailed}
     \keys_set:nn {cw/report}{#1}
     \cw@listheading{\cwreporttitle}
-    \seq_map_inline:Nn \g__cw_item_seq
+    \tl_if_eq:NnTF \l__cw_report_mode_tl {summary}
       {
-        \__cw_report_match:nT {##1}
+        \int_zero:N \l_tmpa_int
+        \prop_clear:N \l__cw_report_author_prop
+        \prop_clear:N \l__cw_report_type_prop
+        \prop_clear:N \l__cw_report_status_prop
+        \prop_clear:N \l__cw_report_severity_prop
+        \seq_map_inline:Nn \g__cw_item_seq
           {
-            \__cw_get_field:nnN {##1}{type}\l_tmpa_tl
-            \__cw_get_field:nnN {##1}{author}\l_tmpb_tl
-            \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
-            \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
-              {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
-            \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
-            \__cw_get_field:nnN {##1}{file}\l__cw_tmpe_tl
-            \__cw_get_field:nnN {##1}{page}\l__cw_tmpf_tl
-            \__cw_get_field:nnN {##1}{body}\l__cw_tmpg_tl
-            \par\noindent
-            \textbf{##1}~
-            [\l_tmpa_tl/\l__cw_tmpc_tl/\l__cw_tmpd_tl]
-            \tl_if_blank:VF \l_tmpb_tl {~\textit{\l_tmpb_tl}}
-            ~---~\l__cw_tmpg_tl
-            \hfill{\footnotesize \l__cw_tmpe_tl:~\l__cw_tmpf_tl}\par
+            \__cw_report_match:nT {##1}
+              {
+                \int_incr:N \l_tmpa_int
+                \__cw_get_field:nnN {##1}{author}\l_tmpa_tl
+                \__cw_get_field:nnN {##1}{type}\l_tmpb_tl
+                \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
+                \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
+                  {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
+                \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
+                \tl_if_blank:VTF \l_tmpa_tl
+                  {\__cw_report_increment:Nn \l__cw_report_author_prop {(unassigned)}}
+                  {\exp_args:NNV \__cw_report_increment:Nn \l__cw_report_author_prop \l_tmpa_tl}
+                \exp_args:NNV \__cw_report_increment:Nn \l__cw_report_type_prop \l_tmpb_tl
+                \exp_args:NNV \__cw_report_increment:Nn \l__cw_report_status_prop \l__cw_tmpc_tl
+                \exp_args:NNV \__cw_report_increment:Nn \l__cw_report_severity_prop \l__cw_tmpd_tl
+              }
+          }
+        \par\noindent\textbf{Total:}~\int_use:N \l_tmpa_int\par
+        \__cw_report_print_prop:nN {By author} \l__cw_report_author_prop
+        \__cw_report_print_prop:nN {By type} \l__cw_report_type_prop
+        \__cw_report_print_prop:nN {By severity} \l__cw_report_severity_prop
+        \__cw_report_print_prop:nN {By status} \l__cw_report_status_prop
+      }
+      {
+        \seq_map_inline:Nn \g__cw_item_seq
+          {
+            \__cw_report_match:nT {##1}
+              {
+                \__cw_get_field:nnN {##1}{type}\l_tmpa_tl
+                \__cw_get_field:nnN {##1}{author}\l_tmpb_tl
+                \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
+                \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
+                  {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
+                \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
+                \__cw_get_field:nnN {##1}{file}\l__cw_tmpe_tl
+                \__cw_get_field:nnN {##1}{page}\l__cw_tmpf_tl
+                \__cw_get_field:nnN {##1}{body}\l__cw_tmpg_tl
+                \par\noindent
+                \textbf{##1}~
+                [\l_tmpa_tl/\l__cw_tmpc_tl/\l__cw_tmpd_tl]
+                \tl_if_blank:VF \l_tmpb_tl {~\textit{\l_tmpb_tl}}
+                ~---~\l__cw_tmpg_tl
+                \hfill{\footnotesize \l__cw_tmpe_tl:~\l__cw_tmpf_tl}\par
+              }
           }
       }
     \group_end:
