@@ -1,0 +1,7 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{class=scrbook=ok}
+\END
+\end{document}

@@ -1,0 +1,16 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage[brazilian,english]{babel}
+\usepackage[editing]{coop-writing}
+\begin{document}
+\cwsetup{warnings=false}
+\START
+\todo{Compact TODO}
+\todo[inline]{Inline TODO}
+\selectlanguage{brazilian}
+\TYPE{draft-pt=\cwdrafttitle}
+\selectlanguage{english}
+\TYPE{draft-en=\cwdrafttitle}
+\TYPE{todo-i18n=ok}
+\END
+\end{document}

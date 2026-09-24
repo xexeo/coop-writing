@@ -1,0 +1,10 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{mode=editing}
+\TYPE{editing=true}
+\TYPE{submit=false}
+\TYPE{publish=false}
+\END
+\end{document}

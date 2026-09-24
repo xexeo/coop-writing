@@ -1,0 +1,16 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage[mode=editing]{coop-writing}
+\begin{document}
+\cwsetup{layout=none,warnings=false}
+\START
+\TYPE{version=\coopwritingversion}
+\cwdefineauthor{alice}{Alice}
+\alice[id=comment-1,severity=warning]{Check café and revisão.}
+\aliceswap[id=change-1,status=accepted]{old}{new}
+\cwreply{comment-1}[id=reply-1,author=alice]{Done.}
+\cwplaceholder[id=placeholder-1,subtype=text]{Missing result.}
+\cwresolve{comment-1}
+\TYPE{semantic-core=ok}
+\END
+\end{document}

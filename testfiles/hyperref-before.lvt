@@ -1,0 +1,12 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage{hyperref}
+\usepackage[editing]{coop-writing}
+\cwnamedef{alice}{blue}{Alice}
+\begin{document}
+\cwsetup{warnings=false}
+\START
+Text \alice{Math $x^2+y^2$ and UTF-8: Xexéo, revisão, não.}
+\TYPE{hyperref-before=ok}
+\END
+\end{document}

@@ -1,0 +1,26 @@
+name: l3build regression tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: l3build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Run l3build regression suite
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: quickref-en-us.tex
+          pre_compile: |
+            l3build check
+            l3build check --dev
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error

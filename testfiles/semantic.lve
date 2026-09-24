@@ -1,0 +1,8 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{version=v1.8}
+\TYPE{semantic-core=ok}
+\END
+\end{document}

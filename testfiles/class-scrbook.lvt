@@ -1,0 +1,11 @@
+\input regression-test.tex
+\documentclass{scrbook}
+\usepackage[editing]{coop-writing}
+\begin{document}
+\cwsetup{warnings=false}
+\cwauthor{Class compatibility comment.}
+\listofcomments
+\START
+\TYPE{class=scrbook=ok}
+\END
+\end{document}

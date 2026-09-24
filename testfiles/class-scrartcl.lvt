@@ -1,0 +1,11 @@
+\input regression-test.tex
+\documentclass{scrartcl}
+\usepackage[editing]{coop-writing}
+\begin{document}
+\cwsetup{warnings=false}
+\cwauthor{Class compatibility comment.}
+\listofcomments
+\START
+\TYPE{class=scrartcl=ok}
+\END
+\end{document}
