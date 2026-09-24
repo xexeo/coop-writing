@@ -13,8 +13,8 @@
 %% This file may be distributed and/or modified under the conditions of
 %% the MIT License
 \NeedsTeXFormat{LaTeX2e}
-\def\cw@version{v1.5.4}
-\ProvidesPackage{coop-writing}[2024/11/18 \cw@version dtx version of coop-writing]
+\def\cw@version{v1.5.5}
+\ProvidesPackage{coop-writing}[2026/09/23 \cw@version dtx version of coop-writing]
 %% \DescribeMacro{\cssetdraftcolor}
 
 %% To use other language, or to use other texts instead of the standard ones, you should define these macros, as in:
@@ -41,7 +41,7 @@
 \newif\if@cwtoclofttitles\@cwtoclofttitlesfalse
 \newif\if@changecolor\@changecolorfalse
 \DeclareOption{rascunhos}{\@showdrafttrue}
-\DeclareOption{cwavoidhyperref}{cw@avoidhyperreftrue}
+\DeclareOption{cwavoidhyperref}{\cw@avoidhyperreftrue}
 \DeclareOption{comentarios}{\@showcomentariotrue}
 \DeclareOption{anonimizar}{\@anonimizartrue} % isso vai se perder nos modos
 \DeclareOption{naoanonimizar}{\@naoanonimizartrue}
@@ -113,7 +113,6 @@
 \RequirePackage[normalem]{ulem}
 \RequirePackage{etoolbox} % \ifdef comes from here
 \RequirePackage{environ}
-\RequirePackage{xstring}
 \RequirePackage{csquotes}
 \RequirePackage{mdframed}
 \ifshowednotes%
@@ -139,19 +138,17 @@
 }%
 \ifednotebookmarks%
 \@ifpackageloaded{hyperref}%
-  {
-    \message{Hyperref loaded before coop-writing}
-  }
-  { \message{Hyperref loaded before coop-writing}
+  {%
+    \message{Hyperref loaded before coop-writing}%
+  }%
+  {%
     \ifcw@avoidhyperref
-       {
-         \message{coop-writing must avoid hyperref}
-       }%
-       {
-         \message{Hyperref called by coop-writing}
-         \RequirePackage{hyperref}
-       }%
-  }
+      \message{coop-writing is configured not to load hyperref}%
+    \else
+      \message{Hyperref called by coop-writing}%
+      \RequirePackage{hyperref}%
+    \fi
+  }%
 \fi
 \@ifclassloaded{memoir}%
 {% TRUE
@@ -661,9 +658,10 @@
 \newcommand{\cw@todobackgroundcolor}{orange}%
 \cwnamedef{cw@todoauthor}{orange}{To do}%
 \if@showtodo%
-\newcommand{\todo}[2][comentar]{%
-\IfEq{inline}{#1}%
+\newcommand{\todo}[2][]{%
+\ifstrequal{#1}{inline}%
 {%
+\refstepcounter{comentario}%
 \begin{mdframed}[backgroundcolor=\cw@todobackgroundcolor]
 #2%
 \if@cwmemoirdefense%
@@ -674,6 +672,9 @@
 \end{mdframed}%
 }%
 {%
+\ifstrempty{#1}{}{%
+\PackageWarning{coop-writing}{Unknown todo option '#1'; using default comment style}%
+}%
 \cw@todoauthor{#2}%
 }%
 }%

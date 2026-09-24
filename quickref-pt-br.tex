@@ -1,0 +1,236 @@
+% !TeX program = pdflatex
+% UTF-8
+\documentclass[11pt]{article}
+
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+\fi
+\usepackage[brazilian]{babel}
+\usepackage[a4paper,margin=24mm]{geometry}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage[publicar]{coop-writing}
+
+\newcommand{\pkg}{\texttt{coop-writing}}
+\newcommand{\cmd}[1]{\texttt{\textbackslash#1}}
+\newcommand{\opt}[1]{\texttt{#1}}
+
+\title{\pkg\ \coopwritingversion\\Referência Rápida (PT-BR)}
+\author{Geraldo Xexéo}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Finalidade}
+
+O \pkg\ é uma camada LaTeX para tratar o ciclo editorial de um documento. A informação editorial fica no código-fonte, em vez de depender da interface de edição usada. Assim, o mesmo projeto pode ser editado no Overleaf, localmente ou por Git, enquanto comentários, alterações propostas, rascunhos, anonimização, TODOs e comportamento de publicação permanecem controlados pelo LaTeX.
+
+\section*{UTF-8 e engines}
+
+Todos os fontes do projeto devem ser UTF-8. O LaTeX atual usa UTF-8 como codificação de entrada padrão, portanto este exemplo não carrega \texttt{inputenc}. Com pdfLaTeX ele seleciona a codificação de fonte T1; LuaLaTeX usa seu modelo Unicode nativo.
+
+A detecção explícita de engine e a cobertura regressiva de pdfLaTeX e LuaLaTeX estão propostas na issue \#34.
+
+\section*{Começo rápido}
+
+Para escrita colaborativa normal:
+
+\begin{verbatim}
+\usepackage[edicao]{coop-writing}
+\cwautor{alice}{blue}{Alice}
+\cwautor{bruno}{red}{Bruno}
+\end{verbatim}
+
+Depois, por exemplo:
+
+\begin{verbatim}
+Esta afirmação \alice{Verifique a evidência.} precisa de revisão.
+
+\alice[Esta frase]{Simplifique a redação.}
+
+\brunosug{Esta frase é uma inserção proposta.}
+
+\brunoswap{redação antiga}{redação nova}
+\end{verbatim}
+
+\section*{Modos editoriais}
+
+Use um modo principal por compilação.
+
+\begin{longtable}{>{\ttfamily}p{0.28\linewidth}p{0.64\linewidth}}
+edicao &
+Modo de trabalho. Mostra comentários, sugestões, TODOs, assuntos e rascunhos. Material que seria anonimizado é marcado, e não ocultado.\\
+submeter &
+Modo de submissão. Oculta as marcações editoriais e, por padrão, anonimiza o material protegido.\\
+publicar &
+Modo limpo de publicação. Oculta marcações, não anonimiza e mantém o lado antigo de sugestões pendentes.\\
+publicaraceitando &
+Modo limpo de publicação que aceita globalmente sugestões e substituições.\\
+\end{longtable}
+
+Use \opt{naoanonimizar} junto com \opt{submeter} quando a submissão não for cega. Também existem opções de nível mais baixo: \opt{comentarios}, \opt{sugestoes}, \opt{assuntos}, \opt{rascunhos}, \opt{todos}, \opt{anonimizar} e \opt{changecolor}. Para projetos normais, prefira um modo editorial principal.
+
+Uma futura interface \texttt{chave=valor} está proposta nas issues \#32, \#33 e \#46.
+
+\section*{Colaboradores}
+
+\begin{verbatim}
+\cwautor{alice}{blue}{Alice}
+\end{verbatim}
+
+Para cada base \texttt{nome}, o \pkg\ cria:
+
+\begin{longtable}{>{\ttfamily\raggedright\arraybackslash}p{0.40\linewidth}p{0.52\linewidth}}
+\textbackslash nome\{comentário\} & Comentário sem trecho selecionado.\\
+\textbackslash nome[trecho]\{comentário\} & Comentário associado a trecho destacado.\\
+\textbackslash nome r[trecho]\{comentário\}\{rótulo\} & Comentário rotulado.\\
+\textbackslash nome x[...] & Comentário riscado.\\
+\textbackslash nome rx[...] & Comentário rotulado e riscado.\\
+\textbackslash nome sug[comentário]\{novo\} & Inserção proposta.\\
+\textbackslash nome rem[comentário]\{antigo\} & Remoção proposta.\\
+\textbackslash nome swap[comentário]\{antigo\}\{novo\} & Substituição proposta.\\
+\textbackslash nome troca[comentário]\{antigo\}\{novo\} & Sinônimo em português de \texttt{swap}.\\
+\end{longtable}
+
+Duas famílias já existem: \cmd{cwauthor} e \cmd{cweditor}.
+
+Use \cmd{cwsetcommwarn}\{símbolo\} para colocar um símbolo antes das marcas de comentário.
+
+\section*{TODOs}
+
+O default desejado é o comentário editorial curto:
+
+\begin{verbatim}
+\todo{Verificar este argumento.}
+\end{verbatim}
+
+A caixa grande é explicitamente opt-in:
+
+\begin{verbatim}
+\todo[inline]{Reescrever este parágrafo antes da submissão.}
+\end{verbatim}
+
+A cor de fundo pode ser alterada com \cmd{cwdefinetodocolor}. A issue \#45 acompanha o teste regressivo e a limpeza da implementação dessa distinção.
+
+\section*{Citação necessária}
+
+\begin{verbatim}
+Esta afirmação quantitativa precisa de fonte.\favorcitar
+
+Outra afirmação.\favorcitar[preferir uma revisão sistemática recente]
+\end{verbatim}
+
+\section*{Blocos de rascunho}
+
+Na v1.5.5, use o nome canônico do ambiente:
+
+\begin{verbatim}
+\begin{cwdraft}[Explicação alternativa]
+Este parágrafo é deliberadamente provisório.
+\end{cwdraft}
+
+\cwsetdraftcolor{cyan}
+\end{verbatim}
+
+O material de rascunho aparece durante a edição e é suprimido nos modos limpos.
+
+\section*{Anonimização}
+
+\begin{verbatim}
+\cwanon{Universidade Federal de Exemplo}
+\cwanoncite{chave}
+\cwanoncitep[cap.~2]{chave}
+\cwanoncitet{chave}
+\end{verbatim}
+
+Personalize as substituições com:
+
+\begin{verbatim}
+\cwsetanoncolor{violet}
+\cwdefanontext{Instituição anônima}
+\cwdefanoncitetext{(Anônimo, Ano)}
+\cwdefanonciteptext{(Anônimo, Ano)}
+\cwdefanoncitettext{Anônimo (Ano)}
+\end{verbatim}
+
+Para material nominal repetido:
+
+\begin{verbatim}
+\cwblind{\minhainstituicao}
+        {Universidade Federal de Exemplo}
+        {Instituição anônima}
+\end{verbatim}
+
+\section*{Assuntos e ideias principais}
+
+\begin{verbatim}
+\cwassunto{Motivação}
+Este parágrafo explica por que o trabalho é necessário.
+
+\cwmain{O pacote separa estado editorial do conteúdo do documento.}
+O restante do parágrafo sustenta essa ideia principal.
+
+\cwsetsubjectcolor{cyan}
+\cwsetmaincolor{yellow}
+\end{verbatim}
+
+A apresentação de \cmd{cwmain} pode ser personalizada redefinindo \cmd{cwmainemphasis}.
+
+\section*{Arquivos dependentes do modo}
+
+\begin{verbatim}
+\cwinput{versao-edicao}{versao-submissao}{versao-publicacao}
+\cwinclude{capitulo-edicao}{capitulo-submissao}{capitulo-publicacao}
+
+\cwinputediting{somente-edicao}
+\cwinputsubmit{somente-submissao}
+\cwinputpublish{somente-publicacao}
+
+\cwincludeediting{capitulo-somente-edicao}
+\cwincludesubmit{capitulo-somente-submissao}
+\cwincludepublish{capitulo-somente-publicacao}
+\end{verbatim}
+
+\section*{Listas}
+
+\begin{verbatim}
+\listofcomments
+\listofcitationneeds
+\listofsubjects
+\end{verbatim}
+
+O relatório editorial unificado planejado está descrito na issue \#49.
+
+\section*{Auxiliares de cor}
+
+No modo de edição:
+
+\begin{verbatim}
+\cwcolor{blue}
+Este texto fica azul.
+\cwrestorecolor
+\end{verbatim}
+
+O auxiliar de baixo nível \cmd{cwsavecolor} também existe. A issue \#54 propõe tornar todas as cores do pacote configuráveis por uma única interface de usuário.
+
+\section*{Aliases em português}
+
+Os aliases de compatibilidade incluem \cmd{cwautor}, \cmd{cwassunto}, \cmd{favorcitar} e \cmd{listofassunto}, além das opções em português. O ambiente \texttt{rascunho} é mantido como alias de compatibilidade; a issue \#40 trata da modernização mais ampla da internacionalização.
+
+\section*{Limitações conhecidas da v1.5.5}
+
+\begin{itemize}
+\item \texttt{tocloft} é hoje um risco importante de compatibilidade; sua remoção está proposta na \#36.
+\item \texttt{hyperref} ainda é carregado automaticamente em configurações normais; torná-lo opcional e sanitizar strings de PDF está proposto na \#37.
+\item Títulos e outros argumentos móveis precisam de comportamento seguro explícito; veja \#26.
+\item Cópias geradas do pacote divergiram historicamente; veja \#43.
+\item A matriz formal de compatibilidade com classes padrão, editoriais, UFRJ, COPPE e Poli está proposta na \#55.
+\end{itemize}
+
+\section*{Fluxo recomendado}
+
+Use \opt{edicao} durante a escrita e \opt{submeter} para submissão cega quando necessário. Depois das decisões editoriais, use \opt{publicar}; use \opt{publicaraceitando} quando todas as alterações propostas devam ser aceitas. Mantenha o fonte como registro autoritativo do processo editorial.
+
+\end{document}

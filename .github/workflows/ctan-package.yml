@@ -1,0 +1,61 @@
+name: Build CTAN submission
+
+on:
+  push:
+    branches:
+      - docs/quickref-max-examples
+    paths:
+      - 'coop-writing.dtx'
+      - 'coop-writing.ins'
+      - 'coop-writing.bib'
+      - 'coop-writing.sty'
+      - 'README.md'
+      - 'LICENSE'
+      - 'quickref-*.tex'
+      - 'max-example-en-us.tex'
+      - 'max-exemplo-pt-br.tex'
+      - 'images/**'
+      - 'example-fragments/**'
+      - 'tools/build-ctan.sh'
+      - '.github/workflows/ctan-package.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ctan-package-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Compile CTAN documentation
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: |
+            coop-writing.dtx
+            quickref-en-us.tex
+            quickref-pt-br.tex
+            max-example-en-us.tex
+            max-exemplo-pt-br.tex
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+
+      - name: Assemble and validate CTAN archive
+        run: bash tools/build-ctan.sh
+
+      - name: Commit generated CTAN staging directory
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ctan-submission/coop-writing ctan-submission/coop-writing-*.zip
+          if git diff --cached --quiet; then
+            echo "CTAN staging directory already up to date."
+          else
+            git commit -m "release: generate CTAN submission"
+            git push
+          fi
