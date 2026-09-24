@@ -1,4 +1,4 @@
-# pacote LaTeX coop-writing v1.5.5
+# pacote LaTeX coop-writing v1.8
 
 Copyright (c) 2024–2026 Geraldo Xexéo
 
@@ -19,6 +19,11 @@ Documentação em inglês:
 - [Maximal Example — English (EN-US)](max-example-en-us.tex)
 
 O manual completo está em [coop-writing.pdf](coop-writing.pdf), gerado a partir de [coop-writing.dtx](coop-writing.dtx).
+
+Informações de versão:
+
+- [Novidades da v1.8](new.md)
+- [Histórico completo de versões](changes.md)
 
 ## Uso mínimo
 
