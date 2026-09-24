@@ -370,6 +370,13 @@
 % be referenced as |\ref{cw:FirstLabel}|, as in here Comment \ref{cw:FirstLabel}.
 %
 %
+% \DescribeMacro{\cwref}
+% References a labeled comment by its stable semantic label.
+%    \begin{macrocode}
+\newcommand{\cwref}[1]{%
+\@ifpackageloaded{hyperref}{\hyperref[cw:#1]{#1}}{#1}}%
+%    \end{macrocode}
+%
 %\subsection{Strikedthrought comments}
 %
 % After using the editorial comments for a time, we started to delete the old ones that represented fixed problems. However, we notice that some comments should be kept,
@@ -1247,6 +1254,24 @@
 \newif\if@cwmemoirdefense\@cwmemoirdefensefalse%
 }%
 %
+% Private editorial lists without tocloft. memoir already provides a
+% compatible \newlistof implementation, so this fallback is only installed
+% when the class does not provide one.
+\newcommand{\cw@listheading}[1]{%
+  \@ifundefined{chapter}{\section*{#1}}{\chapter*{#1}}%
+}%
+\@ifundefined{newlistof}{%
+  \NewDocumentCommand{\newlistof}{o m m m}{%
+    \@ifundefined{c@#2}{\newcounter{#2}}{}%
+    \expandafter\newlength\csname cft#2numwidth\endcsname
+    \setlength{\csname cft#2numwidth\endcsname}{2.3em}%
+    \expandafter\newcommand\csname l@#2\endcsname[2]{%
+      \@dottedtocline{1}{1.5em}{\csname cft#2numwidth\endcsname}{####1}{####2}}%
+    \expandafter\newcommand\csname listof#2\endcsname{%
+      \cw@listheading{#4}\@starttoc{#3}}%
+  }%
+}{}%
+%
 %    \end{macrocode}
 %
 % \subsection{Color related variables}
@@ -1271,65 +1296,80 @@
 %
 % The advantage of this way is that any user can |\renewcommand{\cwdrafttitle}{some text}|.
 %    \begin{macrocode}
-\def\cwdrafttitle{Standard Draft}%
-\def\cwcommentstitle{Standard List of Comments}%
-\def\cwsubjtitle{Standard List of Subjects}%
-\def\cwcitationstitle{Standard List of Citation Needs}%
-\def\cwpleasecitetext{Plese cite}%
-\def\cwpleasecitemessage{something to support this information}%
-\def\cwpleasecitemarginnote{Cite}%
-\def\cw@attentiontext{Attention}%
+\ExplSyntaxOn
+\tl_new:N \g__cw_language_tl
+\tl_gset:Nn \g__cw_language_tl { auto }
+\prop_new:N \g__cw_i18n_en_prop
+\prop_new:N \g__cw_i18n_pt_prop
+\prop_gput_from_keyval:Nn \g__cw_i18n_en_prop
+  {
+    draft = {Draft},
+    comments = {List of Comments},
+    subjects = {List of Subjects},
+    citations = {List of Citation Needs},
+    todos = {List of TODOs},
+    pleasecite = {Please cite},
+    pleasecite-message = {something to support this information},
+    pleasecite-margin = {Cite},
+    attention = {Attention},
+    report = {Editorial Report},
+    errata = {Errata}
+  }
+\prop_gput_from_keyval:Nn \g__cw_i18n_pt_prop
+  {
+    draft = {Rascunho},
+    comments = {Lista de Comentários},
+    subjects = {Lista de Assuntos},
+    citations = {Necessidades de Citação},
+    todos = {Lista de TODOs},
+    pleasecite = {Favor citar},
+    pleasecite-message = {alguma coisa que suporte este texto},
+    pleasecite-margin = {Citar},
+    attention = {Atenção},
+    report = {Relatório Editorial},
+    errata = {Errata}
+  }
+\cs_new:Npn \__cw_effective_language:
+  {
+    \tl_if_eq:NnTF \g__cw_language_tl { auto }
+      {
+        \cs_if_exist:NTF \languagename
+          { \languagename }
+          { english }
+      }
+      { \tl_use:N \g__cw_language_tl }
+  }
+\cs_new:Npn \__cw_translate:n #1
+  {
+    \str_case_e:nnF { \__cw_effective_language: }
+      {
+        {brazil}{\prop_item:Nn \g__cw_i18n_pt_prop {#1}}
+        {brazilian}{\prop_item:Nn \g__cw_i18n_pt_prop {#1}}
+        {portuguese}{\prop_item:Nn \g__cw_i18n_pt_prop {#1}}
+        {pt-BR}{\prop_item:Nn \g__cw_i18n_pt_prop {#1}}
+        {pt-br}{\prop_item:Nn \g__cw_i18n_pt_prop {#1}}
+      }
+      { \prop_item:Nn \g__cw_i18n_en_prop {#1} }
+  }
+\cs_new_protected:Npn \cw_set_language:n #1
+  { \tl_gset:Nn \g__cw_language_tl {#1} }
+\cs_new_eq:NN \cwsetlanguageaux \cw_set_language:n
+\cs_new:Npn \cwtranslateaux #1 { \__cw_translate:n {#1} }
+\ExplSyntaxOff
+
+\newcommand{\cwsetlanguage}[1]{\cwsetlanguageaux{#1}}%
+\newcommand{\cwdrafttitle}{\cwtranslateaux{draft}}%
+\newcommand{\cwcommentstitle}{\cwtranslateaux{comments}}%
+\newcommand{\cwsubjtitle}{\cwtranslateaux{subjects}}%
+\newcommand{\cwcitationstitle}{\cwtranslateaux{citations}}%
+\newcommand{\cwtodostitle}{\cwtranslateaux{todos}}%
+\newcommand{\cwpleasecitetext}{\cwtranslateaux{pleasecite}}%
+\newcommand{\cwpleasecitemessage}{\cwtranslateaux{pleasecite-message}}%
+\newcommand{\cwpleasecitemarginnote}{\cwtranslateaux{pleasecite-margin}}%
+\newcommand{\cw@attentiontext}{\cwtranslateaux{attention}}%
+\newcommand{\cwreporttitle}{\cwtranslateaux{report}}%
+\newcommand{\cwerratatitle}{\cwtranslateaux{errata}}%
 %
-\@ifpackageloaded{babel}%
-{%
-\IfLanguageName{brazil}%
-{%
-\def\cwdrafttitle{Rascunho}%
-\def\cwcommentstitle{Lista de Comentários}%
-\def\cwsubjtitle{Lista de Assuntos}%
-\def\cwcitationstitle{Necessidades de Citação}%
-\def\cwpleasecitetext{Favor citar}%
-\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-\def\cwpleasecitemarginnote{Citar}%
-\def\cw@attentiontext{Atenção}%
-}{}%
-\IfLanguageName{brazilian}%
-{%
-\def\cwdrafttitle{Rascunho}%
-\def\cwcommentstitle{Lista de Comentários}%
-\def\cwsubjtitle{Lista de Assuntos}%
-\def\cwcitationstitle{Necessidades de Citação}%
-\def\cwpleasecitetext{Favor citar}%
-\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-\def\cwpleasecitemarginnote{Citar}%
-\def\cw@attentiontext{Atenção}%
-}{}%
-%
-\IfLanguageName{portuguese}%
-{%
-\def\cwdrafttitle{Rascunho}%
-\def\cwcommentstitle{Lista de Comentários}%
-\def\cwsubjtitle{Lista de Assuntos}%
-\def\cwcitationstitle{Necessidades de Citação}%
-\def\cwpleasecitetext{Favor citar}%
-\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-\def\cwpleasecitemarginnote{Citar}%
-\def\cw@attentiontext{Atenção}%
-}{}%
-%
-\IfLanguageName{english}%
-{%
-\def\cwdrafttitle{Draft}%
-\def\cwcommentstitle{List of Comments}%
-\def\cwsubjtitle{List of Subjects}%
-\def\cwcitationstitle{List of Citation Needs}%
-\def\cwpleasecitetext{Plese cite}%
-\def\cwpleasecitemessage{something to support this information}%
-\def\cwpleasecitemarginnote{Cite}%
-\def\cw@attentiontext{Attention}%
-}{}%
-}%
-{}%
 %    \end{macrocode}
 % \subsection{ed inspired code}
 % This code, inspired in the |ed| package\favorcitar[ed package], makes the basic mechanism for
@@ -1380,6 +1420,7 @@
 \if\@test%
 \@empty%
 \else%
+\def\@currentlabel{#3}%
 \label{cw:#3}%
 \textcolor{\cw@currentcolor}{[#3]}% if \meta{label} is not empty
 \fi%
@@ -1483,7 +1524,9 @@
 \ifshowednotes%
 \cw@footnote{#1}{#2}{#3}%
 \ifednotebookmarks%
-\belowpdfbookmark{#2: #1}{cwnotepdfbm.\thecwnotecounter}%
+\@ifpackageloaded{hyperref}{%
+\belowpdfbookmark{Editorial comment \arabic{cwnotecounter}}{cwnotepdfbm.\thecwnotecounter}%
+}{}%
 \fi%
 \fi}%
 %    \end{macrocode}
