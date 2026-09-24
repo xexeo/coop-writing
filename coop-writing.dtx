@@ -1208,6 +1208,33 @@
 \RequirePackage[normalem]{ulem}
 \RequirePackage{etoolbox}
 \RequirePackage{mdframed}
+%
+% Public mode predicates and current-file information.
+\newif\ifcwediting
+\newif\ifcwsubmit
+\newif\ifcwpublish
+\newif\ifcwacceptingpublish
+\if@modoedicao\cweditingtrue\fi
+\if@modosubmeter\cwsubmittrue\fi
+\if@modopublicaraceitando
+  \cwacceptingpublishtrue
+\else
+  \if@modopublicar\cwpublishtrue\fi
+\fi
+\newcommand{\cwmode}{\cw@modename}%
+\newcommand{\cwifediting}[2]{\ifcwediting#1\else#2\fi}%
+\newcommand{\cwifsubmit}[2]{\ifcwsubmit#1\else#2\fi}%
+\newcommand{\cwifpublish}[2]{\ifcwpublish#1\else#2\fi}%
+\newcommand{\cwifacceptingpublish}[2]{\ifcwacceptingpublish#1\else#2\fi}%
+\newcommand{\cwifmode}[3]{\ifstrequal{#1}{\cwmode}{#2}{#3}}%
+\newcommand{\cwcurrentfile}{%
+  \ifdefined\CurrentFile
+    \ifx\CurrentFile\@empty\jobname.tex\else\CurrentFilePath\CurrentFile\fi
+  \else
+    \jobname.tex%
+  \fi}%
+\newcommand{\cwcurrentfilepath}{%
+  \ifdefined\CurrentFilePath\CurrentFilePath\else\@empty\fi}%
 %    \end{macrocode}
 % \subsection{Optional Packages}
 % Package that are required only sometimes
@@ -2026,12 +2053,15 @@
 \if@showcomentario%
 \newcommand{\cw@commentref}[3][]{%
 \refstepcounter{comentarioref}%
+\refstepcounter{comentario}%
 \cw@hll{#3}{#1}%
 \cw@cwnote{#2}{#3}{\cwpleasecitemarginnote}%
 \if@cwmemoirdefense%
 \addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}#2}%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}#2}%
 \else%
 \addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}{#2}}%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#2}}%
 \fi%
 }%
 \if@cwmemoirdefense%
@@ -2064,17 +2094,21 @@
 % used
 %    \begin{macrocode}
 \if@showdraft%
-\NewEnviron{cwdraft}[1][]{%
+\NewDocumentEnvironment{cwdraft}{O{} +b}{%
+\begin{mdframed}%
 \ifstrempty{#1}%
 {\colorbox{\corleve{\cor@hldraft}}{\textbf{\cwdrafttitle}}}%
 {\cw@hll{\cor@hldraft}{\textbf{#1}}}%
 \newline%
-\BODY%
-}%
-{}%
-\surroundwithmdframed{cwdraft}%
+#2%
+\end{mdframed}%
+}{}%
+\NewDocumentCommand{\cwdrafttext}{O{} m}{\begin{cwdraft}[#1]#2\end{cwdraft}}%
+\NewDocumentCommand{\cwsaveforlater}{O{} m}{\begin{cwdraft}[#1]#2\end{cwdraft}}%
 \else%
-\NewEnviron{cwdraft}[1][]{}{}%
+\NewDocumentEnvironment{cwdraft}{O{} +b}{}{}%
+\NewDocumentCommand{\cwdrafttext}{O{} m}{}%
+\NewDocumentCommand{\cwsaveforlater}{O{} m}{}%
 \fi%
 %    \end{macrocode}
 % \begin{macro}{\cwsetdraftcolor}
@@ -2142,13 +2176,31 @@
 %    \begin{macrocode}
 \newcommand{\cw@todobackgroundcolor}{orange}%
 \cwnamedef{cw@todoauthor}{orange}{To do}%
+\newcommand{\listtodo}{\cwtodostitle}%
+\if@cwmemoirdefense%
+  \@ifundefined{chapter}%
+    {\newlistentry[section]{cwtodo}{cwt}{0}}%
+    {\newlistentry[chapter]{cwtodo}{cwt}{0}}%
+  \newlistof{listofcwtodo}{cwt}{\listtodo}%
+\else%
+  \@ifundefined{chapter}%
+    {\newlistof[section]{cwtodo}{cwt}{\listtodo}}%
+    {\newlistof[chapter]{cwtodo}{cwt}{\listtodo}}%
+\fi%
+\let\listoftodos=\listofcwtodo%
 \if@showtodo%
 \newcommand{\todo}[2][]{%
 \ifstrequal{#1}{inline}%
 {%
 \refstepcounter{comentario}%
+\refstepcounter{cwtodo}%
 \begin{mdframed}[backgroundcolor=\cw@todobackgroundcolor]
 #2%
+\if@cwmemoirdefense%
+\addcontentsline{cwt}{cwtodo}{\protect\numberline{\thecwtodo}#2}%
+\else%
+\addcontentsline{cwt}{cwtodo}{\protect\numberline{\thecwtodo}{#2}}%
+\fi%
 \if@cwmemoirdefense%
 \addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}To do: #2}%
 \else%
@@ -2160,6 +2212,12 @@
 \ifstrempty{#1}{}{%
 \PackageWarning{coop-writing}{Unknown todo option '#1'; using default comment style}%
 }%
+\refstepcounter{cwtodo}%
+\if@cwmemoirdefense%
+\addcontentsline{cwt}{cwtodo}{\protect\numberline{\thecwtodo}#2}%
+\else%
+\addcontentsline{cwt}{cwtodo}{\protect\numberline{\thecwtodo}{#2}}%
+\fi%
 \cw@todoauthor{#2}%
 }%
 }%
