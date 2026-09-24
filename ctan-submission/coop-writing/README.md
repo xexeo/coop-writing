@@ -1,4 +1,4 @@
-# coop-writing LaTeX package v1.5.5
+# coop-writing LaTeX package v1.8
 
 Copyright (c) 2024–2026 Geraldo Xexéo
 
@@ -19,6 +19,11 @@ Portuguese documentation:
 - [Exemplo Máximo — Português do Brasil (PT-BR)](max-exemplo-pt-br.tex)
 
 The full documented source/manual is available as [coop-writing.pdf](coop-writing.pdf), generated from [coop-writing.dtx](coop-writing.dtx).
+
+Release information:
+
+- [What's new in v1.8](new.md)
+- [Complete version history](changes.md)
 
 ## Minimal use
 
