@@ -2866,30 +2866,33 @@
 % \begin{macro}{\cwnamedef}
 %    \begin{macrocode}
 \newcommand{\cwnamedef}[3]{%
-%% cwcomment - texto a hl, cor, comentário, indicador de pessoa
+\cwregisterauthor{#1}{#3}{#2}%
+%% Historic comments keep their original behavior unless the optional
+%% argument contains key=value metadata, in which case they use cwitem.
 \expandafter\newcommand\csname#1\endcsname[2][]%
-{%
-\cw@comment[##1]{##2}{#2}{#3}}%
-% [texto a marcar], cor , comentário, palavra, rótulo
+{\cwdispatchcomment{##1}{##2}{#2}{#3}{#1}}%
+% Labeled/struck historic forms remain source-compatible.
 \expandafter\newcommand\csname#1r\endcsname[3][]%
 {\cw@commentLabeled[##1]{##2}{#2}{#3}{##3}}%
-%% cortados
 \expandafter\newcommand\csname#1x\endcsname[2][]%
-{%
-%% Comentários
-\cw@xcomment[##1]{##2}{#2}{#3}}%
-%% [texto a marcar], cor , comentário, palavra, rótulo
+{\cw@xcomment[##1]{##2}{#2}{#3}}%
 \expandafter\newcommand\csname#1rx\endcsname[3][]%
 {\cw@xcommentLabeled[##1]{##2}{#2}{#3}{##3}}%
-%% sugestões
+%% Suggestions/removals/swaps accept modern key=value metadata while
+%% preserving the historic optional comment syntax.
 \expandafter\newcommand\csname#1sug\endcsname[2][]%
-{\cw@gensug[##1]{#2}{#3}{}{#2}{##2}{#2}}%
+{\cwdispatchchange{##1}{}{##2}{#2}{#3}{#1}}%
 \expandafter\newcommand\csname#1rem\endcsname[2][]%
-{\cw@gensug[##1]{#2}{#3}{##2}{#2}{}{#2}}
+{\cwdispatchchange{##1}{##2}{}{#2}{#3}{#1}}%
 \expandafter\newcommand\csname#1troca\endcsname[3][]%
-{\cw@gensug[##1]{#2}{#3}{##2}{#2}{##3}{#2}}%
+{\cwdispatchchange{##1}{##2}{##3}{#2}{#3}{#1}}%
 \expandafter\newcommand\csname#1swap\endcsname[3][]%
-{\cw@gensug[##1]{#2}{#3}{##2}{#2}{##3}{#2}}%
+{\cwdispatchchange{##1}{##2}{##3}{#2}{#3}{#1}}%
+%% Author-specific TODO and reply helpers.
+\expandafter\newcommand\csname#1todo\endcsname[2][]%
+{\cwitem[type=todo,author={#1},color={#2},##1]{##2}}%
+\expandafter\newcommand\csname#1reply\endcsname[3][]%
+{\cwreply{##2}[author={#1},color={#2},##1]{##3}}%
 }%
 %    \end{macrocode}
 % \end{macro}
@@ -2990,7 +2993,8 @@
 % These next lines of code made easy to convert this package to English, because it was written in Portuguese, for Brazilian researchers.
 % Some commands were rewritten in English with time, such as |rascunho|, but the Portuguese version will always be maintained, while other were translated using only his mechanism.
 %    \begin{macrocode}
-\let\rascunho=\cwdraft%
+\NewDocumentEnvironment{rascunho}{O{} +b}{%
+\begin{cwdraft}[#1]#2\end{cwdraft}}{}%
 \let\cwassunto=\cwsubject%
 \let\favorcitar=\pleasecite%
 \let\cwautor=\cwnamedef%
