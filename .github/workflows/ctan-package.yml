@@ -36,12 +36,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Regenerate package from documented source
-        run: latex -interaction=nonstopmode -halt-on-error coop-writing.ins
-
       - name: Compile CTAN documentation
         uses: xu-cheng/latex-action@v4
         with:
+          pre_compile: latex -interaction=nonstopmode -halt-on-error coop-writing.ins
           root_file: |
             coop-writing.dtx
             quickref-en-us.tex
