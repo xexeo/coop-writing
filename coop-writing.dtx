@@ -2872,8 +2872,9 @@
 
 \cs_new_protected:Npn \__cw_pending_warnings:
   {
-    \bool_if:NT \g__cw_pending_warnings_bool
+    \tl_if_eq:NnF \g__cw_log_policy_tl {none}
       {
+        \int_zero:N \l_tmpa_int
         \seq_map_inline:Nn \g__cw_item_seq
           {
             \__cw_get_field:nnN {##1}{status}\l_tmpa_tl
@@ -2881,14 +2882,40 @@
               {\tl_set_eq:NN \l_tmpa_tl \l_tmpb_tl}
             \str_case_e:nnF {\tl_use:N \l_tmpa_tl}
               {
-                {open}{\PackageWarning{coop-writing}{Editorial item '##1' is still open}}
-                {pending}{\PackageWarning{coop-writing}{Editorial change '##1' is still pending}}
+                {open}{
+                  \int_incr:N \l_tmpa_int
+                  \tl_if_eq:NnT \g__cw_log_policy_tl {each}
+                    {\PackageWarning{coop-writing}{Editorial item '##1' is still open}}
+                }
+                {pending}{
+                  \int_incr:N \l_tmpa_int
+                  \tl_if_eq:NnT \g__cw_log_policy_tl {each}
+                    {\PackageWarning{coop-writing}{Editorial change '##1' is still pending}}
+                }
               }
               { }
+          }
+        \tl_if_eq:NnT \g__cw_log_policy_tl {summary}
+          {
+            \int_compare:nNnT {\l_tmpa_int} > {0}
+              {\PackageWarning{coop-writing}{\int_use:N \l_tmpa_int\space editorial item(s) remain open or pending}}
           }
       }
   }
 \AddToHook{enddocument/info}{\__cw_pending_warnings:}
+
+\NewDocumentCommand{\cwinline}{O{} m}
+  {\cwitem[layout=inline,#1]{#2}}
+\NewDocumentCommand{\cwneedsinfo}{O{} m}
+  {\cwitem[type=needs-info,#1]{#2}}
+\NewDocumentCommand{\cwneedsjustification}{O{} m}
+  {\cwitem[type=needs-justification,#1]{#2}}
+\NewDocumentCommand{\cwneedsexplanation}{O{} m}
+  {\cwitem[type=needs-explanation,#1]{#2}}
+\NewDocumentCommand{\cwneedsimage}{O{} m}
+  {\cwitem[type=needs-image,#1]{#2}}
+\NewDocumentCommand{\cwneedsenglish}{O{} m}
+  {\cwitem[type=needs-english,#1]{#2}}
 
 \NewDocumentCommand{\cwheadingcomment}{O{} m m}
   {
@@ -2928,6 +2955,9 @@
 % \begin{macro}{\cwnamedef}
 %    \begin{macrocode}
 \newcommand{\cwnamedef}[3]{%
+\ifstrequal{#2}{auto}{%
+  \cwdefineauthor{#1}{#3}%
+}{%
 \cwregisterauthor{#1}{#3}{#2}%
 %% Historic comments keep their original behavior unless the optional
 %% argument contains key=value metadata, in which case they use cwitem.
@@ -2955,6 +2985,7 @@
 {\cwitem[type=todo,author={#1},color={#2},##1]{##2}}%
 \expandafter\newcommand\csname#1reply\endcsname[3][]%
 {\cwreply{##2}[author={#1},color={#2},##1]{##3}}%
+}%
 }%
 %    \end{macrocode}
 % \end{macro}
