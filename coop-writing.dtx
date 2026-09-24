@@ -2121,6 +2121,743 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{environment}
+% \section{Semantic editorial core}
+% The modern API is implemented with expl3 data structures while the historic
+% commands remain available as compatibility front-ends.
+%    \begin{macrocode}
+\ExplSyntaxOn
+
+\seq_new:N  \g__cw_item_seq
+\prop_new:N \g__cw_item_prop
+\prop_new:N \g__cw_decision_prop
+\prop_new:N \g__cw_type_prop
+\prop_new:N \g__cw_style_prop
+\prop_new:N \g__cw_author_color_prop
+\prop_new:N \g__cw_author_name_prop
+\prop_new:N \g__cw_author_policy_prop
+\prop_new:N \g__cw_document_prop
+\prop_new:N \g__cw_revision_prop
+\clist_new:N \g__cw_author_include_clist
+\clist_new:N \g__cw_author_exclude_clist
+\clist_new:N \g__cw_color_palette_clist
+\int_new:N \g__cw_item_int
+\int_new:N \g__cw_author_color_int
+\bool_new:N \g__cw_pending_warnings_bool
+\bool_new:N \g__cw_export_sensitive_bool
+\tl_new:N \g__cw_mode_tl
+\tl_new:N \g__cw_view_tl
+\tl_new:N \g__cw_layout_tl
+\tl_new:N \g__cw_theme_tl
+\tl_new:N \g__cw_pdf_backend_tl
+\tl_new:N \g__cw_placeholder_policy_tl
+
+\tl_gset:Nx \g__cw_mode_tl { \cw@modename }
+\tl_gset:Nx \g__cw_view_tl { \cw@initialview }
+\tl_gset:Nn \g__cw_layout_tl { margin-footnote }
+\tl_gset:Nn \g__cw_theme_tl { color }
+\tl_gset:Nn \g__cw_pdf_backend_tl { none }
+\tl_gset:Nn \g__cw_placeholder_policy_tl { warning }
+\bool_gset_true:N \g__cw_pending_warnings_bool
+\bool_gset_false:N \g__cw_export_sensitive_bool
+\clist_gset:Nn \g__cw_color_palette_clist
+  { blue,red,teal,violet,olive,magenta,brown,cyan }
+
+\prop_gput:Nnn \g__cw_type_prop { comment }
+  { label={Comment},severity=info,color=blue }
+\prop_gput:Nnn \g__cw_type_prop { todo }
+  { label={TODO},severity=warning,color=orange }
+\prop_gput:Nnn \g__cw_type_prop { citation }
+  { label={Citation},severity=warning,color=purple }
+\prop_gput:Nnn \g__cw_type_prop { reply }
+  { label={Reply},severity=info,color=teal }
+\prop_gput:Nnn \g__cw_type_prop { change }
+  { label={Change},severity=info,color=blue,status=pending }
+\prop_gput:Nnn \g__cw_type_prop { revision }
+  { label={Revision},severity=info,color=blue }
+\prop_gput:Nnn \g__cw_type_prop { placeholder }
+  { label={Placeholder},severity=warning,color=orange }
+\prop_gput:Nnn \g__cw_type_prop { erratum }
+  { label={Erratum},severity=warning,color=red,status=accepted }
+
+\tl_new:N \l__cw_item_id_tl
+\tl_new:N \l__cw_item_type_tl
+\tl_new:N \l__cw_item_label_tl
+\tl_new:N \l__cw_item_author_tl
+\tl_new:N \l__cw_item_status_tl
+\tl_new:N \l__cw_item_severity_tl
+\tl_new:N \l__cw_item_parent_tl
+\tl_new:N \l__cw_item_style_tl
+\tl_new:N \l__cw_item_layout_tl
+\tl_new:N \l__cw_item_color_tl
+\tl_new:N \l__cw_item_subtype_tl
+\tl_new:N \l__cw_item_comment_tl
+\tl_new:N \l__cw_item_date_tl
+\tl_new:N \l__cw_item_version_tl
+\tl_new:N \l__cw_item_file_tl
+\tl_new:N \l__cw_item_page_tl
+\bool_new:N \l__cw_item_pdf_bool
+\bool_new:N \l__cw_item_visible_bool
+
+\keys_define:nn { cw/item }
+  {
+    id .tl_set:N = \l__cw_item_id_tl,
+    type .tl_set:N = \l__cw_item_type_tl,
+    label .tl_set:N = \l__cw_item_label_tl,
+    author .tl_set:N = \l__cw_item_author_tl,
+    status .tl_set:N = \l__cw_item_status_tl,
+    decision .meta:n = { status = #1 },
+    severity .tl_set:N = \l__cw_item_severity_tl,
+    parent .tl_set:N = \l__cw_item_parent_tl,
+    style .tl_set:N = \l__cw_item_style_tl,
+    layout .tl_set:N = \l__cw_item_layout_tl,
+    color .tl_set:N = \l__cw_item_color_tl,
+    subtype .tl_set:N = \l__cw_item_subtype_tl,
+    comment .tl_set:N = \l__cw_item_comment_tl,
+    date .tl_set:N = \l__cw_item_date_tl,
+    version .tl_set:N = \l__cw_item_version_tl,
+    pdf .choice:,
+    pdf / true .code:n = { \bool_set_true:N \l__cw_item_pdf_bool },
+    pdf / false .code:n = { \bool_set_false:N \l__cw_item_pdf_bool },
+  }
+
+\cs_new_protected:Npn \__cw_item_reset:
+  {
+    \tl_clear:N \l__cw_item_id_tl
+    \tl_set:Nn \l__cw_item_type_tl { comment }
+    \tl_clear:N \l__cw_item_label_tl
+    \tl_clear:N \l__cw_item_author_tl
+    \tl_set:Nn \l__cw_item_status_tl { open }
+    \tl_set:Nn \l__cw_item_severity_tl { info }
+    \tl_clear:N \l__cw_item_parent_tl
+    \tl_clear:N \l__cw_item_style_tl
+    \tl_set_eq:NN \l__cw_item_layout_tl \g__cw_layout_tl
+    \tl_set:Nn \l__cw_item_color_tl { black }
+    \tl_clear:N \l__cw_item_subtype_tl
+    \tl_clear:N \l__cw_item_comment_tl
+    \tl_clear:N \l__cw_item_date_tl
+    \tl_clear:N \l__cw_item_version_tl
+    \bool_set_false:N \l__cw_item_pdf_bool
+    \bool_set_true:N \l__cw_item_visible_bool
+  }
+
+\cs_new_protected:Npn \__cw_prepare_item:n #1
+  {
+    \__cw_item_reset:
+    \keys_set:nn { cw/item } {#1}
+    \tl_set_eq:NN \l_tmpa_tl \l__cw_item_type_tl
+    \tl_set_eq:NN \l_tmpb_tl \l__cw_item_style_tl
+    \__cw_item_reset:
+    \tl_set_eq:NN \l__cw_item_type_tl \l_tmpa_tl
+    \exp_args:NNx \prop_get:NnNTF \g__cw_type_prop
+      { \tl_use:N \l_tmpa_tl } \l_tmpc_tl
+      { \keys_set:nV { cw/item } \l_tmpc_tl }
+      { }
+    \tl_if_blank:VF \l_tmpb_tl
+      {
+        \exp_args:NNx \prop_get:NnNTF \g__cw_style_prop
+          { \tl_use:N \l_tmpb_tl } \l_tmpc_tl
+          { \keys_set:nV { cw/item } \l_tmpc_tl }
+          { \PackageWarning{coop-writing}{Unknown editorial style '\tl_use:N \l_tmpb_tl'} }
+      }
+    \keys_set:nn { cw/item } {#1}
+    \tl_if_blank:VTF \l__cw_item_id_tl
+      {
+        \int_gincr:N \g__cw_item_int
+        \tl_set:Nx \l__cw_item_id_tl { cw-\int_use:N \g__cw_item_int }
+      }
+      { }
+    \tl_if_blank:VTF \l__cw_item_label_tl
+      { \tl_set_eq:NN \l__cw_item_label_tl \l__cw_item_type_tl }
+      { }
+    \tl_if_blank:VF \l__cw_item_author_tl
+      {
+        \exp_args:NNx \prop_get:NnNTF \g__cw_author_color_prop
+          { \tl_use:N \l__cw_item_author_tl } \l_tmpa_tl
+          {
+            \tl_if_eq:NnT \l__cw_item_color_tl { black }
+              { \tl_set_eq:NN \l__cw_item_color_tl \l_tmpa_tl }
+          }
+          { }
+        \exp_args:NNx \prop_get:NnNTF \g__cw_author_policy_prop
+          { \tl_use:N \l__cw_item_author_tl } \l_tmpa_tl
+          {
+            \str_case_e:nnF { \tl_use:N \l_tmpa_tl }
+              {
+                {hide}{\bool_set_false:N \l__cw_item_visible_bool}
+                {accept}{\tl_set:Nn \l__cw_item_status_tl {accepted}}
+                {reject}{\tl_set:Nn \l__cw_item_status_tl {rejected}}
+              }{}
+          }{}
+      }
+    \exp_args:NNx \prop_get:NnNTF \g__cw_decision_prop
+      { \tl_use:N \l__cw_item_id_tl } \l_tmpa_tl
+      { \tl_set_eq:NN \l__cw_item_status_tl \l_tmpa_tl }
+      { }
+    \clist_if_empty:NF \g__cw_author_include_clist
+      {
+        \exp_args:NNV \clist_if_in:NnF \g__cw_author_include_clist
+          \l__cw_item_author_tl
+          { \bool_set_false:N \l__cw_item_visible_bool }
+      }
+    \exp_args:NNV \clist_if_in:NnT \g__cw_author_exclude_clist
+      \l__cw_item_author_tl
+      { \bool_set_false:N \l__cw_item_visible_bool }
+    \tl_set:Nx \l__cw_item_file_tl { \cwcurrentfile }
+    \tl_set:Nx \l__cw_item_page_tl { \thepage }
+  }
+
+\cs_new_protected:Npn \__cw_store_var:nN #1#2
+  {
+    \exp_args:NNxx \prop_gput:Nnn \g__cw_item_prop
+      { \tl_use:N \l__cw_item_id_tl / #1 }
+      { \exp_not:V #2 }
+  }
+\cs_new_protected:Npn \__cw_store_tokens:nn #1#2
+  {
+    \exp_args:NNxx \prop_gput:Nnn \g__cw_item_prop
+      { \tl_use:N \l__cw_item_id_tl / #1 }
+      { \exp_not:n {#2} }
+  }
+\cs_new_protected:Npn \__cw_get_field:nnN #1#2#3
+  {
+    \exp_args:NNx \prop_get:NnNTF \g__cw_item_prop {#1/#2} #3
+      { } { \tl_clear:N #3 }
+  }
+
+\cs_new_protected:Npn \__cw_register_current:n #1
+  {
+    \exp_args:NNx \prop_if_in:NnTF \g__cw_item_prop
+      { \tl_use:N \l__cw_item_id_tl / type }
+      { \PackageWarning{coop-writing}{Duplicate editorial id '\tl_use:N \l__cw_item_id_tl'; metadata replaced} }
+      { \seq_gput_right:NV \g__cw_item_seq \l__cw_item_id_tl }
+    \__cw_store_var:nN {type} \l__cw_item_type_tl
+    \__cw_store_var:nN {label} \l__cw_item_label_tl
+    \__cw_store_var:nN {author} \l__cw_item_author_tl
+    \__cw_store_var:nN {status} \l__cw_item_status_tl
+    \__cw_store_var:nN {severity} \l__cw_item_severity_tl
+    \__cw_store_var:nN {parent} \l__cw_item_parent_tl
+    \__cw_store_var:nN {style} \l__cw_item_style_tl
+    \__cw_store_var:nN {layout} \l__cw_item_layout_tl
+    \__cw_store_var:nN {color} \l__cw_item_color_tl
+    \__cw_store_var:nN {subtype} \l__cw_item_subtype_tl
+    \__cw_store_var:nN {comment} \l__cw_item_comment_tl
+    \__cw_store_var:nN {date} \l__cw_item_date_tl
+    \__cw_store_var:nN {version} \l__cw_item_version_tl
+    \__cw_store_var:nN {file} \l__cw_item_file_tl
+    \__cw_store_var:nN {page} \l__cw_item_page_tl
+    \__cw_store_tokens:nn {body} {#1}
+  }
+
+\cs_new_protected:Npn \__cw_author_display:N #1
+  {
+    \tl_if_blank:VTF \l__cw_item_author_tl
+      { \tl_set:Nn #1 { Editor } }
+      {
+        \exp_args:NNx \prop_get:NnNTF \g__cw_author_name_prop
+          { \tl_use:N \l__cw_item_author_tl } #1
+          { } { \tl_set_eq:NN #1 \l__cw_item_author_tl }
+      }
+  }
+
+\cs_new_protected:Npn \__cw_render_generic:n #1
+  {
+    \bool_if:NT \l__cw_item_visible_bool
+      {
+        \tl_if_eq:NnT \g__cw_mode_tl { editing }
+          {
+            \__cw_author_display:N \l_tmpa_tl
+            \tl_set_eq:NN \l_tmpb_tl \l__cw_item_color_tl
+            \tl_if_eq:NnF \g__cw_theme_tl { color }
+              { \tl_set:Nn \l_tmpb_tl { black } }
+            \str_case_e:nnF { \tl_use:N \l__cw_item_layout_tl }
+              {
+                {none}{}
+                {margin}{\marginpar{\textcolor{\l_tmpb_tl}{\l_tmpa_tl:~#1}}}
+                {inline}{\textcolor{\l_tmpb_tl}{[\l_tmpa_tl/\l__cw_item_type_tl:~#1]}}
+                {compact}{\textcolor{\l_tmpb_tl}{[\l_tmpa_tl:~#1]}}
+                {pdf-annotation}
+                  {
+                    \@ifpackageloaded{pdfcomment}
+                      {\pdfcomment[author={\l_tmpa_tl}]{#1}}
+                      {\textcolor{\l_tmpb_tl}{[\l_tmpa_tl:~#1]}}
+                  }
+                {margin-footnote}
+                  {\cw@cwnote{#1}{\l_tmpb_tl}{\l_tmpa_tl}}
+              }
+              {\textcolor{\l_tmpb_tl}{[\l_tmpa_tl:~#1]}}
+            \tl_if_eq:NnT \g__cw_pdf_backend_tl { bookmark }
+              {
+                \@ifpackageloaded{hyperref}
+                  {\belowpdfbookmark{Editorial item \l__cw_item_id_tl}{cwitem.\l__cw_item_id_tl}}
+                  {}
+              }
+            \tl_if_eq:NnT \g__cw_pdf_backend_tl { pdfcomment }
+              {
+                \@ifpackageloaded{pdfcomment}
+                  {\pdfcomment[author={\l_tmpa_tl}]{#1}}
+                  {\PackageWarning{coop-writing}{pdf-backend=pdfcomment requested but pdfcomment is not loaded}}
+              }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \__cw_item:nn #1#2
+  {
+    \__cw_prepare_item:n {#1}
+    \__cw_register_current:n {#2}
+    \tl_if_eq:NnTF \l__cw_item_type_tl { placeholder }
+      {
+        \tl_if_eq:NnTF \g__cw_mode_tl { editing }
+          { \__cw_render_generic:n {#2} }
+          {
+            \str_case_e:nn { \tl_use:N \g__cw_placeholder_policy_tl }
+              {
+                {warning}{\PackageWarning{coop-writing}{Unresolved placeholder '\l__cw_item_id_tl': \tl_to_str:n{#2}}}
+                {error}{\PackageError{coop-writing}{Unresolved placeholder '\l__cw_item_id_tl'}{Resolve or suppress the placeholder before final output.}}
+                {suppress}{}
+              }
+          }
+      }
+      { \__cw_render_generic:n {#2} }
+  }
+
+\NewDocumentCommand{\cwitem}{O{} m}{\__cw_item:nn{#1}{#2}}
+
+\cs_new_protected:Npn \__cw_decision:nn #1#2
+  { \prop_gput:Nnn \g__cw_decision_prop {#1} {#2} }
+\cs_new_eq:NN \cwdecisionaux \__cw_decision:nn
+\newcommand{\cw@decision}[2]{\cwdecisionaux{#1}{#2}}%
+
+\cs_new_protected:Npn \__cw_set_decision:nn #1#2
+  {
+    \prop_gput:Nnn \g__cw_decision_prop {#1} {#2}
+    \protected@write\@auxout{}{\string\cw@decision{#1}{#2}}
+  }
+\NewDocumentCommand{\cwaccept}{m}{\__cw_set_decision:nn{#1}{accepted}}
+\NewDocumentCommand{\cwreject}{m}{\__cw_set_decision:nn{#1}{rejected}}
+\NewDocumentCommand{\cwresolve}{m}{\__cw_set_decision:nn{#1}{resolved}}
+\NewDocumentCommand{\cwreopen}{m}{\__cw_set_decision:nn{#1}{open}}
+
+\iow_new:N \g__cw_revision_iow
+\AtBeginDocument{\iow_open:Nn \g__cw_revision_iow {\jobname.cwr}}
+\AddToHook{enddocument/end}{\iow_close:N \g__cw_revision_iow}
+
+\cs_new_protected:Npn \__cw_write_revision:nnn #1#2#3
+  {
+    \iow_now:Nx \g__cw_revision_iow
+      {
+        \token_to_str:N \cwrevisionrecord
+        {\jobname}
+        {\tl_use:N \l__cw_item_id_tl}
+        {\exp_not:n{#1}}
+        {\exp_not:n{#2}}
+        {\thepage}
+        {\exp_not:V \l__cw_item_file_tl}
+        {\exp_not:V \l__cw_item_type_tl}
+      }
+  }
+
+\cs_new_protected:Npn \__cw_render_change:nn #1#2
+  {
+    \bool_if:NTF \l__cw_item_visible_bool
+      {
+        \tl_if_eq:NnTF \g__cw_mode_tl { editing }
+          {
+            \tl_if_eq:NnTF \g__cw_theme_tl { color }
+              {\textcolor{\l__cw_item_color_tl}{\sout{#1}}\textcolor{\l__cw_item_color_tl}{#2}}
+              {\sout{#1}#2}
+            \tl_if_blank:VF \l__cw_item_comment_tl
+              {\__cw_render_generic:n {\l__cw_item_comment_tl}}
+          }
+          {
+            \str_case_e:nnF { \tl_use:N \l__cw_item_status_tl }
+              {
+                {accepted}{#2}
+                {rejected}{#1}
+              }
+              {
+                \tl_if_eq:NnTF \l__cw_item_type_tl { erratum }
+                  {#2}
+                  {
+                    \tl_if_eq:NnTF \g__cw_mode_tl { acceptingpublish }
+                      {#2}
+                      {#1}
+                  }
+              }
+          }
+      }
+      {
+        \str_case_e:nnF { \tl_use:N \l__cw_item_status_tl }
+          {{accepted}{#2}{rejected}{#1}}
+          {#1}
+      }
+  }
+
+\cs_new_protected:Npn \__cw_change:nnn #1#2#3
+  {
+    \__cw_prepare_item:n { type=change,#1 }
+    \tl_if_blank:VTF \l__cw_item_comment_tl
+      { \__cw_register_current:n {Change} }
+      { \__cw_register_current:n {\l__cw_item_comment_tl} }
+    \__cw_store_tokens:nn {old} {#2}
+    \__cw_store_tokens:nn {new} {#3}
+    \__cw_write_revision:nnn {#2}{#3}{\l__cw_item_type_tl}
+    \__cw_render_change:nn {#2}{#3}
+  }
+\NewDocumentCommand{\cwchange}{O{} m m}{\__cw_change:nnn{#1}{#2}{#3}}
+
+\cs_new_protected:Npn \__cw_revision_record:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \prop_gput:Nnn \g__cw_revision_prop {#1/#2/old} {#3}
+    \prop_gput:Nnn \g__cw_revision_prop {#1/#2/new} {#4}
+    \prop_gput:Nnn \g__cw_revision_prop {#1/#2/page} {#5}
+    \prop_gput:Nnn \g__cw_revision_prop {#1/#2/file} {#6}
+    \prop_gput:Nnn \g__cw_revision_prop {#1/#2/type} {#7}
+  }
+\NewDocumentCommand{\cwrevisionrecord}{m m m m m m m}
+  {\__cw_revision_record:nnnnnnn{#1}{#2}{#3}{#4}{#5}{#6}{#7}}
+\NewDocumentCommand{\cwloadrevisions}{m}
+  {\InputIfFileExists{#1.cwr}{}{\PackageWarning{coop-writing}{Revision file '#1.cwr' not found}}}
+
+\cs_new:Npn \__cw_revision_field:nnn #1#2#3
+  {
+    \prop_item:Nn \g__cw_revision_prop {#1/#2/#3}
+  }
+\NewExpandableDocumentCommand{\cwrevisionold}{m m}
+  {\__cw_revision_field:nnn{#1}{#2}{old}}
+\NewExpandableDocumentCommand{\cwrevisionnew}{m m}
+  {\__cw_revision_field:nnn{#1}{#2}{new}}
+\NewDocumentCommand{\cwrevisionref}{m m}
+  {
+    #1:~#2,~p.~\__cw_revision_field:nnn{#1}{#2}{page}
+    ~[\__cw_revision_field:nnn{#1}{#2}{file}]
+  }
+\NewDocumentCommand{\cwreviewresponse}{m m m}
+  {
+    \par\noindent\textbf{\cwrevisionref{#1}{#2}}\par
+    \textit{Old:}~\cwrevisionold{#1}{#2}\par
+    \textit{New:}~\cwrevisionnew{#1}{#2}\par
+    #3\par
+  }
+
+\NewDocumentCommand{\cwreply}{m O{} m}
+  {\cwitem[type=reply,parent={#1},#2]{#3}}
+\NewDocumentCommand{\cwplaceholder}{O{} m}
+  {\cwitem[type=placeholder,#1]{#2}}
+\NewDocumentCommand{\cwerratum}{O{} m m}
+  {\cwchange[type=erratum,status=accepted,#1]{#2}{#3}}
+\NewDocumentCommand{\cwerratareport}{O{}}
+  {\cwreport[type=erratum,#1]}
+
+\NewDocumentEnvironment{cwrevision}{O{} +b}
+  {
+    \cwitem[type=revision,layout=none,#1]{Revision~block}
+    \tl_if_eq:NnTF \g__cw_mode_tl { editing }
+      {\begin{mdframed}#2\end{mdframed}}
+      {#2}
+  }{}
+\NewDocumentCommand{\cwrevisioninline}{O{} m}
+  {
+    \cwitem[type=revision,layout=none,#1]{Inline~revision}
+    \tl_if_eq:NnTF \g__cw_mode_tl { editing }
+      {\textcolor{blue}{#2}}{#2}
+  }
+
+\NewDocumentEnvironment{cwview}{m +b}
+  {\tl_if_eq:NnT \g__cw_view_tl {#1}{#2}}{}
+\NewDocumentCommand{\cwifview}{m m}
+  {\tl_if_eq:NnT \g__cw_view_tl {#1}{#2}}
+\NewDocumentCommand{\cwifviewTF}{m m m}
+  {\tl_if_eq:NnTF \g__cw_view_tl {#1}{#2}{#3}}
+\NewDocumentCommand{\cwinputview}{m m}
+  {\tl_if_eq:NnT \g__cw_view_tl {#1}{\input{#2}}}
+\NewDocumentCommand{\cwincludeview}{m m}
+  {\tl_if_eq:NnT \g__cw_view_tl {#1}{\include{#2}}}
+
+\keys_define:nn { cw/setup }
+  {
+    mode .choice:,
+    mode / editing .code:n = {\tl_gset:Nn \g__cw_mode_tl {editing}},
+    mode / submit .code:n = {\tl_gset:Nn \g__cw_mode_tl {submit}},
+    mode / publish .code:n = {\tl_gset:Nn \g__cw_mode_tl {publish}},
+    mode / acceptingpublish .code:n = {\tl_gset:Nn \g__cw_mode_tl {acceptingpublish}},
+    view .tl_gset:N = \g__cw_view_tl,
+    layout .tl_gset:N = \g__cw_layout_tl,
+    theme .choice:,
+    theme / color .code:n = {\tl_gset:Nn \g__cw_theme_tl {color}},
+    theme / monochrome .code:n = {\tl_gset:Nn \g__cw_theme_tl {monochrome}},
+    theme / print .code:n = {\tl_gset:Nn \g__cw_theme_tl {print}},
+    pdf-backend .choice:,
+    pdf-backend / none .code:n = {\tl_gset:Nn \g__cw_pdf_backend_tl {none}},
+    pdf-backend / bookmark .code:n = {\tl_gset:Nn \g__cw_pdf_backend_tl {bookmark}},
+    pdf-backend / pdfcomment .code:n = {\tl_gset:Nn \g__cw_pdf_backend_tl {pdfcomment}},
+    placeholder-policy .choice:,
+    placeholder-policy / warning .code:n = {\tl_gset:Nn \g__cw_placeholder_policy_tl {warning}},
+    placeholder-policy / error .code:n = {\tl_gset:Nn \g__cw_placeholder_policy_tl {error}},
+    placeholder-policy / suppress .code:n = {\tl_gset:Nn \g__cw_placeholder_policy_tl {suppress}},
+    warnings .choice:,
+    warnings / true .code:n = {\bool_gset_true:N \g__cw_pending_warnings_bool},
+    warnings / false .code:n = {\bool_gset_false:N \g__cw_pending_warnings_bool},
+    export-sensitive .choice:,
+    export-sensitive / true .code:n = {\bool_gset_true:N \g__cw_export_sensitive_bool},
+    export-sensitive / false .code:n = {\bool_gset_false:N \g__cw_export_sensitive_bool},
+    language .code:n = {\cw_set_language:n{#1}},
+    authors/include .code:n = {\clist_gset:Nn \g__cw_author_include_clist {#1}},
+    authors/exclude .code:n = {\clist_gset:Nn \g__cw_author_exclude_clist {#1}},
+    document/status .code:n = {\prop_gput:Nnn \g__cw_document_prop {status}{#1}},
+    document/submitted-to .code:n = {\prop_gput:Nnn \g__cw_document_prop {submitted-to}{#1}},
+    document/restricted .code:n = {\prop_gput:Nnn \g__cw_document_prop {restricted}{#1}},
+    colors/anonymized .code:n = {\cwsetanoncolor{#1}},
+    colors/subject .code:n = {\cwsetsubjectcolor{#1}},
+    colors/main .code:n = {\cwsetmaincolor{#1}},
+    colors/draft .code:n = {\cwsetdraftcolor{#1}},
+    colors/todo .code:n = {\def\cw@todobackgroundcolor{#1}},
+    style .code:n =
+      {
+        \prop_get:NnNTF \g__cw_style_prop {#1} \l_tmpa_tl
+          {\keys_set:nV {cw/setup}\l_tmpa_tl}
+          {\PackageWarning{coop-writing}{Unknown document style '#1'}}
+      },
+  }
+\NewDocumentCommand{\cwsetup}{m}{\keys_set:nn{cw/setup}{#1}}
+
+\NewDocumentCommand{\cwdefinetype}{m m}
+  {\prop_gput:Nnn \g__cw_type_prop {#1}{#2}}
+\NewDocumentCommand{\cwdefinestyle}{m m}
+  {\prop_gput:Nnn \g__cw_style_prop {#1}{#2}}
+
+\cs_new_protected:Npn \__cw_register_author:nnn #1#2#3
+  {
+    \prop_gput:Nnn \g__cw_author_name_prop {#1}{#2}
+    \prop_gput:Nnn \g__cw_author_color_prop {#1}{#3}
+  }
+\cs_new_eq:NN \cwregisterauthoraux \__cw_register_author:nnn
+\NewDocumentCommand{\cwregisterauthor}{m m m}
+  {\cwregisterauthoraux{#1}{#2}{#3}}
+
+\cs_new_protected:Npn \__cw_define_author:nnn #1#2#3
+  {
+    \tl_set:Nn \l_tmpa_tl {#1}
+    \tl_if_blank:VTF \l_tmpa_tl
+      {
+        \int_gincr:N \g__cw_author_color_int
+        \int_set:Nn \l_tmpa_int
+          {1 + \int_mod:nn {\g__cw_author_color_int - 1}{\clist_count:N \g__cw_color_palette_clist}}
+        \tl_set:Nx \l_tmpa_tl
+          {\clist_item:Nn \g__cw_color_palette_clist {\l_tmpa_int}}
+      }{}
+    \cwregisterauthor{#2}{#3}{\l_tmpa_tl}
+    \cwnamedef{#2}{\l_tmpa_tl}{#3}
+  }
+\NewDocumentCommand{\cwdefineauthor}{O{} m m}
+  {\__cw_define_author:nnn{#1}{#2}{#3}}
+
+\NewDocumentCommand{\cwincludeauthor}{m}
+  {\clist_gput_right:Nn \g__cw_author_include_clist {#1}}
+\NewDocumentCommand{\cwexcludeauthor}{m}
+  {\clist_gput_right:Nn \g__cw_author_exclude_clist {#1}}
+\NewDocumentCommand{\cwacceptauthor}{m}
+  {\prop_gput:Nnn \g__cw_author_policy_prop {#1}{accept}}
+\NewDocumentCommand{\cwrejectauthor}{m}
+  {\prop_gput:Nnn \g__cw_author_policy_prop {#1}{reject}}
+\NewDocumentCommand{\cwhideauthor}{m}
+  {\prop_gput:Nnn \g__cw_author_policy_prop {#1}{hide}}
+\NewDocumentCommand{\cwresetauthorfilters}{}
+  {
+    \clist_gclear:N \g__cw_author_include_clist
+    \clist_gclear:N \g__cw_author_exclude_clist
+    \prop_gclear:N \g__cw_author_policy_prop
+  }
+
+\NewExpandableDocumentCommand{\cwdocumentstatus}{}
+  {\prop_item:Nn \g__cw_document_prop {status}}
+\NewExpandableDocumentCommand{\cwdocumentsubmittedto}{}
+  {\prop_item:Nn \g__cw_document_prop {submitted-to}}
+\NewExpandableDocumentCommand{\cwdocumentrestricted}{}
+  {\prop_item:Nn \g__cw_document_prop {restricted}}
+\NewDocumentCommand{\cwshowdocumentstatus}{}
+  {
+    \par\noindent\textbf{Status:}~\cwdocumentstatus
+    \tl_if_blank:eF {\cwdocumentsubmittedto}
+      {;~\textbf{Submitted~to:}~\cwdocumentsubmittedto}
+    \tl_if_blank:eF {\cwdocumentrestricted}
+      {;~\textbf{Restricted:}~\cwdocumentrestricted}
+    \par
+  }
+
+\tl_new:N \l__cw_report_author_tl
+\tl_new:N \l__cw_report_type_tl
+\tl_new:N \l__cw_report_status_tl
+\tl_new:N \l__cw_report_severity_tl
+\keys_define:nn {cw/report}
+  {
+    author .tl_set:N = \l__cw_report_author_tl,
+    type .tl_set:N = \l__cw_report_type_tl,
+    status .tl_set:N = \l__cw_report_status_tl,
+    severity .tl_set:N = \l__cw_report_severity_tl,
+  }
+\prg_new_conditional:Npnn \__cw_report_match:n #1 {T,F,TF}
+  {
+    \__cw_get_field:nnN {#1}{author}\l_tmpa_tl
+    \__cw_get_field:nnN {#1}{type}\l_tmpb_tl
+    \__cw_get_field:nnN {#1}{status}\l_tmpc_tl
+    \exp_args:NNn \prop_get:NnNT \g__cw_decision_prop {#1} \l_tmpd_tl
+      {\tl_set_eq:NN \l_tmpc_tl \l_tmpd_tl}
+    \__cw_get_field:nnN {#1}{severity}\l_tmpe_tl
+    \bool_set_true:N \l_tmpa_bool
+    \tl_if_blank:VF \l__cw_report_author_tl
+      {\tl_if_eq:NNTF \l__cw_report_author_tl \l_tmpa_tl {}{\bool_set_false:N \l_tmpa_bool}}
+    \tl_if_blank:VF \l__cw_report_type_tl
+      {\tl_if_eq:NNTF \l__cw_report_type_tl \l_tmpb_tl {}{\bool_set_false:N \l_tmpa_bool}}
+    \tl_if_blank:VF \l__cw_report_status_tl
+      {\tl_if_eq:NNTF \l__cw_report_status_tl \l_tmpc_tl {}{\bool_set_false:N \l_tmpa_bool}}
+    \tl_if_blank:VF \l__cw_report_severity_tl
+      {\tl_if_eq:NNTF \l__cw_report_severity_tl \l_tmpe_tl {}{\bool_set_false:N \l_tmpa_bool}}
+    \bool_if:NTF \l_tmpa_bool {\prg_return_true:}{\prg_return_false:}
+  }
+
+\NewDocumentCommand{\cwreport}{O{}}
+  {
+    \group_begin:
+    \tl_clear:N \l__cw_report_author_tl
+    \tl_clear:N \l__cw_report_type_tl
+    \tl_clear:N \l__cw_report_status_tl
+    \tl_clear:N \l__cw_report_severity_tl
+    \keys_set:nn {cw/report}{#1}
+    \cw@listheading{\cwreporttitle}
+    \seq_map_inline:Nn \g__cw_item_seq
+      {
+        \__cw_report_match:nT {##1}
+          {
+            \__cw_get_field:nnN {##1}{type}\l_tmpa_tl
+            \__cw_get_field:nnN {##1}{author}\l_tmpb_tl
+            \__cw_get_field:nnN {##1}{status}\l_tmpc_tl
+            \prop_get:NnNT \g__cw_decision_prop {##1} \l_tmpd_tl
+              {\tl_set_eq:NN \l_tmpc_tl \l_tmpd_tl}
+            \__cw_get_field:nnN {##1}{severity}\l_tmpd_tl
+            \__cw_get_field:nnN {##1}{file}\l_tmpe_tl
+            \__cw_get_field:nnN {##1}{page}\l_tmpf_tl
+            \__cw_get_field:nnN {##1}{body}\l_tmpg_tl
+            \par\noindent
+            \textbf{##1}~
+            [\l_tmpa_tl/\l_tmpc_tl/\l_tmpd_tl]
+            \tl_if_blank:VF \l_tmpb_tl {~\textit{\l_tmpb_tl}}
+            ~---~\l_tmpg_tl
+            \hfill{\footnotesize \l_tmpe_tl:~\l_tmpf_tl}\par
+          }
+      }
+    \group_end:
+  }
+
+\iow_new:N \l__cw_export_iow
+\tl_new:N \l__cw_export_format_tl
+\keys_define:nn {cw/export}
+  { format .tl_set:N = \l__cw_export_format_tl }
+\NewDocumentCommand{\cwexport}{O{format=tsv} m}
+  {
+    \group_begin:
+    \tl_set:Nn \l__cw_export_format_tl {tsv}
+    \keys_set:nn {cw/export}{#1}
+    \tl_if_eq:NnTF \l__cw_export_format_tl {tsv}
+      {
+        \tl_if_eq:NnTF \g__cw_mode_tl {submit}
+          {
+            \bool_if:NTF \g__cw_export_sensitive_bool
+              {\__cw_export_tsv:n{#2}}
+              {\PackageWarning{coop-writing}{Editorial export suppressed in submit mode; set export-sensitive=true explicitly to allow it}}
+          }
+          {\__cw_export_tsv:n{#2}}
+      }
+      {\PackageError{coop-writing}{Unsupported export format '\l__cw_export_format_tl'}{Use format=tsv. tools/cw-meta-to-json.py converts TSV to JSON.}}
+    \group_end:
+  }
+
+\cs_new_protected:Npn \__cw_export_tsv:n #1
+  {
+    \iow_open:Nn \l__cw_export_iow {#1}
+    \iow_now:Nn \l__cw_export_iow
+      {#~coop-writing-meta-v1^^Iid^^Itype^^Iauthor^^Istatus^^Iseverity^^Ifile^^Ipage^^Iparent^^Ibody^^Iold^^Inew}
+    \seq_map_inline:Nn \g__cw_item_seq
+      {
+        \__cw_get_field:nnN {##1}{type}\l_tmpa_tl
+        \__cw_get_field:nnN {##1}{author}\l_tmpb_tl
+        \__cw_get_field:nnN {##1}{status}\l_tmpc_tl
+        \prop_get:NnNT \g__cw_decision_prop {##1} \l_tmpd_tl
+          {\tl_set_eq:NN \l_tmpc_tl \l_tmpd_tl}
+        \__cw_get_field:nnN {##1}{severity}\l_tmpd_tl
+        \__cw_get_field:nnN {##1}{file}\l_tmpe_tl
+        \__cw_get_field:nnN {##1}{page}\l_tmpf_tl
+        \__cw_get_field:nnN {##1}{parent}\l_tmpg_tl
+        \__cw_get_field:nnN {##1}{body}\l_tmph_tl
+        \__cw_get_field:nnN {##1}{old}\l_tmpi_tl
+        \__cw_get_field:nnN {##1}{new}\l_tmpj_tl
+        \iow_now:Nx \l__cw_export_iow
+          {
+            ##1^^I
+            \tl_to_str:V \l_tmpa_tl^^I
+            \tl_to_str:V \l_tmpb_tl^^I
+            \tl_to_str:V \l_tmpc_tl^^I
+            \tl_to_str:V \l_tmpd_tl^^I
+            \tl_to_str:V \l_tmpe_tl^^I
+            \tl_to_str:V \l_tmpf_tl^^I
+            \tl_to_str:V \l_tmpg_tl^^I
+            \tl_to_str:V \l_tmph_tl^^I
+            \tl_to_str:V \l_tmpi_tl^^I
+            \tl_to_str:V \l_tmpj_tl
+          }
+      }
+    \iow_close:N \l__cw_export_iow
+  }
+
+\cs_new_protected:Npn \__cw_pending_warnings:
+  {
+    \bool_if:NT \g__cw_pending_warnings_bool
+      {
+        \seq_map_inline:Nn \g__cw_item_seq
+          {
+            \__cw_get_field:nnN {##1}{status}\l_tmpa_tl
+            \prop_get:NnNT \g__cw_decision_prop {##1} \l_tmpb_tl
+              {\tl_set_eq:NN \l_tmpa_tl \l_tmpb_tl}
+            \str_case_e:nnT {\tl_use:N \l_tmpa_tl}
+              {
+                {open}{\PackageWarning{coop-writing}{Editorial item '##1' is still open}}
+                {pending}{\PackageWarning{coop-writing}{Editorial change '##1' is still pending}}
+              }
+          }
+      }
+  }
+\AddToHook{enddocument/info}{\__cw_pending_warnings:}
+
+\NewDocumentCommand{\cwheadingcomment}{O{} m m}
+  {
+    \@ifpackageloaded{hyperref}
+      {\texorpdfstring{#2\textsuperscript{\textcolor{blue}{*}}}{#2}}
+      {#2\textsuperscript{\textcolor{blue}{*}}}
+    \PackageInfo{coop-writing}{Heading comment: \tl_to_str:n{#3}}
+  }
+
+\cs_new_protected:Npn \__cw_dispatch_comment:nnnnn #1#2#3#4#5
+  {
+    \tl_if_in:nnTF {#1}{=}
+      {\cwitem[author={#5},color={#3},#1]{#2}}
+      {\cw@comment[#1]{#2}{#3}{#4}}
+  }
+\cs_new_eq:NN \cwdispatchcommentaux \__cw_dispatch_comment:nnnnn
+
+\cs_new_protected:Npn \__cw_dispatch_change:nnnnnn #1#2#3#4#5#6
+  {
+    \tl_if_in:nnTF {#1}{=}
+      {\cwchange[author={#6},color={#4},#1]{#2}{#3}}
+      {\cw@gensug[#1]{#4}{#5}{#2}{#4}{#3}{#4}}
+  }
+\cs_new_eq:NN \cwdispatchchangeaux \__cw_dispatch_change:nnnnnn
+
+\ExplSyntaxOff
+
+\newcommand{\cwdispatchcomment}[5]{\cwdispatchcommentaux{#1}{#2}{#3}{#4}{#5}}%
+\newcommand{\cwdispatchchange}[6]{\cwdispatchchangeaux{#1}{#2}{#3}{#4}{#5}{#6}}%
+%    \end{macrocode}
+%
 % \subsection{Powerful command to create editors and authors}
 % This allows for many types of comments. This was the reason I started
 % using a front-end to |ed|, and later decided to use colors, that |ed| dones not support.
