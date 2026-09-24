@@ -1147,7 +1147,7 @@
   }
 \cs_new_eq:NN \cwapplyfeatureoverrides \cw_apply_feature_overrides:
 \ExplSyntaxOff
-\DeclareOption*{\cwprocesspackageoption{\CurrentOption}}
+\DeclareOption*{\expandafter\cwprocesspackageoption\expandafter{\CurrentOption}}
 \ProcessOptions\relax
 %    \end{macrocode}
 % \subsubsection{Fixing the Super Options}
