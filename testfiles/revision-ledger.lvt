@@ -1,0 +1,14 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage[mode=editing]{coop-writing}
+\begin{document}
+\cwsetup{warnings=false,layout=none}
+\START
+\cwrevisionrecord{manuscript}{rev-method}{old text}{new text}{7}{chapter.tex}{change}
+\TYPE{revision-old=\cwrevisionold{manuscript}{rev-method}}
+\TYPE{revision-new=\cwrevisionnew{manuscript}{rev-method}}
+\cwerratum[id=err-01,date=2026-09-24,version=1.8]{published}{corrected}
+\TYPE{erratum-type=\cwitemfield{err-01}{type}}
+\TYPE{revision-ledger=ok}
+\END
+\end{document}
