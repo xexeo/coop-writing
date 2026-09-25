@@ -1,0 +1,20 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{alice-color=teal}
+\TYPE{bob-color=red}
+\TYPE{theme=monochrome}
+\TYPE{placeholder-policy=suppress}
+\TYPE{local-color=purple}
+\TYPE{local-severity=critical}
+\TYPE{alice-visible=true}
+\TYPE{bob-visible=false}
+\TYPE{author-decision=accepted}
+\TYPE{pdf-global=true}
+\TYPE{pdf-todo=false}
+\TYPE{log-policy=each}
+\TYPE{final-placeholder=registered}
+\TYPE{workflow-policies=ok}
+\END
+\end{document}
