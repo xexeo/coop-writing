@@ -1,0 +1,12 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage[mode=editing]{coop-writing}
+\usepackage{hyperref}
+\begin{document}
+\cwsetup{warnings=false}
+\START
+\cwauthor{Math in comment: $i+j$.}
+\section{\cwheadingcomment{Index \ensuremath{i}}{Check heading math}}
+\TYPE{hyperref-math-heading=ok}
+\END
+\end{document}

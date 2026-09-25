@@ -1,0 +1,16 @@
+\input regression-test.tex
+\documentclass{scrartcl}
+\usepackage{etoc}
+\usepackage[mode=editing,bookmarks=false]{coop-writing}
+\usepackage{subfig}
+\begin{document}
+\cwsetup{warnings=false}
+\START
+\makeatletter
+\@ifpackageloaded{tocloft}{\TYPE{tocloft=loaded}}{\TYPE{tocloft=not-loaded}}
+\@ifpackageloaded{hyperref}{\TYPE{hyperref=loaded}}{\TYPE{hyperref=not-loaded}}
+\makeatother
+\listofcomments
+\TYPE{load-order=ok}
+\END
+\end{document}

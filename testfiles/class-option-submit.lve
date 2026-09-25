@@ -1,0 +1,7 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{mode-with-class-submit=publish}
+\END
+\end{document}

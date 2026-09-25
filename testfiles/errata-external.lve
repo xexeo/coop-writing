@@ -1,0 +1,11 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{external-type=erratum}
+\TYPE{external-old=old published}
+\TYPE{external-new=new corrected}
+\TYPE{external-file=chapter.tex}
+\TYPE{errata-external=ok}
+\END
+\end{document}

@@ -253,6 +253,134 @@ O auxiliar de baixo nível pode ser usado separadamente:
 \cwrestorecolor
 a cor salva é restaurada.
 
+
+\section{Workflow semântico moderno}
+
+A API preferencial da v1.8 convive com todos os comandos históricos mostrados
+acima. Para esta demonstração, os itens semânticos aparecem inline e os
+warnings de pendência ao final são desligados:
+
+\begin{verbatim}
+\cwsetup{layout=inline,log=none,view=coautores}
+\end{verbatim}
+
+\cwsetup{layout=inline,log=none,view=coautores}
+
+Um colaborador pode receber cor automática determinística:
+\cwdefineauthor{maria}{Maria}.
+
+Tipos semânticos e estilos de apresentação são independentes:
+
+\begin{verbatim}
+\cwdefinetype[command=cwclarezademo]{clareza-demo}{
+  label={Clareza},severity=warning,color=orange
+}
+\cwdefinestyle{urgente-demo}{
+  severity=critical,color=red,layout=inline
+}
+\end{verbatim}
+
+\cwdefinetype[command=cwclarezademo]{clareza-demo}{
+  label={Clareza},severity=warning,color=orange
+}
+\cwdefinestyle{urgente-demo}{
+  severity=critical,color=red,layout=inline
+}
+
+\cwclarezademo{Explicar esta transição.}
+
+\cwitem[id=comentario-semantico,type=comment,author=maria,
+        severity=warning,style=urgente-demo]
+       {Verificar a interpretação deste resultado.}
+
+Uma resposta cria uma thread explícita:
+\cwreply{comentario-semantico}[id=resposta-semantica,author=maria]
+        {A explicação foi incluída.}
+O item pode ser resolvido e reaberto:
+\cwresolve{comentario-semantico}
+\cwreopen{comentario-semantico}.
+
+Decisões seletivas usam IDs estáveis:
+\cwchange[id=mudanca-semantica,author=maria,status=accepted]
+         {formulação antiga}{formulação nova}.
+Também é possível registrar rejeição:
+\cwchange[id=mudanca-rejeitada,author=maria]
+         {texto mantido após rejeição}{alternativa proposta}
+\cwreject{mudanca-rejeitada}.
+
+Conteúdo ausente estruturado é diferente de um TODO genérico:
+\cwplaceholder[id=figura-ausente,subtype=figure,author=maria]
+              {Figura geral da arquitetura}.
+
+Revisões longas aceitam parágrafos, listas e matemática display:
+
+\begin{cwrevision}[id=revisao-longa,author=maria]
+Este é o primeiro parágrafo de uma revisão longa.
+
+\begin{itemize}
+\item Listas podem aparecer dentro do bloco de revisão.
+\end{itemize}
+
+\[
+  a^2+b^2=c^2 .
+\]
+\end{cwrevision}
+
+Visões nomeadas formam um segundo eixo, independente do modo editorial:
+
+\begin{cwview}{coautores}
+Esta frase aparece na visão \texttt{coautores}.
+\end{cwview}
+
+O estado do documento é metadado, não um page style obrigatório:
+
+\cwsetup{
+  document/status=draft,
+  document/submitted-to={Revista de Exemplos},
+  document/restricted=false
+}
+\cwshowdocumentstatus
+
+Uma errata reutiliza a infraestrutura de mudança:
+\cwerratum[id=err-demo,date=2026-09-24,version=1.8]
+          {redação publicada}{redação corrigida}.
+
+O relatório semântico pode ser detalhado ou resumido:
+\cwreport[mode=summary]
+
+Os metadados também podem ser exportados para ferramentas:
+\cwexport{exemplo-maximo-editorial.tsv}
+
+Os comandos de resposta a revisores entre documentos são apresentados sem
+carregar um segundo documento neste exemplo:
+
+\begin{verbatim}
+\cwloadrevisions{manuscrito}
+\cwrevisionref{manuscrito}{id-mudanca}
+\cwrevisionold{manuscrito}{id-mudanca}
+\cwrevisionnew{manuscrito}{id-mudanca}
+\cwreviewresponse{manuscrito}{id-mudanca}{Resposta ao revisor.}
+
+\cwloaderrata{versao-publicada}
+\cwerratareport
+
+\cwsetup{authors/include={alice,bob}}
+\cwincludeauthor{alice}
+\cwexcludeauthor{carol}
+\cwacceptauthor{alice}
+\cwrejectauthor{bob}
+\cwhideauthor{carol}
+\cwresetauthorfilters
+
+\cwsetup{pdf-comments=true,pdf-comments/todo=false}
+\cwsettypepdf{comment}{true}
+\cwsetauthorcolor{alice}{teal}
+\cwsettypecolor{todo}{orange}
+
+\cwinputview{orientador}{notas-orientador}
+\cwincludeview{orientador}{capitulo-orientador}
+\end{verbatim}
+
 \section{Conteúdo LaTeX comum}
 
 O pacote deve coexistir com estruturas normais, equações, floats, citações e

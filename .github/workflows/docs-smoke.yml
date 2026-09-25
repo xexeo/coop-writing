@@ -24,6 +24,7 @@ jobs:
       - name: Compile quick reference and maximal examples
         uses: xu-cheng/latex-action@v4
         with:
+          pre_compile: rm -f coop-writing.sty && latex -interaction=nonstopmode -halt-on-error coop-writing.ins
           root_file: |
             quickref-en-us.tex
             quickref-pt-br.tex

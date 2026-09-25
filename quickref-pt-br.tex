@@ -199,9 +199,13 @@ A apresentação de \cmd{cwmain} pode ser personalizada redefinindo \cmd{cwmaine
 \listofcomments
 \listofcitationneeds
 \listofsubjects
+\listoftodos
+
+\cwreport[mode=summary]
+\cwreport[type=todo,status=open]
 \end{verbatim}
 
-O relatório editorial unificado planejado está descrito na issue \#49.
+O relatório unificado pode filtrar por autor, tipo, severidade e estado.
 
 \section*{Auxiliares de cor}
 
@@ -219,14 +223,88 @@ O auxiliar de baixo nível \cmd{cwsavecolor} também existe. A issue \#54 propõ
 
 Os aliases de compatibilidade incluem \cmd{cwautor}, \cmd{cwassunto}, \cmd{favorcitar} e \cmd{listofassunto}, além das opções em português. O ambiente \texttt{rascunho} é mantido como alias de compatibilidade; a issue \#40 trata da modernização mais ampla da internacionalização.
 
-\section*{Limitações conhecidas da v1.8}
+\section*{API moderna da v1.8}
+
+A interface preferencial usa configuração explícita por chave/valor:
+
+\begin{verbatim}
+\usepackage[mode=editing,bookmarks=false]{coop-writing}
+\cwsetup{
+  layout=margin-footnote,
+  theme=color,
+  log=summary,
+  view=orientador,
+  document/status=draft
+}
+\end{verbatim}
+
+Itens semânticos carregam metadados e IDs estáveis:
+
+\begin{verbatim}
+\cwitem[id=metodo-1,type=comment,author=alice,
+        severity=warning]{Explicar a estratégia de amostragem.}
+
+\cwchange[id=mudanca-metodo,author=alice]
+  {redação antiga}{redação nova}
+
+\cwaccept{mudanca-metodo}
+\cwresolve{metodo-1}
+\cwreopen{metodo-1}
+
+\cwreply{metodo-1}[author=bob]{Incluí a explicação.}
+\end{verbatim}
+
+Tipos e estilos reutilizáveis são independentes:
+
+\begin{verbatim}
+\cwdefinetype[command=clareza]{clarity}{
+  label={Clareza}, severity=warning, color=orange
+}
+\cwdefinestyle{urgente}{
+  severity=critical, color=red, layout=inline
+}
+\clareza{Explicar esta transição.}
+\cwitem[type=todo,style=urgente]{Verificar o resultado.}
+\end{verbatim}
+
+Revisões longas, placeholders, visões nomeadas, metadados do documento,
+resposta a revisores, errata e exportação estruturada também fazem parte da API:
+
+\begin{verbatim}
+\begin{cwrevision}[id=rev-arquitetura,author=alice]
+  São permitidos parágrafos, listas e matemática display.
+\end{cwrevision}
+
+\cwplaceholder[id=fig-1,subtype=figure]{Diagrama da arquitetura}
+
+\begin{cwview}{orientador}
+Texto interno para o orientador.
+\end{cwview}
+
+\cwsetup{
+  document/status=submitted,
+  document/submitted-to={Revista de Exemplo},
+  document/restricted=false
+}
+
+\cwloadrevisions{manuscrito}
+\cwrevisionref{manuscrito}{mudanca-metodo}
+
+\cwerratum[id=err-01,date=2026-09-24,version=1.8]
+  {texto publicado}{texto corrigido}
+\cwerratareport
+
+\cwexport{itens-editoriais.tsv}
+\end{verbatim}
+
+\section*{Garantias de compatibilidade e release}
 
 \begin{itemize}
-\item \texttt{tocloft} é hoje um risco importante de compatibilidade; sua remoção está proposta na \#36.
-\item \texttt{hyperref} ainda é carregado automaticamente em configurações normais; torná-lo opcional e sanitizar strings de PDF está proposto na \#37.
-\item Títulos e outros argumentos móveis precisam de comportamento seguro explícito; veja \#26.
-\item Cópias geradas do pacote divergiram historicamente; veja \#43.
-\item A matriz formal de compatibilidade com classes padrão, editoriais, UFRJ, COPPE e Poli está proposta na \#55.
+\item \texttt{tocloft} não é mais carregado; as listas editoriais são privadas do coop-writing.
+\item \texttt{hyperref} nunca é carregado automaticamente; se já estiver presente, a integração é segura.
+\item pdfLaTeX e LuaLaTeX são cobertos por testes regressivos.
+\item Classes padrão, memoir, KOMA-Script e fontes canônicas UFRJ/COPPE/Poli são testadas em CI.
+\item \texttt{coop-writing.dtx} e \texttt{coop-writing.ins} são canônicos; style, distribuição e CTAN são gerados.
 \end{itemize}
 
 \section*{Fluxo recomendado}

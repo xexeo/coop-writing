@@ -1,0 +1,44 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage[mode=editing,bookmarks=false]{coop-writing}
+\begin{document}
+\cwsetup{
+  layout=none,
+  warnings=false,
+  authors/include={alice},
+  theme=monochrome,
+  placeholder-policy=suppress,
+  colors/palette={blue,red}
+}
+\cwdefineauthor{alice}{Alice}
+\cwdefineauthor{bob}{Bob}
+\cwsetauthorcolor{alice}{teal}
+\cwsettypecolor{todo}{orange}
+\cwdefinestyle{urgent}{severity=critical,color=violet,layout=none}
+\START
+\TYPE{alice-color=\cwauthorcolor{alice}}
+\TYPE{bob-color=\cwauthorcolor{bob}}
+\TYPE{theme=\cwthemename}
+\TYPE{placeholder-policy=\cwplaceholderpolicy}
+\cwitem[id=local-color,type=todo,author=alice,style=urgent,color=purple]{Policy item.}
+\TYPE{local-color=\cwitemfield{local-color}{color}}
+\TYPE{local-severity=\cwitemfield{local-color}{severity}}
+\TYPE{alice-visible=\cwitemfield{local-color}{visible}}
+\cwitem[id=bob-item,author=bob]{Hidden by include filter.}
+\TYPE{bob-visible=\cwitemfield{bob-item}{visible}}
+\cwacceptauthor{alice}
+\cwchange[id=alice-change,author=alice]{old}{new}
+\TYPE{author-decision=\cwitemfield{alice-change}{status}}
+\cwsetup{pdf-comments=true,pdf-comments/todo=false}
+\TYPE{pdf-global=\cwpdfcomments}
+\TYPE{pdf-todo=\cwtypepdfpolicy{todo}}
+\cwsetup{pdf-comments=false,log=each}
+\TYPE{log-policy=\cwlogpolicy}
+\cwsetup{log=none}
+\cwreport[mode=summary]
+\cwsetup{mode=publish,placeholder-policy=suppress}
+\cwplaceholder[id=final-placeholder]{Suppressed placeholder.}
+\TYPE{final-placeholder=registered}
+\TYPE{workflow-policies=ok}
+\END
+\end{document}

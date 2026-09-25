@@ -1,0 +1,17 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{mode=editing}
+\TYPE{mark-anonymized=false}
+\TYPE{tocloft=not-loaded}
+\TYPE{hyperref=not-loaded}
+\TYPE{current-file=available}
+\TYPE{editing-if=true}
+\TYPE{status=draft}
+\TYPE{submitted-to=Forum}
+\TYPE{restricted=true}
+\TYPE{comment-ref=stable-id}
+\TYPE{legacy-features=ok}
+\END
+\end{document}

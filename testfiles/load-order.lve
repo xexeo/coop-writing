@@ -1,0 +1,9 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{tocloft=not-loaded}
+\TYPE{hyperref=not-loaded}
+\TYPE{load-order=ok}
+\END
+\end{document}

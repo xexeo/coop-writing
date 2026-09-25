@@ -1,0 +1,9 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{draft-pt=Rascunho}
+\TYPE{draft-en=Draft}
+\TYPE{todo-i18n=ok}
+\END
+\end{document}

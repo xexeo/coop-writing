@@ -1,0 +1,11 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage[editing]{coop-writing}
+\begin{document}
+\cwsetup{warnings=false}
+\cwauthor{Class compatibility comment.}
+\listofcomments
+\START
+\TYPE{class=article=ok}
+\END
+\end{document}

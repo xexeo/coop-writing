@@ -1,0 +1,35 @@
+name: l3build regression tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: l3build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Test external tools
+        run: python3 tools/test_tools.py
+
+      - name: Run l3build regression suite
+        uses: xu-cheng/latex-action@v4
+        with:
+          os: debian
+          root_file: quickref-en-us.tex
+          pre_compile: |
+            l3build check
+            l3build check --dev
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+
+      - name: Show l3build differences
+        if: failure()
+        run: |
+          find build/test -name '*.diff' -print -exec sh -c 'echo "===== $1 ====="; cat "$1"' _ {} \;

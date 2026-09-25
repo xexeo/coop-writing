@@ -1,0 +1,11 @@
+\input regression-test.tex
+\documentclass{scrreprt}
+\usepackage[editing]{coop-writing}
+\begin{document}
+\cwsetup{warnings=false}
+\cwauthor{Class compatibility comment.}
+\listofcomments
+\START
+\TYPE{class=scrreprt=ok}
+\END
+\end{document}

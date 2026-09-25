@@ -45,13 +45,34 @@ Para gerar uma versão limpa de submissão ou publicação, altere o modo princi
 
 Os fontes do projeto devem ser UTF-8. O LaTeX atual usa UTF-8 como codificação de entrada padrão. O projeto está sendo organizado para testar explicitamente **pdfLaTeX** e **LuaLaTeX** e para evitar interfaces deprecadas quando o LaTeX atual oferece uma alternativa mantida.
 
+## API moderna de workflow
+
+Para documentos novos, a interface preferencial usa configuração explícita por chave/valor:
+
+```latex
+\usepackage[mode=editing]{coop-writing}
+\cwsetup{layout=margin-footnote, log=summary, view=coautores}
+
+\cwitem[id=metodo-1,type=comment,author=alice,severity=warning]
+  {Explicar a estratégia de amostragem.}
+
+\cwchange[id=mudanca-metodo,author=alice]
+  {redação antiga}{redação nova}
+\cwaccept{mudanca-metodo}
+\cwresolve{metodo-1}
+```
+
+A camada semântica da v1.8 também cobre respostas/threads, revisões longas, tipos e estilos editoriais definidos pelo usuário, filtros por autor, metadados de estado do documento, visões nomeadas, placeholders, resposta a revisores, errata, relatórios, exportação estruturada e materialização externa do fonte. A API histórica continua compatível.
+
 ## Organização do repositório
 
-A raiz contém o fonte de desenvolvimento atual. Historicamente, `dist/`, `CTAN/` e `tests/` também mantiveram arquivos gerados ou cópias do pacote. O projeto está migrando para uma única fonte canônica e artefatos reproduzíveis; as propostas correspondentes estão registradas nos issues.
+`coop-writing.dtx` e `coop-writing.ins` são as fontes canônicas. O arquivo de estilo, PDFs, `dist/` e o staging do CTAN são gerados a partir deles. O CI regenera o style antes de cada teste, impedindo que cópias antigas sejam usadas. A árvore histórica `CTAN/` e o antigo snapshot `tests/coop-writing.sty` foram removidos.
 
 ## Desenvolvimento e compatibilidade
 
-Compatibilidade com classes LaTeX é um requisito central. A matriz de testes proposta cobre as classes padrão do LaTeX, `memoir`, KOMA-Script, templates editoriais importantes e as classes UFRJ/COPPE/Poli mantidas no GitHub.
+A suíte regressiva usa `l3build` com pdfTeX e LuaTeX e também testa o kernel de desenvolvimento do LaTeX. Outro workflow cobre classes padrão, `memoir`, KOMA-Script, templates editoriais disponíveis e fontes canônicas UFRJ/COPPE/Poli obtidas diretamente do GitHub.
+
+Veja [a política de compatibilidade](COMPATIBILITY.md), [a auditoria de dependências](DEPENDENCIES.md) e [a matriz issue→teste](ISSUE-TEST-MATRIX.md).
 
 Ao relatar uma incompatibilidade, inclua um exemplo mínimo e informe:
 

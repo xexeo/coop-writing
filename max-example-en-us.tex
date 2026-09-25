@@ -253,6 +253,134 @@ The lower-level save helper can be used separately:
 \cwrestorecolor
 the saved color is restored.
 
+
+\section{Modern semantic workflow}
+
+The preferred v1.8 API can coexist with all historical commands above.
+For this demonstration, semantic items are rendered inline and end-of-document
+pending warnings are disabled:
+
+\begin{verbatim}
+\cwsetup{layout=inline,log=none,view=coauthors}
+\end{verbatim}
+
+\cwsetup{layout=inline,log=none,view=coauthors}
+
+An author can receive a deterministic automatic color:
+\cwdefineauthor{maria}{Maria}.
+
+Reusable semantic types and presentation styles are independent:
+
+\begin{verbatim}
+\cwdefinetype[command=cwclaritydemo]{clarity-demo}{
+  label={Clarity},severity=warning,color=orange
+}
+\cwdefinestyle{urgent-demo}{
+  severity=critical,color=red,layout=inline
+}
+\end{verbatim}
+
+\cwdefinetype[command=cwclaritydemo]{clarity-demo}{
+  label={Clarity},severity=warning,color=orange
+}
+\cwdefinestyle{urgent-demo}{
+  severity=critical,color=red,layout=inline
+}
+
+\cwclaritydemo{Explain this transition.}
+
+\cwitem[id=semantic-comment,type=comment,author=maria,
+        severity=warning,style=urgent-demo]
+       {Check the interpretation of this result.}
+
+A reply forms an explicit thread:
+\cwreply{semantic-comment}[id=semantic-reply,author=maria]
+        {The explanation was added.}
+The item can be resolved and later reopened:
+\cwresolve{semantic-comment}
+\cwreopen{semantic-comment}.
+
+Selective change decisions use stable IDs:
+\cwchange[id=semantic-change,author=maria,status=accepted]
+         {old formulation}{new formulation}.
+A second decision can be recorded with \cmd{cwreject}:
+\cwchange[id=semantic-rejected,author=maria]
+         {text kept after rejection}{proposed alternative}
+\cwreject{semantic-rejected}.
+
+Structured missing content is distinct from a generic TODO:
+\cwplaceholder[id=missing-figure,subtype=figure,author=maria]
+              {Architecture overview figure}.
+
+Large revisions can contain paragraphs, lists, and display mathematics:
+
+\begin{cwrevision}[id=large-revision,author=maria]
+This is the first paragraph of a long revision.
+
+\begin{itemize}
+\item Lists are accepted inside the revision block.
+\end{itemize}
+
+\[
+  a^2+b^2=c^2 .
+\]
+\end{cwrevision}
+
+Named views are a second axis, independent from the editorial mode:
+
+\begin{cwview}{coauthors}
+This sentence is visible in the \texttt{coauthors} view.
+\end{cwview}
+
+Document status is metadata rather than a forced page style:
+
+\cwsetup{
+  document/status=draft,
+  document/submitted-to={Journal of Examples},
+  document/restricted=false
+}
+\cwshowdocumentstatus
+
+An erratum reuses the same change infrastructure:
+\cwerratum[id=err-demo,date=2026-09-24,version=1.8]
+          {published wording}{corrected wording}.
+
+The semantic report can be detailed or summarized:
+\cwreport[mode=summary]
+
+The metadata can also be exported for tools:
+\cwexport{max-example-editorial.tsv}
+
+Cross-document reviewer-response commands are intentionally shown without
+loading a second document in this example:
+
+\begin{verbatim}
+\cwloadrevisions{manuscript}
+\cwrevisionref{manuscript}{change-id}
+\cwrevisionold{manuscript}{change-id}
+\cwrevisionnew{manuscript}{change-id}
+\cwreviewresponse{manuscript}{change-id}{Response to reviewer.}
+
+\cwloaderrata{published-version}
+\cwerratareport
+
+\cwsetup{authors/include={alice,bob}}
+\cwincludeauthor{alice}
+\cwexcludeauthor{carol}
+\cwacceptauthor{alice}
+\cwrejectauthor{bob}
+\cwhideauthor{carol}
+\cwresetauthorfilters
+
+\cwsetup{pdf-comments=true,pdf-comments/todo=false}
+\cwsettypepdf{comment}{true}
+\cwsetauthorcolor{alice}{teal}
+\cwsettypecolor{todo}{orange}
+
+\cwinputview{advisor}{advisor-notes}
+\cwincludeview{advisor}{advisor-chapter}
+\end{verbatim}
+
 \section{A little ordinary document content}
 
 The package is intended to coexist with ordinary LaTeX structures, equations,

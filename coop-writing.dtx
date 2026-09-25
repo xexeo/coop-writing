@@ -370,6 +370,13 @@
 % be referenced as |\ref{cw:FirstLabel}|, as in here Comment \ref{cw:FirstLabel}.
 %
 %
+% \DescribeMacro{\cwref}
+% References a labeled comment by its stable semantic label.
+%    \begin{macrocode}
+\newcommand{\cwref}[1]{%
+\@ifpackageloaded{hyperref}{\hyperref[cw:#1]{#1}}{#1}}%
+%    \end{macrocode}
+%
 %\subsection{Strikedthrought comments}
 %
 % After using the editorial comments for a time, we started to delete the old ones that represented fixed problems. However, we notice that some comments should be kept,
@@ -1007,56 +1014,164 @@
 \newif\if@modopublicaraceitando\@modopublicaraceitandofalse%
 \newif\if@cwtoclofttitles\@cwtoclofttitlesfalse
 \newif\if@changecolor\@changecolorfalse
+\newif\ifcw@markanonymized\cw@markanonymizedfalse
 %    \end{macrocode}
 % \subsubsection{Portuguese Options}
 %    \begin{macrocode}
-\DeclareOption{rascunhos}{\@showdrafttrue}
-\DeclareOption{cwavoidhyperref}{\cw@avoidhyperreftrue}
-\DeclareOption{comentarios}{\@showcomentariotrue}
-\DeclareOption{anonimizar}{\@anonimizartrue} % isso vai se perder nos modos
-\DeclareOption{naoanonimizar}{\@naoanonimizartrue}
-\DeclareOption{sugestoes}{\@showsugestaotrue}
-\DeclareOption{assuntos}{\@showsubjectstrue}
-\DeclareOption{edicao}{\@modoedicaotrue}
-\DeclareOption{submeter}{\@modosubmetertrue}
-\DeclareOption{publicar}{\@modopublicartrue}
-\DeclareOption{publicaraceitando}{
-\@modopublicartrue
-\@modopublicaraceitandotrue
-}
-%    \end{macrocode}
-% \subsubsection{English Options, inspired on ed package}
-%    \begin{macrocode}
-\DeclareOption{nopdfbookmarks}{\ednotebookmarksfalse}
-%    \end{macrocode}
-%
-% \subsubsection{Original English Options}
-%
-%    \begin{macrocode}
-\DeclareOption{comments}{\@showcomentariotrue}
-\DeclareOption{anonymize}{\@anonimizartrue}
-\DeclareOption{noanonymize}{\@naoanonimizartrue}
-\DeclareOption{suggestions}{\@showsugestaotrue}
-\DeclareOption{subjects}{\@showsubjectstrue}
-\DeclareOption{drafts}{\@showdrafttrue}
-\DeclareOption{todos}{\@showtodotrue}
-\DeclareOption{changecolor}{\@changecolortrue}
-\DeclareOption{editing}{\@modoedicaotrue}
-\DeclareOption{submit}{\@modosubmetertrue}
-\DeclareOption{publish}{\@modopublicartrue}
-\DeclareOption{acceptingpublish}{
-\@modopublicartrue
-\@modopublicaraceitandotrue
-}
-%    \end{macrocode}
-% New option to titles in tocloft
-%    \begin{macrocode}
-\DeclareOption{toclofttitles}{\@cwtoclofttitlestrue}
+% All package options are processed locally through the wildcard handler.
+% This intentionally avoids declaring generic names such as "submit" and
+% "publish": a class option with the same name is therefore not consumed by
+% coop-writing unless it is explicitly passed to this package.
+\def\cw@modename{publish}
+\def\cw@initialview{default}
+\ExplSyntaxOn
+\tl_new:N \g__cw_comments_override_tl
+\tl_new:N \g__cw_suggestions_override_tl
+\tl_new:N \g__cw_subjects_override_tl
+\tl_new:N \g__cw_drafts_override_tl
+\tl_new:N \g__cw_todos_override_tl
+\tl_new:N \g__cw_changecolor_override_tl
+\tl_new:N \g__cw_markanon_override_tl
+\int_new:N \g__cw_mode_option_count_int
+\tl_gset:Nn \g__cw_comments_override_tl { unset }
+\tl_gset:Nn \g__cw_suggestions_override_tl { unset }
+\tl_gset:Nn \g__cw_subjects_override_tl { unset }
+\tl_gset:Nn \g__cw_drafts_override_tl { unset }
+\tl_gset:Nn \g__cw_todos_override_tl { unset }
+\tl_gset:Nn \g__cw_changecolor_override_tl { unset }
+\tl_gset:Nn \g__cw_markanon_override_tl { unset }
+
+\cs_new_protected:Npn \__cw_set_mode:n #1
+  {
+    \@modoedicaofalse
+    \@modosubmeterfalse
+    \@modopublicarfalse
+    \@modopublicaraceitandofalse
+    \str_case:nnF {#1}
+      {
+        {editing}{\@modoedicaotrue}
+        {submit}{\@modosubmetertrue}
+        {publish}{\@modopublicartrue}
+        {acceptingpublish}{\@modopublicartrue\@modopublicaraceitandotrue}
+      }
+      { \PackageError{coop-writing}{Unknown editorial mode '#1'}{Use editing, submit, publish, or acceptingpublish.} }
+    \def\cw@modename{#1}
+  }
+\cs_new_protected:Npn \__cw_choose_mode:n #1
+  {
+    \int_gincr:N \g__cw_mode_option_count_int
+    \int_compare:nNnT {\g__cw_mode_option_count_int} > {1}
+      {\PackageWarning{coop-writing}{More than one editorial mode was requested; the last one ('#1') takes precedence}}
+    \__cw_set_mode:n {#1}
+  }
+\__cw_set_mode:n { publish }
+
+\cs_new_protected:Npn \__cw_set_override:Nn #1#2
+  { \tl_gset:Nn #1 {#2} }
+
+\keys_define:nn { cw/package }
+  {
+    mode .choice:,
+    mode / editing .code:n = { \__cw_choose_mode:n {editing} },
+    mode / submit .code:n = { \__cw_choose_mode:n {submit} },
+    mode / publish .code:n = { \__cw_choose_mode:n {publish} },
+    mode / acceptingpublish .code:n = { \__cw_choose_mode:n {acceptingpublish} },
+    comments .choice:,
+    comments / true .code:n = { \__cw_set_override:Nn \g__cw_comments_override_tl {true} },
+    comments / false .code:n = { \__cw_set_override:Nn \g__cw_comments_override_tl {false} },
+    suggestions .choice:,
+    suggestions / true .code:n = { \__cw_set_override:Nn \g__cw_suggestions_override_tl {true} },
+    suggestions / false .code:n = { \__cw_set_override:Nn \g__cw_suggestions_override_tl {false} },
+    subjects .choice:,
+    subjects / true .code:n = { \__cw_set_override:Nn \g__cw_subjects_override_tl {true} },
+    subjects / false .code:n = { \__cw_set_override:Nn \g__cw_subjects_override_tl {false} },
+    drafts .choice:,
+    drafts / true .code:n = { \__cw_set_override:Nn \g__cw_drafts_override_tl {true} },
+    drafts / false .code:n = { \__cw_set_override:Nn \g__cw_drafts_override_tl {false} },
+    todos .choice:,
+    todos / true .code:n = { \__cw_set_override:Nn \g__cw_todos_override_tl {true} },
+    todos / false .code:n = { \__cw_set_override:Nn \g__cw_todos_override_tl {false} },
+    changecolor .choice:,
+    changecolor / true .code:n = { \__cw_set_override:Nn \g__cw_changecolor_override_tl {true} },
+    changecolor / false .code:n = { \__cw_set_override:Nn \g__cw_changecolor_override_tl {false} },
+    anonymize .choice:,
+    anonymize / true .code:n =
+      { \@anonimizartrue \@naoanonimizarfalse },
+    anonymize / false .code:n =
+      { \@anonimizarfalse \@naoanonimizartrue },
+    bookmarks .choice:,
+    bookmarks / auto .code:n = { \ednotebookmarkstrue },
+    bookmarks / true .code:n = { \ednotebookmarkstrue },
+    bookmarks / false .code:n = { \ednotebookmarksfalse },
+    mark-anonymized .choice:,
+    mark-anonymized / true .code:n = { \__cw_set_override:Nn \g__cw_markanon_override_tl {true} },
+    mark-anonymized / false .code:n = { \__cw_set_override:Nn \g__cw_markanon_override_tl {false} },
+    view .code:n = { \def\cw@initialview{#1} },
+  }
+
+\cs_new_protected:Npn \cw_process_package_option:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        {editing}{\__cw_choose_mode:n{editing}}
+        {edicao}{\__cw_choose_mode:n{editing}}
+        {submit}{\__cw_choose_mode:n{submit}}
+        {submeter}{\__cw_choose_mode:n{submit}}
+        {publish}{\__cw_choose_mode:n{publish}}
+        {publicar}{\__cw_choose_mode:n{publish}}
+        {acceptingpublish}{\__cw_choose_mode:n{acceptingpublish}}
+        {publicaraceitando}{\__cw_choose_mode:n{acceptingpublish}}
+        {comments}{\__cw_set_override:Nn \g__cw_comments_override_tl {true}}
+        {comentarios}{\__cw_set_override:Nn \g__cw_comments_override_tl {true}}
+        {suggestions}{\__cw_set_override:Nn \g__cw_suggestions_override_tl {true}}
+        {sugestoes}{\__cw_set_override:Nn \g__cw_suggestions_override_tl {true}}
+        {subjects}{\__cw_set_override:Nn \g__cw_subjects_override_tl {true}}
+        {assuntos}{\__cw_set_override:Nn \g__cw_subjects_override_tl {true}}
+        {drafts}{\__cw_set_override:Nn \g__cw_drafts_override_tl {true}}
+        {rascunhos}{\__cw_set_override:Nn \g__cw_drafts_override_tl {true}}
+        {todos}{\__cw_set_override:Nn \g__cw_todos_override_tl {true}}
+        {changecolor}{\__cw_set_override:Nn \g__cw_changecolor_override_tl {true}}
+        {markanonymized}{\__cw_set_override:Nn \g__cw_markanon_override_tl {true}}
+        {anonymize}{\@anonimizartrue\@naoanonimizarfalse}
+        {anonimizar}{\@anonimizartrue\@naoanonimizarfalse}
+        {noanonymize}{\@anonimizarfalse\@naoanonimizartrue}
+        {naoanonimizar}{\@anonimizarfalse\@naoanonimizartrue}
+        {nopdfbookmarks}{\ednotebookmarksfalse}
+        {cwavoidhyperref}{\cw@avoidhyperreftrue}
+        {toclofttitles}
+          {\PackageWarning{coop-writing}{Option 'toclofttitles' is obsolete; coop-writing no longer loads tocloft}}
+      }
+      { \keys_set:nn { cw/package } {#1} }
+  }
+\cs_new_protected:Npn \cwprocesspackageoption #1
+  { \exp_args:Ne \cw_process_package_option:n {#1} }
+
+\cs_new_protected:Npn \cw_apply_feature_overrides:
+  {
+    \tl_if_eq:NnT \g__cw_comments_override_tl {true} {\@showcomentariotrue}
+    \tl_if_eq:NnT \g__cw_comments_override_tl {false} {\@showcomentariofalse}
+    \tl_if_eq:NnT \g__cw_suggestions_override_tl {true} {\@showsugestaotrue}
+    \tl_if_eq:NnT \g__cw_suggestions_override_tl {false} {\@showsugestaofalse}
+    \tl_if_eq:NnT \g__cw_subjects_override_tl {true} {\@showsubjectstrue}
+    \tl_if_eq:NnT \g__cw_subjects_override_tl {false} {\@showsubjectsfalse}
+    \tl_if_eq:NnT \g__cw_drafts_override_tl {true} {\@showdrafttrue}
+    \tl_if_eq:NnT \g__cw_drafts_override_tl {false} {\@showdraftfalse}
+    \tl_if_eq:NnT \g__cw_todos_override_tl {true} {\@showtodotrue}
+    \tl_if_eq:NnT \g__cw_todos_override_tl {false} {\@showtodofalse}
+    \tl_if_eq:NnT \g__cw_changecolor_override_tl {true} {\@changecolortrue}
+    \tl_if_eq:NnT \g__cw_changecolor_override_tl {false} {\@changecolorfalse}
+    \tl_if_eq:NnT \g__cw_markanon_override_tl {true} {\cw@markanonymizedtrue}
+    \tl_if_eq:NnT \g__cw_markanon_override_tl {false} {\cw@markanonymizedfalse}
+  }
+\cs_new_eq:NN \cwapplyfeatureoverrides \cw_apply_feature_overrides:
+\ExplSyntaxOff
+\DeclareOption*{\cwprocesspackageoption{\CurrentOption}}
 \ProcessOptions\relax
 %    \end{macrocode}
 % \subsubsection{Fixing the Super Options}
 %    \begin{macrocode}
 \if@modoedicao
+\cw@markanonymizedtrue
 \@showsubjectstrue
 \@showdrafttrue
 \@showcomentariotrue
@@ -1066,6 +1181,7 @@
 \@changecolortrue
 \fi
 \if@modosubmeter
+\cw@markanonymizedfalse
 \@showsubjectsfalse
 \@showdraftfalse
 \@showcomentariofalse
@@ -1075,6 +1191,7 @@
 \@changecolorfalse
 \fi
 \if@modopublicar
+\cw@markanonymizedfalse
 \@showsubjectsfalse
 \@showsugestaofalse
 \@showdraftfalse
@@ -1094,6 +1211,7 @@
 \if@showtodo
 \@showcomentariotrue
 \fi
+\cwapplyfeatureoverrides
 %    \end{macrocode}
 % \subsection{Required Packages}
 % Packages that are always required
@@ -1110,60 +1228,55 @@
 \RequirePackage{xcolor}
 \RequirePackage{soul}
 \RequirePackage[normalem]{ulem}
-\RequirePackage{etoolbox} % \ifdef comes from here
-\RequirePackage{environ}
-\RequirePackage{csquotes}
+\RequirePackage{etoolbox}
 \RequirePackage{mdframed}
+% Beamer has no normal margin-paragraph float. Keep the comment/footnote
+% semantics but automatically disable the margin marker in that class.
+\@ifclassloaded{beamer}{\marginsfalse}{}
+%
+% Public mode predicates and current-file information.
+\newif\ifcwediting
+\newif\ifcwsubmit
+\newif\ifcwpublish
+\newif\ifcwacceptingpublish
+\if@modoedicao\cweditingtrue\fi
+\if@modosubmeter\cwsubmittrue\fi
+\if@modopublicaraceitando
+  \cwacceptingpublishtrue
+\else
+  \if@modopublicar\cwpublishtrue\fi
+\fi
+\newcommand{\cwmode}{\cw@modename}%
+\newcommand{\cwifediting}[2]{\ifcwediting#1\else#2\fi}%
+\newcommand{\cwifsubmit}[2]{\ifcwsubmit#1\else#2\fi}%
+\newcommand{\cwifpublish}[2]{\ifcwpublish#1\else#2\fi}%
+\newcommand{\cwifacceptingpublish}[2]{\ifcwacceptingpublish#1\else#2\fi}%
+\newcommand{\cwifmode}[3]{\ifstrequal{#1}{\cwmode}{#2}{#3}}%
+\newcommand{\cwcurrentfile}{%
+  \ifdefined\CurrentFile
+    \ifx\CurrentFile\@empty\jobname.tex\else\CurrentFilePath\CurrentFile\fi
+  \else
+    \jobname.tex%
+  \fi}%
+\newcommand{\cwcurrentfilepath}{%
+  \ifdefined\CurrentFilePath\CurrentFilePath\else\@empty\fi}%
 %    \end{macrocode}
 % \subsection{Optional Packages}
-% Package that are required only sometimes
+% No optional package is loaded automatically. PDF integrations are enabled
+% only when the user has explicitly loaded the corresponding package.
 %    \begin{macrocode}
-\ifshowednotes%
-\else%
-\RequirePackage{verbatim}%
-\fi%
 %    \end{macrocode}
 % \subsection{CoppeTeX problems}
 % tocloft and CoppeTeX have different assumptions whether
 % LoF, LoT and etc... appears in ToC. In default Book, they
 % do not appear
 %    \begin{macrocode}
-\@ifclassloaded{coppe}%
-{%
-\RequirePackage[titles]{tocloft}%
-}%
-{%
-\if@cwtoclofttitles%
-\RequirePackage[titles]{tocloft}%
-\else%
-\RequirePackage{tocloft}%
-\fi%
-}%
-%    \end{macrocode}
-% Checking if babel is loaded, use iflang
-%    \begin{macrocode}
-\@ifpackageloaded{babel}%
-{%  \message{Babel Loaded!}%
-\RequirePackage{iflang}%
-}{%
-\message{Babel not detected!}%
-}%
-%    \end{macrocode}
-% |hyperref| must always be the last
-%    \begin{macrocode}
-\ifednotebookmarks%
-\@ifpackageloaded{hyperref}%
-  {%
-    \message{Hyperref loaded before coop-writing}%
-  }%
-  {%
-    \ifcw@avoidhyperref
-      \message{coop-writing is configured not to load hyperref}%
-    \else
-      \message{Hyperref called by coop-writing}%
-      \RequirePackage{hyperref}%
-    \fi
-  }%
+% coop-writing deliberately does not load tocloft or hyperref.
+% Editorial lists use private auxiliary files, so document classes remain
+% sovereign over ToC/LoF/LoT.  If hyperref is present (before or after this
+% package), bookmarks are used opportunistically.
+\ifcw@avoidhyperref
+  \PackageInfo{coop-writing}{cwavoidhyperref retained for compatibility; hyperref is never auto-loaded}
 \fi
 %    \end{macrocode}
 %
@@ -1190,6 +1303,23 @@
 \newif\if@cwmemoirdefense\@cwmemoirdefensefalse%
 }%
 %
+% Private editorial lists.  They intentionally do not call tocloft,
+% memoir's \newlistof, KOMA's tocbasic helpers, or any class-owned list API.
+% This keeps coop-writing out of the document class's ToC/LoF/LoT machinery.
+\newcommand{\cw@listheading}[1]{%
+  \@ifundefined{chapter}{\section*{#1}}{\chapter*{#1}}%
+}%
+\newcommand{\cw@newlist}[3]{%
+  \@ifundefined{c@#1}{\newcounter{#1}}{}%
+  \@ifundefined{cft#1numwidth}{%
+    \expandafter\newlength\csname cft#1numwidth\endcsname
+  }{}%
+  \setlength{\csname cft#1numwidth\endcsname}{\cw@cftnumwidth}%
+  \expandafter\def\csname l@#1\endcsname##1##2{%
+    \@dottedtocline{1}{1.5em}{\csname cft#1numwidth\endcsname}{##1}{##2}}%
+  \expandafter\def\csname listof#1\endcsname{%
+    \cw@listheading{#3}\@starttoc{#2}}%
+}%
 %    \end{macrocode}
 %
 % \subsection{Color related variables}
@@ -1214,65 +1344,80 @@
 %
 % The advantage of this way is that any user can |\renewcommand{\cwdrafttitle}{some text}|.
 %    \begin{macrocode}
-\def\cwdrafttitle{Standard Draft}%
-\def\cwcommentstitle{Standard List of Comments}%
-\def\cwsubjtitle{Standard List of Subjects}%
-\def\cwcitationstitle{Standard List of Citation Needs}%
-\def\cwpleasecitetext{Plese cite}%
-\def\cwpleasecitemessage{something to support this information}%
-\def\cwpleasecitemarginnote{Cite}%
-\def\cw@attentiontext{Attention}%
+\ExplSyntaxOn
+\tl_new:N \g__cw_language_tl
+\tl_gset:Nn \g__cw_language_tl { auto }
+\prop_new:N \g__cw_trans_en_prop
+\prop_new:N \g__cw_trans_pt_prop
+\prop_gput_from_keyval:Nn \g__cw_trans_en_prop
+  {
+    draft = {Draft},
+    comments = {List of Comments},
+    subjects = {List of Subjects},
+    citations = {List of Citation Needs},
+    todos = {List of TODOs},
+    pleasecite = {Please cite},
+    pleasecite-message = {something to support this information},
+    pleasecite-margin = {Cite},
+    attention = {Attention},
+    report = {Editorial Report},
+    errata = {Errata}
+  }
+\prop_gput_from_keyval:Nn \g__cw_trans_pt_prop
+  {
+    draft = {Rascunho},
+    comments = {Lista de Comentários},
+    subjects = {Lista de Assuntos},
+    citations = {Necessidades de Citação},
+    todos = {Lista de TODOs},
+    pleasecite = {Favor citar},
+    pleasecite-message = {alguma coisa que suporte este texto},
+    pleasecite-margin = {Citar},
+    attention = {Atenção},
+    report = {Relatório Editorial},
+    errata = {Errata}
+  }
+\cs_new:Npn \__cw_effective_language:
+  {
+    \tl_if_eq:NnTF \g__cw_language_tl { auto }
+      {
+        \cs_if_exist:NTF \languagename
+          { \languagename }
+          { english }
+      }
+      { \tl_use:N \g__cw_language_tl }
+  }
+\cs_new:Npn \__cw_translate:n #1
+  {
+    \str_case_e:nnF { \__cw_effective_language: }
+      {
+        {brazil}{\prop_item:Nn \g__cw_trans_pt_prop {#1}}
+        {brazilian}{\prop_item:Nn \g__cw_trans_pt_prop {#1}}
+        {portuguese}{\prop_item:Nn \g__cw_trans_pt_prop {#1}}
+        {pt-BR}{\prop_item:Nn \g__cw_trans_pt_prop {#1}}
+        {pt-br}{\prop_item:Nn \g__cw_trans_pt_prop {#1}}
+      }
+      { \prop_item:Nn \g__cw_trans_en_prop {#1} }
+  }
+\cs_new_protected:Npn \cw_set_language:n #1
+  { \tl_gset:Nn \g__cw_language_tl {#1} }
+\cs_new_eq:NN \cwsetlanguageaux \cw_set_language:n
+\cs_new:Npn \cwtranslateaux #1 { \__cw_translate:n {#1} }
+\ExplSyntaxOff
+
+\newcommand{\cwsetlanguage}[1]{\cwsetlanguageaux{#1}}%
+\newcommand{\cwdrafttitle}{\cwtranslateaux{draft}}%
+\newcommand{\cwcommentstitle}{\cwtranslateaux{comments}}%
+\newcommand{\cwsubjtitle}{\cwtranslateaux{subjects}}%
+\newcommand{\cwcitationstitle}{\cwtranslateaux{citations}}%
+\newcommand{\cwtodostitle}{\cwtranslateaux{todos}}%
+\newcommand{\cwpleasecitetext}{\cwtranslateaux{pleasecite}}%
+\newcommand{\cwpleasecitemessage}{\cwtranslateaux{pleasecite-message}}%
+\newcommand{\cwpleasecitemarginnote}{\cwtranslateaux{pleasecite-margin}}%
+\newcommand{\cw@attentiontext}{\cwtranslateaux{attention}}%
+\newcommand{\cwreporttitle}{\cwtranslateaux{report}}%
+\newcommand{\cwerratatitle}{\cwtranslateaux{errata}}%
 %
-\@ifpackageloaded{babel}%
-{%
-\IfLanguageName{brazil}%
-{%
-\def\cwdrafttitle{Rascunho}%
-\def\cwcommentstitle{Lista de Comentários}%
-\def\cwsubjtitle{Lista de Assuntos}%
-\def\cwcitationstitle{Necessidades de Citação}%
-\def\cwpleasecitetext{Favor citar}%
-\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-\def\cwpleasecitemarginnote{Citar}%
-\def\cw@attentiontext{Atenção}%
-}{}%
-\IfLanguageName{brazilian}%
-{%
-\def\cwdrafttitle{Rascunho}%
-\def\cwcommentstitle{Lista de Comentários}%
-\def\cwsubjtitle{Lista de Assuntos}%
-\def\cwcitationstitle{Necessidades de Citação}%
-\def\cwpleasecitetext{Favor citar}%
-\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-\def\cwpleasecitemarginnote{Citar}%
-\def\cw@attentiontext{Atenção}%
-}{}%
-%
-\IfLanguageName{portuguese}%
-{%
-\def\cwdrafttitle{Rascunho}%
-\def\cwcommentstitle{Lista de Comentários}%
-\def\cwsubjtitle{Lista de Assuntos}%
-\def\cwcitationstitle{Necessidades de Citação}%
-\def\cwpleasecitetext{Favor citar}%
-\def\cwpleasecitemessage{alguma coisa que suporte este texto}%
-\def\cwpleasecitemarginnote{Citar}%
-\def\cw@attentiontext{Atenção}%
-}{}%
-%
-\IfLanguageName{english}%
-{%
-\def\cwdrafttitle{Draft}%
-\def\cwcommentstitle{List of Comments}%
-\def\cwsubjtitle{List of Subjects}%
-\def\cwcitationstitle{List of Citation Needs}%
-\def\cwpleasecitetext{Plese cite}%
-\def\cwpleasecitemessage{something to support this information}%
-\def\cwpleasecitemarginnote{Cite}%
-\def\cw@attentiontext{Attention}%
-}{}%
-}%
-{}%
 %    \end{macrocode}
 % \subsection{ed inspired code}
 % This code, inspired in the |ed| package\favorcitar[ed package], makes the basic mechanism for
@@ -1323,6 +1468,7 @@
 \if\@test%
 \@empty%
 \else%
+\def\@currentlabel{#3}%
 \label{cw:#3}%
 \textcolor{\cw@currentcolor}{[#3]}% if \meta{label} is not empty
 \fi%
@@ -1426,7 +1572,9 @@
 \ifshowednotes%
 \cw@footnote{#1}{#2}{#3}%
 \ifednotebookmarks%
-\belowpdfbookmark{#2: #1}{cwnotepdfbm.\thecwnotecounter}%
+\@ifpackageloaded{hyperref}{%
+\belowpdfbookmark{Editorial comment \arabic{cwnotecounter}}{cwnotepdfbm.\thecwnotecounter}%
+}{}%
 \fi%
 \fi}%
 %    \end{macrocode}
@@ -1553,6 +1701,7 @@
 \newcommand{\cwanoncitet}[2][]{\cw@anoncitettext}%
 \else% be anonymous
 \if@modoedicao%
+\ifcw@markanonymized
 \newcommand{\cwanon}[1]{\textcolor{\cw@editAnonColor}{#1}}%
 \newcommand{\cwanoncite}[2][]%
 {%
@@ -1560,6 +1709,15 @@
 {\textcolor{\cw@editAnonColor}{\cite{#2}}}%
 {\textcolor{\cw@editAnonColor}{\cite[#1]{#2}}}%
 }%
+\else
+\newcommand{\cwanon}[1]{#1}%
+\newcommand{\cwanoncite}[2][]%
+{%
+\ifstrempty{#1}%
+{\cite{#2}}%
+{\cite[#1]{#2}}%
+}%
+\fi
 \else% modo edicao
 \newcommand{\cwanon}[1]{#1}%
 \newcommand{\cwanoncite}[2][]%
@@ -1576,7 +1734,7 @@
 {% tem citep
 \newcommand{\cwanoncitep}[2][]%
 {%
-\if@modoedicao%
+\if@modoedicao%\ifcw@markanonymized
 \ifstrempty{#1}%
 {\textcolor{\cw@editAnonColor}{\citep{#2}}}%
 {\textcolor{\cw@editAnonColor}{\citep[#1]{#2}}}%
@@ -1584,7 +1742,7 @@
 \ifstrempty{#1}%
 {\citep{#2}}%
 {\citep[#1]{#2}}%
-\fi% mode edicao
+\fi\fi% mode edicao
 }%
 }%
 {% não tem citep
@@ -1599,7 +1757,7 @@
 {% tem citet
 \newcommand{\cwanoncitet}[2][]%
 {%
-\if@modoedicao%
+\if@modoedicao%\ifcw@markanonymized
 \ifstrempty{#1}%
 {\textcolor{\cw@editAnonColor}{\citet{#2}}}%
 {\textcolor{\cw@editAnonColor}{\citet[#1]{#2}}}%
@@ -1607,7 +1765,7 @@
 \ifstrempty{#1}%
 {\citet{#2}}%
 {\citet[#1]{#2}}%
-\fi% mode edicao
+\fi\fi% mode edicao
 }%
 }%
 {% não tem citet
@@ -1677,16 +1835,8 @@
 % Memoir class needs 2 commands to really define a list
 % It also changes the  |\newlistof| arguments' meaning
 %    \begin{macrocode}
-\if@cwmemoirdefense%
-\@ifundefined{chapter}%
-{\newlistentry[section]{subject}{aaa}{0}}
-{\newlistentry[chapter]{subject}{aaa}{0}}
-\newlistof{listofsubject}{aaa}{\listsubject}
-\else%
-\@ifundefined{chapter}%
-{\newlistof[section]{subject}{aaa}{\listsubject}}%
-{\newlistof[chapter]{subject}{aaa}{\listsubject}}%
-\fi%
+\cw@newlist{subject}{aaa}{\listsubject}%
+%
 %
 %
 \newcommand{\cwsubject}[2][\cor@subject]{%
@@ -1731,10 +1881,7 @@
 \fi%
 }%
 %
-\if@cwmemoirdefense%
-\else%
 \setlength{\cftsubjectnumwidth}{\cw@cftnumwidth}%
-\fi%
 \else%
 \newcommand{\listofsubject}{}%
 \newcommand{\cwsubject}[2][]{}%
@@ -1749,17 +1896,7 @@
 \if@showcomentario
 %% Resolve a lista de comentários
 \newcommand{\listcomentario}{\cwcommentstitle}%
-%% cria a lista
-\if@cwmemoirdefense%
-\@ifundefined{chapter}%
-{\newlistentry[section]{comentario}{ccc}{0}}
-{\newlistentry[chapter]{comentario}{ccc}{0}}
-\newlistof{listofcomentario}{ccc}{\listcomentario}%
-\else%
-\@ifundefined{chapter}
-{\newlistof[section]{comentario}{ccc}{\listcomentario}}
-{\newlistof[chapter]{comentario}{ccc}{\listcomentario}}%%
-\fi%
+\cw@newlist{comentario}{ccc}{\listcomentario}%
 %%
 %% Comentador genérico - parte I
 %% faz o cwnote e soma na lista
@@ -1815,10 +1952,7 @@
 \cw@comentar[#5]{\sout{#2}}{#3}{#4}%
 }%
 %%
-\if@cwmemoirdefense%
-\else%
 \setlength{\cftcomentarionumwidth}{\cw@cftnumwidth}%
-\fi%
 \else
 \newcommand{\cw@comentar}[4][]{}%
 \newcommand{\listofcomentario}{}%
@@ -1910,34 +2044,25 @@
 %    \begin{macrocode}
 \if@showcomentario%
 \newcommand{\listcomentarioref}{\cwcitationstitle}%
-\if@cwmemoirdefense%
-\@ifundefined{chapter}%
-{\newlistentry[section]{comentarioref}{ccr}{0}}
-{\newlistentry[chapter]{comentarioref}{ccr}{0}}
-\newlistof{listofcomentarioref}{ccr}{\listcomentarioref}
-\else%
-\@ifundefined{chapter}%
-{\newlistof[section]{comentarioref}{ccr}{\listcomentarioref}}
-{\newlistof[chapter]{comentarioref}{ccr}{\listcomentarioref}}%
-\fi%
+\cw@newlist{comentarioref}{ccr}{\listcomentarioref}%
 \else%
 \newcommand{\listofcomentarioref}{}%
 \fi%
 \if@showcomentario%
 \newcommand{\cw@commentref}[3][]{%
 \refstepcounter{comentarioref}%
+\refstepcounter{comentario}%
 \cw@hll{#3}{#1}%
 \cw@cwnote{#2}{#3}{\cwpleasecitemarginnote}%
 \if@cwmemoirdefense%
 \addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}#2}%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}#2}%
 \else%
 \addcontentsline{ccr}{comentarioref}{\protect\numberline{\thecomentarioref}{#2}}%
+\addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}{#2}}%
 \fi%
 }%
-\if@cwmemoirdefense%
-\else%
 \setlength{\cftcomentariorefnumwidth}{\cw@cftnumwidth}%
-\fi%
 \else%
 \newcommand{\cw@commentref}[3]{}%
 \fi%
@@ -1964,17 +2089,21 @@
 % used
 %    \begin{macrocode}
 \if@showdraft%
-\NewEnviron{cwdraft}[1][]{%
+\NewDocumentEnvironment{cwdraft}{O{} +b}{%
+\begin{mdframed}%
 \ifstrempty{#1}%
 {\colorbox{\corleve{\cor@hldraft}}{\textbf{\cwdrafttitle}}}%
 {\cw@hll{\cor@hldraft}{\textbf{#1}}}%
 \newline%
-\BODY%
-}%
-{}%
-\surroundwithmdframed{cwdraft}%
+#2%
+\end{mdframed}%
+}{}%
+\NewDocumentCommand{\cwdrafttext}{O{} m}{\begin{cwdraft}[#1]#2\end{cwdraft}}%
+\NewDocumentCommand{\cwsaveforlater}{O{} m}{\begin{cwdraft}[#1]#2\end{cwdraft}}%
 \else%
-\NewEnviron{cwdraft}[1][]{}{}%
+\NewDocumentEnvironment{cwdraft}{O{} +b}{}{}%
+\NewDocumentCommand{\cwdrafttext}{O{} m}{}%
+\NewDocumentCommand{\cwsaveforlater}{O{} m}{}%
 \fi%
 %    \end{macrocode}
 % \begin{macro}{\cwsetdraftcolor}
@@ -1987,6 +2116,1031 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{environment}
+% \section{Semantic editorial core}
+% The modern API is implemented with expl3 data structures while the historic
+% commands remain available as compatibility front-ends.
+%    \begin{macrocode}
+\ExplSyntaxOn
+
+\seq_new:N  \g__cw_item_seq
+\prop_new:N \g__cw_item_prop
+\prop_new:N \g__cw_decision_prop
+\prop_new:N \g__cw_type_prop
+\prop_new:N \g__cw_style_prop
+\prop_new:N \g__cw_author_color_prop
+\prop_new:N \g__cw_author_name_prop
+\prop_new:N \g__cw_author_policy_prop
+\prop_new:N \g__cw_document_prop
+\prop_new:N \g__cw_revision_prop
+\clist_new:N \g__cw_author_include_clist
+\clist_new:N \g__cw_author_exclude_clist
+\clist_new:N \g__cw_color_palette_clist
+\int_new:N \g__cw_item_int
+\int_new:N \g__cw_author_color_int
+\bool_new:N \g__cw_pending_warnings_bool
+\bool_new:N \g__cw_export_sensitive_bool
+\prop_new:N \g__cw_pdf_type_prop
+\prop_new:N \g__cw_type_color_prop
+\tl_new:N \g__cw_log_policy_tl
+\tl_new:N \g__cw_pdf_comments_tl
+\tl_new:N \g__cw_addition_color_tl
+\tl_new:N \g__cw_deletion_color_tl
+\tl_new:N \g__cw_mode_tl
+\tl_new:N \g__cw_view_tl
+\tl_new:N \g__cw_layout_tl
+\tl_new:N \g__cw_theme_tl
+\tl_new:N \g__cw_pdf_backend_tl
+\tl_new:N \g__cw_placeholder_policy_tl
+
+\tl_gset:Nx \g__cw_mode_tl { \cw@modename }
+\tl_gset:Nx \g__cw_view_tl { \cw@initialview }
+\tl_gset:Nn \g__cw_layout_tl { margin-footnote }
+\tl_gset:Nn \g__cw_theme_tl { color }
+\tl_gset:Nn \g__cw_pdf_backend_tl { none }
+\tl_gset:Nn \g__cw_placeholder_policy_tl { warning }
+\tl_gset:Nn \g__cw_log_policy_tl { summary }
+\tl_gset:Nn \g__cw_pdf_comments_tl { false }
+\tl_gset:Nn \g__cw_addition_color_tl { blue }
+\tl_gset:Nn \g__cw_deletion_color_tl { red }
+\bool_gset_true:N \g__cw_pending_warnings_bool
+\bool_gset_false:N \g__cw_export_sensitive_bool
+\clist_gset:Nn \g__cw_color_palette_clist
+  { blue,red,teal,violet,olive,magenta,brown,cyan }
+
+\prop_gput:Nnn \g__cw_type_prop { comment }
+  { label={Comment},severity=info,color=blue }
+\prop_gput:Nnn \g__cw_type_prop { todo }
+  { label={TODO},severity=warning,color=orange }
+\prop_gput:Nnn \g__cw_type_prop { citation }
+  { label={Citation},severity=warning,color=purple }
+\prop_gput:Nnn \g__cw_type_prop { reply }
+  { label={Reply},severity=info,color=teal }
+\prop_gput:Nnn \g__cw_type_prop { change }
+  { label={Change},severity=info,color=blue,status=pending }
+\prop_gput:Nnn \g__cw_type_prop { revision }
+  { label={Revision},severity=info,color=blue }
+\prop_gput:Nnn \g__cw_type_prop { placeholder }
+  { label={Placeholder},severity=warning,color=orange }
+\prop_gput:Nnn \g__cw_type_prop { erratum }
+  { label={Erratum},severity=warning,color=red,status=accepted }
+\prop_gput:Nnn \g__cw_type_prop { needs-info }
+  { label={Needs information},severity=warning,color=orange }
+\prop_gput:Nnn \g__cw_type_prop { needs-justification }
+  { label={Needs justification},severity=warning,color=orange }
+\prop_gput:Nnn \g__cw_type_prop { needs-explanation }
+  { label={Needs explanation},severity=warning,color=orange }
+\prop_gput:Nnn \g__cw_type_prop { needs-image }
+  { label={Needs image},severity=warning,color=purple }
+\prop_gput:Nnn \g__cw_type_prop { needs-english }
+  { label={Needs English revision},severity=warning,color=teal }
+
+\tl_new:N \l__cw_item_id_tl
+\tl_new:N \l__cw_item_type_tl
+\tl_new:N \l__cw_item_label_tl
+\tl_new:N \l__cw_item_author_tl
+\tl_new:N \l__cw_item_status_tl
+\tl_new:N \l__cw_item_severity_tl
+\tl_new:N \l__cw_item_parent_tl
+\tl_new:N \l__cw_item_style_tl
+\tl_new:N \l__cw_item_layout_tl
+\tl_new:N \l__cw_item_color_tl
+\tl_new:N \l__cw_item_subtype_tl
+\tl_new:N \l__cw_item_comment_tl
+\tl_new:N \l__cw_item_date_tl
+\tl_new:N \l__cw_item_version_tl
+\tl_new:N \l__cw_item_file_tl
+\tl_new:N \l__cw_item_page_tl
+\tl_new:N \l__cw_item_pdf_tl
+\bool_new:N \l__cw_item_visible_bool
+\tl_new:N \l__cw_tmpc_tl
+\tl_new:N \l__cw_tmpd_tl
+\tl_new:N \l__cw_tmpe_tl
+\tl_new:N \l__cw_tmpf_tl
+\tl_new:N \l__cw_tmpg_tl
+\tl_new:N \l__cw_tmph_tl
+\tl_new:N \l__cw_tmpi_tl
+\tl_new:N \l__cw_tmpj_tl
+\cs_generate_variant:Nn \keys_set:nn { nV }
+\cs_generate_variant:Nn \clist_if_in:NnTF { NVTF }
+
+\keys_define:nn { cw/item }
+  {
+    id .tl_set:N = \l__cw_item_id_tl,
+    type .tl_set:N = \l__cw_item_type_tl,
+    label .tl_set:N = \l__cw_item_label_tl,
+    author .tl_set:N = \l__cw_item_author_tl,
+    status .choice:,
+    status / open .code:n = { \tl_set:Nn \l__cw_item_status_tl {open} },
+    status / pending .code:n = { \tl_set:Nn \l__cw_item_status_tl {pending} },
+    status / accepted .code:n = { \tl_set:Nn \l__cw_item_status_tl {accepted} },
+    status / rejected .code:n = { \tl_set:Nn \l__cw_item_status_tl {rejected} },
+    status / resolved .code:n = { \tl_set:Nn \l__cw_item_status_tl {resolved} },
+    decision .meta:n = { status = #1 },
+    severity .choice:,
+    severity / info .code:n = { \tl_set:Nn \l__cw_item_severity_tl {info} },
+    severity / note .code:n = { \tl_set:Nn \l__cw_item_severity_tl {note} },
+    severity / warning .code:n = { \tl_set:Nn \l__cw_item_severity_tl {warning} },
+    severity / error .code:n = { \tl_set:Nn \l__cw_item_severity_tl {error} },
+    severity / fatal .code:n = { \tl_set:Nn \l__cw_item_severity_tl {fatal} },
+    severity / low .code:n = { \tl_set:Nn \l__cw_item_severity_tl {low} },
+    severity / normal .code:n = { \tl_set:Nn \l__cw_item_severity_tl {normal} },
+    severity / high .code:n = { \tl_set:Nn \l__cw_item_severity_tl {high} },
+    severity / critical .code:n = { \tl_set:Nn \l__cw_item_severity_tl {critical} },
+    parent .tl_set:N = \l__cw_item_parent_tl,
+    style .tl_set:N = \l__cw_item_style_tl,
+    layout .tl_set:N = \l__cw_item_layout_tl,
+    color .tl_set:N = \l__cw_item_color_tl,
+    subtype .tl_set:N = \l__cw_item_subtype_tl,
+    comment .tl_set:N = \l__cw_item_comment_tl,
+    date .tl_set:N = \l__cw_item_date_tl,
+    version .tl_set:N = \l__cw_item_version_tl,
+    pdf .choice:,
+    pdf / auto .code:n = { \tl_set:Nn \l__cw_item_pdf_tl {auto} },
+    pdf / true .code:n = { \tl_set:Nn \l__cw_item_pdf_tl {true} },
+    pdf / false .code:n = { \tl_set:Nn \l__cw_item_pdf_tl {false} },
+  }
+
+\cs_new_protected:Npn \__cw_item_reset:
+  {
+    \tl_clear:N \l__cw_item_id_tl
+    \tl_set:Nn \l__cw_item_type_tl { comment }
+    \tl_clear:N \l__cw_item_label_tl
+    \tl_clear:N \l__cw_item_author_tl
+    \tl_set:Nn \l__cw_item_status_tl { open }
+    \tl_set:Nn \l__cw_item_severity_tl { info }
+    \tl_clear:N \l__cw_item_parent_tl
+    \tl_clear:N \l__cw_item_style_tl
+    \tl_set:NV \l__cw_item_layout_tl \g__cw_layout_tl
+    \tl_set:Nn \l__cw_item_color_tl { black }
+    \tl_clear:N \l__cw_item_subtype_tl
+    \tl_clear:N \l__cw_item_comment_tl
+    \tl_clear:N \l__cw_item_date_tl
+    \tl_clear:N \l__cw_item_version_tl
+    \tl_set:Nn \l__cw_item_pdf_tl {auto}
+    \bool_set_true:N \l__cw_item_visible_bool
+  }
+
+\cs_new_protected:Npn \__cw_prepare_item:n #1
+  {
+    \__cw_item_reset:
+    \keys_set:nn { cw/item } {#1}
+    \tl_set:NV \l_tmpa_tl \l__cw_item_type_tl
+    \tl_set:NV \l_tmpb_tl \l__cw_item_style_tl
+    \tl_set:NV \l__cw_tmpd_tl \l__cw_item_author_tl
+    \__cw_item_reset:
+    \tl_set:NV \l__cw_item_type_tl \l_tmpa_tl
+    \exp_args:NNx \prop_get:NnNTF \g__cw_type_prop
+      { \tl_use:N \l_tmpa_tl } \l__cw_tmpc_tl
+      { \keys_set:nV { cw/item } \l__cw_tmpc_tl }
+      { }
+    \exp_args:NNx \prop_get:NnNT \g__cw_type_color_prop
+      { \tl_use:N \l__cw_item_type_tl } \l__cw_tmpc_tl
+      { \tl_set:NV \l__cw_item_color_tl \l__cw_tmpc_tl }
+    \tl_if_blank:VF \l__cw_tmpd_tl
+      {
+        \exp_args:NNx \prop_get:NnNT \g__cw_author_color_prop
+          { \tl_use:N \l__cw_tmpd_tl } \l__cw_tmpc_tl
+          { \tl_set:NV \l__cw_item_color_tl \l__cw_tmpc_tl }
+      }
+    \tl_if_blank:VF \l_tmpb_tl
+      {
+        \exp_args:NNx \prop_get:NnNTF \g__cw_style_prop
+          { \tl_use:N \l_tmpb_tl } \l__cw_tmpc_tl
+          { \keys_set:nV { cw/item } \l__cw_tmpc_tl }
+          { \PackageWarning{coop-writing}{Unknown editorial style '\tl_use:N \l_tmpb_tl'} }
+      }
+    \keys_set:nn { cw/item } {#1}
+    \tl_if_blank:VTF \l__cw_item_id_tl
+      {
+        \int_gincr:N \g__cw_item_int
+        \tl_set:Nx \l__cw_item_id_tl { cw-\int_use:N \g__cw_item_int }
+      }
+      { }
+    \tl_if_blank:VTF \l__cw_item_label_tl
+      { \tl_set:NV \l__cw_item_label_tl \l__cw_item_type_tl }
+      { }
+    \tl_if_blank:VF \l__cw_item_author_tl
+      {
+        \exp_args:NNx \prop_get:NnNTF \g__cw_author_policy_prop
+          { \tl_use:N \l__cw_item_author_tl } \l_tmpa_tl
+          {
+            \str_case_e:nnF { \tl_use:N \l_tmpa_tl }
+              {
+                {hide}{\bool_set_false:N \l__cw_item_visible_bool}
+                {accept}{\tl_set:Nn \l__cw_item_status_tl {accepted}}
+                {reject}{\tl_set:Nn \l__cw_item_status_tl {rejected}}
+              }{}
+          }{}
+      }
+    \exp_args:NNx \prop_get:NnNTF \g__cw_decision_prop
+      { \tl_use:N \l__cw_item_id_tl } \l_tmpa_tl
+      { \tl_set:NV \l__cw_item_status_tl \l_tmpa_tl }
+      { }
+    \clist_if_empty:NF \g__cw_author_include_clist
+      {
+        \clist_if_in:NVTF \g__cw_author_include_clist
+          \l__cw_item_author_tl
+          { }
+          { \bool_set_false:N \l__cw_item_visible_bool }
+      }
+    \clist_if_in:NVTF \g__cw_author_exclude_clist
+      \l__cw_item_author_tl
+      { \bool_set_false:N \l__cw_item_visible_bool }
+      { }
+    \tl_set:Nx \l__cw_item_file_tl { \cwcurrentfile }
+    \tl_set:Nx \l__cw_item_page_tl { \thepage }
+  }
+
+\cs_new_protected:Npn \__cw_store_var:nN #1#2
+  {
+    \exp_args:NNxx \prop_gput:Nnn \g__cw_item_prop
+      { \tl_use:N \l__cw_item_id_tl / #1 }
+      { \exp_not:V #2 }
+  }
+\cs_new_protected:Npn \__cw_store_tokens:nn #1#2
+  {
+    \exp_args:NNxx \prop_gput:Nnn \g__cw_item_prop
+      { \tl_use:N \l__cw_item_id_tl / #1 }
+      { \exp_not:n {#2} }
+  }
+\cs_new_protected:Npn \__cw_get_field:nnN #1#2#3
+  {
+    \exp_args:NNx \prop_get:NnNTF \g__cw_item_prop {#1/#2} #3
+      { } { \tl_clear:N #3 }
+  }
+
+\cs_new_protected:Npn \__cw_register_current:n #1
+  {
+    \exp_args:NNx \prop_if_in:NnTF \g__cw_item_prop
+      { \tl_use:N \l__cw_item_id_tl / type }
+      { \PackageWarning{coop-writing}{Duplicate editorial id '\tl_use:N \l__cw_item_id_tl'; metadata replaced} }
+      { \seq_gput_right:NV \g__cw_item_seq \l__cw_item_id_tl }
+    \__cw_store_var:nN {type} \l__cw_item_type_tl
+    \__cw_store_var:nN {label} \l__cw_item_label_tl
+    \__cw_store_var:nN {author} \l__cw_item_author_tl
+    \__cw_store_var:nN {status} \l__cw_item_status_tl
+    \__cw_store_var:nN {severity} \l__cw_item_severity_tl
+    \__cw_store_var:nN {parent} \l__cw_item_parent_tl
+    \__cw_store_var:nN {style} \l__cw_item_style_tl
+    \__cw_store_var:nN {layout} \l__cw_item_layout_tl
+    \__cw_store_var:nN {color} \l__cw_item_color_tl
+    \__cw_store_var:nN {subtype} \l__cw_item_subtype_tl
+    \__cw_store_var:nN {comment} \l__cw_item_comment_tl
+    \__cw_store_var:nN {date} \l__cw_item_date_tl
+    \__cw_store_var:nN {version} \l__cw_item_version_tl
+    \__cw_store_var:nN {file} \l__cw_item_file_tl
+    \__cw_store_var:nN {page} \l__cw_item_page_tl
+    \__cw_store_var:nN {pdf} \l__cw_item_pdf_tl
+    \bool_if:NTF \l__cw_item_visible_bool
+      {\__cw_store_tokens:nn {visible}{true}}
+      {\__cw_store_tokens:nn {visible}{false}}
+    \__cw_store_tokens:nn {body} {#1}
+  }
+
+\cs_new_protected:Npn \__cw_author_display:N #1
+  {
+    \tl_if_blank:VTF \l__cw_item_author_tl
+      { \tl_set:Nn #1 { Editor } }
+      {
+        \exp_args:NNx \prop_get:NnNTF \g__cw_author_name_prop
+          { \tl_use:N \l__cw_item_author_tl } #1
+          { } { \tl_set:NV #1 \l__cw_item_author_tl }
+      }
+  }
+
+\prg_new_conditional:Npnn \__cw_item_pdf_enabled: {T,F,TF}
+  {
+    \tl_if_eq:NnTF \l__cw_item_pdf_tl {true}
+      { \prg_return_true: }
+      {
+        \tl_if_eq:NnTF \l__cw_item_pdf_tl {false}
+          { \prg_return_false: }
+          {
+            \exp_args:NNx \prop_get:NnNTF \g__cw_pdf_type_prop
+              { \tl_use:N \l__cw_item_type_tl } \l_tmpa_tl
+              {
+                \tl_if_eq:NnTF \l_tmpa_tl {true}
+                  { \prg_return_true: }
+                  { \prg_return_false: }
+              }
+              {
+                \tl_if_eq:NnTF \g__cw_pdf_comments_tl {true}
+                  { \prg_return_true: }
+                  { \prg_return_false: }
+              }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \__cw_render_generic:n #1
+  {
+    \bool_if:NT \l__cw_item_visible_bool
+      {
+        \tl_if_eq:NnT \g__cw_mode_tl { editing }
+          {
+            \__cw_author_display:N \l_tmpa_tl
+            \tl_set:NV \l_tmpb_tl \l__cw_item_color_tl
+            \tl_if_eq:NnF \g__cw_theme_tl { color }
+              { \tl_set:Nn \l_tmpb_tl { black } }
+            \str_case_e:nnF { \tl_use:N \l__cw_item_layout_tl }
+              {
+                {none}{}
+                {margin}{\marginpar{\textcolor{\l_tmpb_tl}{\tl_use:N \l_tmpa_tl :~#1}}}
+                {inline}{\textcolor{\l_tmpb_tl}{[\tl_use:N \l_tmpa_tl /\tl_use:N \l__cw_item_type_tl :~#1]}}
+                {compact}{\textcolor{\l_tmpb_tl}{[\tl_use:N \l_tmpa_tl :~#1]}}
+                {pdf-annotation}
+                  {
+                    \@ifpackageloaded{pdfcomment}
+                      {\pdfcomment[author={\l_tmpa_tl}]{#1}}
+                      {\textcolor{\l_tmpb_tl}{[\tl_use:N \l_tmpa_tl :~#1]}}
+                  }
+                {margin-footnote}
+                  {\cw@cwnote{#1}{\l_tmpb_tl}{\l_tmpa_tl}}
+              }
+              {\textcolor{\l_tmpb_tl}{[\tl_use:N \l_tmpa_tl :~#1]}}
+            \tl_if_eq:NnT \g__cw_pdf_backend_tl { bookmark }
+              {
+                \@ifpackageloaded{hyperref}
+                  {\belowpdfbookmark{Editorial item \l__cw_item_id_tl}{cwitem.\l__cw_item_id_tl}}
+                  {}
+              }
+            \__cw_item_pdf_enabled:T
+              {
+                \@ifpackageloaded{pdfcomment}
+                  {\pdfcomment[author={\l_tmpa_tl}]{#1}}
+                  {\PackageWarning{coop-writing}{PDF annotation requested for type '\l__cw_item_type_tl' but pdfcomment is not loaded}}
+              }
+            \tl_if_eq:NnT \g__cw_pdf_backend_tl { pdfcomment }
+              {
+                \__cw_item_pdf_enabled:F
+                  {
+                    \@ifpackageloaded{pdfcomment}
+                      {\pdfcomment[author={\l_tmpa_tl}]{#1}}
+                      {\PackageWarning{coop-writing}{pdf-backend=pdfcomment requested but pdfcomment is not loaded}}
+                  }
+              }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \__cw_item:nn #1#2
+  {
+    \__cw_prepare_item:n {#1}
+    \__cw_register_current:n {#2}
+    \tl_if_eq:NnTF \l__cw_item_type_tl { placeholder }
+      {
+        \tl_if_eq:NnTF \g__cw_mode_tl { editing }
+          { \__cw_render_generic:n {#2} }
+          {
+            \str_case_e:nn { \tl_use:N \g__cw_placeholder_policy_tl }
+              {
+                {warning}{\PackageWarning{coop-writing}{Unresolved placeholder '\l__cw_item_id_tl': \tl_to_str:n{#2}}}
+                {error}{\PackageError{coop-writing}{Unresolved placeholder '\l__cw_item_id_tl'}{Resolve or suppress the placeholder before final output.}}
+                {suppress}{}
+              }
+          }
+      }
+      { \__cw_render_generic:n {#2} }
+  }
+
+\NewDocumentCommand{\cwitem}{O{} m}{\__cw_item:nn{#1}{#2}}
+\NewExpandableDocumentCommand{\cwitemfield}{m m}
+  {\prop_item:Nn \g__cw_item_prop {#1/#2}}
+\NewExpandableDocumentCommand{\cwdecision}{m}
+  {\prop_item:Nn \g__cw_decision_prop {#1}}
+\NewExpandableDocumentCommand{\cwviewname}{}
+  {\tl_use:N \g__cw_view_tl}
+\NewExpandableDocumentCommand{\cwlayoutname}{}
+  {\tl_use:N \g__cw_layout_tl}
+\NewExpandableDocumentCommand{\cwthemename}{}
+  {\tl_use:N \g__cw_theme_tl}
+\NewExpandableDocumentCommand{\cwlogpolicy}{}
+  {\tl_use:N \g__cw_log_policy_tl}
+\NewExpandableDocumentCommand{\cwpdfcomments}{}
+  {\tl_use:N \g__cw_pdf_comments_tl}
+\NewExpandableDocumentCommand{\cwplaceholderpolicy}{}
+  {\tl_use:N \g__cw_placeholder_policy_tl}
+\NewExpandableDocumentCommand{\cwtypepdfpolicy}{m}
+  {\prop_item:Nn \g__cw_pdf_type_prop {#1}}
+
+\cs_new_protected:Npn \__cw_decision:nn #1#2
+  { \prop_gput:Nnn \g__cw_decision_prop {#1} {#2} }
+\cs_new_eq:NN \cwdecisionaux \__cw_decision:nn
+\newcommand{\cw@decision}[2]{\cwdecisionaux{#1}{#2}}%
+
+\cs_new_protected:Npn \__cw_set_decision:nn #1#2
+  {
+    \prop_gput:Nnn \g__cw_decision_prop {#1} {#2}
+    \protected@write\@auxout{}{\string\cw@decision{#1}{#2}}
+  }
+\NewDocumentCommand{\cwaccept}{m}{\__cw_set_decision:nn{#1}{accepted}}
+\NewDocumentCommand{\cwreject}{m}{\__cw_set_decision:nn{#1}{rejected}}
+\NewDocumentCommand{\cwresolve}{m}{\__cw_set_decision:nn{#1}{resolved}}
+\NewDocumentCommand{\cwreopen}{m}{\__cw_set_decision:nn{#1}{open}}
+
+\iow_new:N \g__cw_revision_iow
+\iow_new:N \g__cw_errata_iow
+\AtBeginDocument{
+  \iow_open:Nn \g__cw_revision_iow {\jobname.cwr}
+  \iow_open:Nn \g__cw_errata_iow {\jobname.cwe}
+}
+\AddToHook{enddocument/end}{
+  \iow_close:N \g__cw_revision_iow
+  \iow_close:N \g__cw_errata_iow
+}
+
+\cs_new_protected:Npn \__cw_write_revision:nnn #1#2#3
+  {
+    \iow_now:Nx \g__cw_revision_iow
+      {
+        \token_to_str:N \cwrevisionrecord
+        {\jobname}
+        {\tl_use:N \l__cw_item_id_tl}
+        {\exp_not:n{#1}}
+        {\exp_not:n{#2}}
+        {\thepage}
+        {\exp_not:V \l__cw_item_file_tl}
+        {\exp_not:V \l__cw_item_type_tl}
+      }
+  }
+
+\cs_new_protected:Npn \__cw_render_change:nn #1#2
+  {
+    \bool_if:NTF \l__cw_item_visible_bool
+      {
+        \tl_if_eq:NnTF \g__cw_mode_tl { editing }
+          {
+            \tl_if_eq:NnTF \g__cw_theme_tl { color }
+              {\textcolor{\g__cw_deletion_color_tl}{\sout{#1}}\textcolor{\g__cw_addition_color_tl}{#2}}
+              {\sout{#1}#2}
+            \tl_if_blank:VF \l__cw_item_comment_tl
+              {\__cw_render_generic:n {\l__cw_item_comment_tl}}
+          }
+          {
+            \str_case_e:nnF { \tl_use:N \l__cw_item_status_tl }
+              {
+                {accepted}{#2}
+                {rejected}{#1}
+              }
+              {
+                \tl_if_eq:NnTF \l__cw_item_type_tl { erratum }
+                  {#2}
+                  {
+                    \tl_if_eq:NnTF \g__cw_mode_tl { acceptingpublish }
+                      {#2}
+                      {#1}
+                  }
+              }
+          }
+      }
+      {
+        \str_case_e:nnF { \tl_use:N \l__cw_item_status_tl }
+          {{accepted}{#2}{rejected}{#1}}
+          {#1}
+      }
+  }
+
+\cs_new_protected:Npn \__cw_change:nnn #1#2#3
+  {
+    \__cw_prepare_item:n { type=change,#1 }
+    \tl_if_blank:VTF \l__cw_item_comment_tl
+      { \__cw_register_current:n {Change} }
+      { \__cw_register_current:n {\l__cw_item_comment_tl} }
+    \__cw_store_tokens:nn {old} {#2}
+    \__cw_store_tokens:nn {new} {#3}
+    \__cw_write_revision:nnn {#2}{#3}{\l__cw_item_type_tl}
+    \__cw_render_change:nn {#2}{#3}
+  }
+\NewDocumentCommand{\cwchange}{O{} m m}{\__cw_change:nnn{#1}{#2}{#3}}
+
+\cs_new_protected:Npn \__cw_revision_record:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \prop_gput:Nnn \g__cw_revision_prop {#1/#2/old} {#3}
+    \prop_gput:Nnn \g__cw_revision_prop {#1/#2/new} {#4}
+    \prop_gput:Nnn \g__cw_revision_prop {#1/#2/page} {#5}
+    \prop_gput:Nnn \g__cw_revision_prop {#1/#2/file} {#6}
+    \prop_gput:Nnn \g__cw_revision_prop {#1/#2/type} {#7}
+  }
+\NewDocumentCommand{\cwrevisionrecord}{m m m m m m m}
+  {\__cw_revision_record:nnnnnnn{#1}{#2}{#3}{#4}{#5}{#6}{#7}}
+\NewDocumentCommand{\cwloadrevisions}{m}
+  {\InputIfFileExists{#1.cwr}{}{\PackageWarning{coop-writing}{Revision file '#1.cwr' not found}}}
+
+\cs_new:Npn \__cw_revision_field:nnn #1#2#3
+  {
+    \prop_item:Nn \g__cw_revision_prop {#1/#2/#3}
+  }
+\NewExpandableDocumentCommand{\cwrevisionold}{m m}
+  {\__cw_revision_field:nnn{#1}{#2}{old}}
+\NewExpandableDocumentCommand{\cwrevisionnew}{m m}
+  {\__cw_revision_field:nnn{#1}{#2}{new}}
+\NewDocumentCommand{\cwrevisionref}{m m}
+  {
+    #1:~#2,~p.~\__cw_revision_field:nnn{#1}{#2}{page}
+    ~[\__cw_revision_field:nnn{#1}{#2}{file}]
+  }
+\NewDocumentCommand{\cwreviewresponse}{m m m}
+  {
+    \par\noindent\textbf{\cwrevisionref{#1}{#2}}\par
+    \textit{Old:}~\cwrevisionold{#1}{#2}\par
+    \textit{New:}~\cwrevisionnew{#1}{#2}\par
+    #3\par
+  }
+
+\NewDocumentCommand{\cwreply}{m O{} m}
+  {\cwitem[type=reply,parent={#1},#2]{#3}}
+\NewDocumentCommand{\cwplaceholder}{O{} m}
+  {\cwitem[type=placeholder,#1]{#2}}
+\cs_new_protected:Npn \__cw_write_erratum:nn #1#2
+  {
+    \iow_now:Nx \g__cw_errata_iow
+      {
+        \token_to_str:N \cwerratarecord
+        {\jobname}
+        {\tl_use:N \l__cw_item_id_tl}
+        {\exp_not:n{#1}}
+        {\exp_not:n{#2}}
+        {\exp_not:V \l__cw_item_date_tl}
+        {\exp_not:V \l__cw_item_version_tl}
+        {\thepage}
+        {\exp_not:V \l__cw_item_file_tl}
+      }
+  }
+\cs_new_protected:Npn \__cw_erratum:nnn #1#2#3
+  {
+    \cwchange[type=erratum,status=accepted,#1]{#2}{#3}
+    \__cw_write_erratum:nn {#2}{#3}
+  }
+\NewDocumentCommand{\cwerratum}{O{} m m}
+  {\__cw_erratum:nnn{#1}{#2}{#3}}
+
+\cs_new_protected:Npn \__cw_errata_record:nnnnnnnn #1#2#3#4#5#6#7#8
+  {
+    \cwitem[type=erratum,id={#2},status=accepted,date={#5},version={#6},layout=none]{Erratum~from~#1}
+    \prop_gput:Nnn \g__cw_item_prop {#2/old}{#3}
+    \prop_gput:Nnn \g__cw_item_prop {#2/new}{#4}
+    \prop_gput:Nnn \g__cw_item_prop {#2/page}{#7}
+    \prop_gput:Nnn \g__cw_item_prop {#2/file}{#8}
+  }
+\NewDocumentCommand{\cwerratarecord}{m m m m m m m m}
+  {\__cw_errata_record:nnnnnnnn{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}}
+\NewDocumentCommand{\cwloaderrata}{m}
+  {\InputIfFileExists{#1.cwe}{}{\PackageWarning{coop-writing}{Errata file '#1.cwe' not found}}}
+\NewDocumentCommand{\cwerratareport}{O{}}
+  {\cwreport[type=erratum,#1]}
+
+\NewDocumentEnvironment{cwrevision}{O{} +b}
+  {
+    \cwitem[type=revision,layout=none,#1]{Revision~block}
+    \tl_if_eq:NnTF \g__cw_mode_tl { editing }
+      {\begin{mdframed}#2\end{mdframed}}
+      {#2}
+  }{}
+\NewDocumentCommand{\cwrevisioninline}{O{} m}
+  {
+    \cwitem[type=revision,layout=none,#1]{Inline~revision}
+    \tl_if_eq:NnTF \g__cw_mode_tl { editing }
+      {\textcolor{blue}{#2}}{#2}
+  }
+
+\NewDocumentEnvironment{cwview}{m +b}
+  {\tl_if_eq:NnT \g__cw_view_tl {#1}{#2}}{}
+\NewDocumentCommand{\cwifview}{m m}
+  {\tl_if_eq:NnT \g__cw_view_tl {#1}{#2}}
+\NewDocumentCommand{\cwifviewTF}{m m m}
+  {\tl_if_eq:NnTF \g__cw_view_tl {#1}{#2}{#3}}
+\NewDocumentCommand{\cwinputview}{m m}
+  {\tl_if_eq:NnT \g__cw_view_tl {#1}{\input{#2}}}
+\NewDocumentCommand{\cwincludeview}{m m}
+  {\tl_if_eq:NnT \g__cw_view_tl {#1}{\include{#2}}}
+
+\keys_define:nn { cw/setup }
+  {
+    mode .choice:,
+    mode / editing .code:n = {\tl_gset:Nn \g__cw_mode_tl {editing}},
+    mode / submit .code:n = {\tl_gset:Nn \g__cw_mode_tl {submit}},
+    mode / publish .code:n = {\tl_gset:Nn \g__cw_mode_tl {publish}},
+    mode / acceptingpublish .code:n = {\tl_gset:Nn \g__cw_mode_tl {acceptingpublish}},
+    view .tl_gset:N = \g__cw_view_tl,
+    layout .tl_gset:N = \g__cw_layout_tl,
+    theme .choice:,
+    theme / color .code:n = {\tl_gset:Nn \g__cw_theme_tl {color}},
+    theme / monochrome .code:n = {\tl_gset:Nn \g__cw_theme_tl {monochrome}},
+    theme / print .code:n = {\tl_gset:Nn \g__cw_theme_tl {print}},
+    pdf-backend .choice:,
+    pdf-backend / none .code:n = {\tl_gset:Nn \g__cw_pdf_backend_tl {none}},
+    pdf-backend / bookmark .code:n = {\tl_gset:Nn \g__cw_pdf_backend_tl {bookmark}},
+    pdf-backend / pdfcomment .code:n = {\tl_gset:Nn \g__cw_pdf_backend_tl {pdfcomment}},
+    placeholder-policy .choice:,
+    placeholder-policy / warning .code:n = {\tl_gset:Nn \g__cw_placeholder_policy_tl {warning}},
+    placeholder-policy / error .code:n = {\tl_gset:Nn \g__cw_placeholder_policy_tl {error}},
+    placeholder-policy / suppress .code:n = {\tl_gset:Nn \g__cw_placeholder_policy_tl {suppress}},
+    warnings .choice:,
+    warnings / true .code:n = {\tl_gset:Nn \g__cw_log_policy_tl {summary}},
+    warnings / false .code:n = {\tl_gset:Nn \g__cw_log_policy_tl {none}},
+    log .choice:,
+    log / none .code:n = {\tl_gset:Nn \g__cw_log_policy_tl {none}},
+    log / summary .code:n = {\tl_gset:Nn \g__cw_log_policy_tl {summary}},
+    log / each .code:n = {\tl_gset:Nn \g__cw_log_policy_tl {each}},
+    pdf-comments .choice:,
+    pdf-comments / true .code:n = {\tl_gset:Nn \g__cw_pdf_comments_tl {true}},
+    pdf-comments / false .code:n = {\tl_gset:Nn \g__cw_pdf_comments_tl {false}},
+    pdf-comments/comment .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {comment}{#1}},
+    pdf-comments/todo .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {todo}{#1}},
+    pdf-comments/citation .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {citation}{#1}},
+    pdf-comments/change .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {change}{#1}},
+    pdf-comments/reply .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {reply}{#1}},
+    pdf-comments/revision .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {revision}{#1}},
+    pdf-comments/placeholder .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {placeholder}{#1}},
+    pdf-comments/erratum .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {erratum}{#1}},
+    export-sensitive .choice:,
+    export-sensitive / true .code:n = {\bool_gset_true:N \g__cw_export_sensitive_bool},
+    export-sensitive / false .code:n = {\bool_gset_false:N \g__cw_export_sensitive_bool},
+    language .code:n = {\cw_set_language:n{#1}},
+    authors/include .code:n = {\clist_gset:Nn \g__cw_author_include_clist {#1}},
+    authors/exclude .code:n = {\clist_gset:Nn \g__cw_author_exclude_clist {#1}},
+    document/status .code:n = {\prop_gput:Nnn \g__cw_document_prop {status}{#1}},
+    document/submitted-to .code:n = {\prop_gput:Nnn \g__cw_document_prop {submitted-to}{#1}},
+    document/restricted .code:n = {\prop_gput:Nnn \g__cw_document_prop {restricted}{#1}},
+    colors/anonymized .code:n = {\cwsetanoncolor{#1}},
+    colors/subject .code:n = {\cwsetsubjectcolor{#1}},
+    colors/main .code:n = {\cwsetmaincolor{#1}},
+    colors/draft .code:n = {\cwsetdraftcolor{#1}},
+    colors/todo .code:n = {\def\cw@todobackgroundcolor{#1}\prop_gput:Nnn \g__cw_type_prop {todo}{label={TODO},severity=warning,color={#1}}},
+    colors/palette .code:n = {\clist_gset:Nn \g__cw_color_palette_clist {#1}},
+    colors/comment .code:n =
+      {\prop_gput:Nnn \g__cw_type_prop {comment}{label={Comment},severity=info,color={#1}}},
+    colors/citation .code:n =
+      {\def\cor@citar{#1}\prop_gput:Nnn \g__cw_type_prop {citation}{label={Citation},severity=warning,color={#1}}},
+    colors/addition .tl_gset:N = \g__cw_addition_color_tl,
+    colors/deletion .tl_gset:N = \g__cw_deletion_color_tl,
+    style .code:n =
+      {
+        \prop_get:NnNTF \g__cw_style_prop {#1} \l_tmpa_tl
+          {\keys_set:nV {cw/setup}\l_tmpa_tl}
+          {\PackageWarning{coop-writing}{Unknown document style '#1'}}
+      },
+  }
+\NewDocumentCommand{\cwsetup}{m}{\keys_set:nn{cw/setup}{#1}}
+
+\tl_new:N \l__cw_define_type_command_tl
+\keys_define:nn {cw/define-type}
+  { command .tl_set:N = \l__cw_define_type_command_tl }
+\NewDocumentCommand{\cwdefinetype}{O{} m m}
+  {
+    \prop_gput:Nnn \g__cw_type_prop {#2}{#3}
+    \tl_clear:N \l__cw_define_type_command_tl
+    \keys_set:nn {cw/define-type}{#1}
+    \tl_if_blank:VF \l__cw_define_type_command_tl
+      {
+        \exp_args:Nc \cs_if_exist:NTF {\l__cw_define_type_command_tl}
+          {\PackageError{coop-writing}{Command '\l__cw_define_type_command_tl' already exists}{Choose another command name.}}
+          {
+            \exp_args:Nc \cs_new_protected:Npn {\l__cw_define_type_command_tl} ##1
+              {\cwitem[type={#2}]{##1}}
+          }
+      }
+  }
+\NewDocumentCommand{\cwdefinestyle}{m m}
+  {\prop_gput:Nnn \g__cw_style_prop {#1}{#2}}
+\NewDocumentCommand{\cwsettypepdf}{m m}
+  {\prop_gput:Nnn \g__cw_pdf_type_prop {#1}{#2}}
+\NewDocumentCommand{\cwsetauthorcolor}{m m}
+  {\prop_gput:Nnn \g__cw_author_color_prop {#1}{#2}}
+\NewDocumentCommand{\cwsettypecolor}{m m}
+  {\prop_gput:Nnn \g__cw_type_color_prop {#1}{#2}}
+
+\cs_new_protected:Npn \__cw_register_author:nnn #1#2#3
+  {
+    \prop_gput:Nnn \g__cw_author_name_prop {#1}{#2}
+    \prop_gput:Nnn \g__cw_author_color_prop {#1}{#3}
+  }
+\cs_new_eq:NN \cwregisterauthoraux \__cw_register_author:nnn
+\NewDocumentCommand{\cwregisterauthor}{m m m}
+  {\cwregisterauthoraux{#1}{#2}{#3}}
+\NewExpandableDocumentCommand{\cwauthorcolor}{m}
+  {\prop_item:Nn \g__cw_author_color_prop {#1}}
+\NewExpandableDocumentCommand{\cwauthorname}{m}
+  {\prop_item:Nn \g__cw_author_name_prop {#1}}
+
+\cs_new_protected:Npn \__cw_define_author:nnn #1#2#3
+  {
+    \tl_set:Nn \l_tmpa_tl {#1}
+    \tl_if_blank:VTF \l_tmpa_tl
+      {
+        \int_gincr:N \g__cw_author_color_int
+        \int_set:Nn \l_tmpa_int
+          {1 + \int_mod:nn {\g__cw_author_color_int - 1}{\clist_count:N \g__cw_color_palette_clist}}
+        \tl_set:Nx \l_tmpa_tl
+          {\clist_item:Nn \g__cw_color_palette_clist {\l_tmpa_int}}
+      }{}
+    \cwregisterauthor{#2}{#3}{\l_tmpa_tl}
+    \cwnamedef{#2}{\l_tmpa_tl}{#3}
+  }
+\NewDocumentCommand{\cwdefineauthor}{O{} m m}
+  {\__cw_define_author:nnn{#1}{#2}{#3}}
+
+\NewDocumentCommand{\cwincludeauthor}{m}
+  {\clist_gput_right:Nn \g__cw_author_include_clist {#1}}
+\NewDocumentCommand{\cwexcludeauthor}{m}
+  {\clist_gput_right:Nn \g__cw_author_exclude_clist {#1}}
+\NewDocumentCommand{\cwacceptauthor}{m}
+  {\prop_gput:Nnn \g__cw_author_policy_prop {#1}{accept}}
+\NewDocumentCommand{\cwrejectauthor}{m}
+  {\prop_gput:Nnn \g__cw_author_policy_prop {#1}{reject}}
+\NewDocumentCommand{\cwhideauthor}{m}
+  {\prop_gput:Nnn \g__cw_author_policy_prop {#1}{hide}}
+\NewDocumentCommand{\cwresetauthorfilters}{}
+  {
+    \clist_gclear:N \g__cw_author_include_clist
+    \clist_gclear:N \g__cw_author_exclude_clist
+    \prop_gclear:N \g__cw_author_policy_prop
+  }
+
+\NewExpandableDocumentCommand{\cwdocumentstatus}{}
+  {\prop_item:Nn \g__cw_document_prop {status}}
+\NewExpandableDocumentCommand{\cwdocumentsubmittedto}{}
+  {\prop_item:Nn \g__cw_document_prop {submitted-to}}
+\NewExpandableDocumentCommand{\cwdocumentrestricted}{}
+  {\prop_item:Nn \g__cw_document_prop {restricted}}
+\NewDocumentCommand{\cwshowdocumentstatus}{}
+  {
+    \par\noindent\textbf{Status:}~\cwdocumentstatus
+    \tl_set:Nx \l_tmpa_tl {\cwdocumentsubmittedto}
+    \tl_if_blank:VF \l_tmpa_tl
+      {;~\textbf{Submitted~to:}~\l_tmpa_tl}
+    \tl_set:Nx \l_tmpa_tl {\cwdocumentrestricted}
+    \tl_if_blank:VF \l_tmpa_tl
+      {;~\textbf{Restricted:}~\l_tmpa_tl}
+    \par
+  }
+
+\tl_new:N \l__cw_report_author_tl
+\tl_new:N \l__cw_report_type_tl
+\tl_new:N \l__cw_report_status_tl
+\tl_new:N \l__cw_report_severity_tl
+\tl_new:N \l__cw_report_mode_tl
+\prop_new:N \l__cw_report_author_prop
+\prop_new:N \l__cw_report_type_prop
+\prop_new:N \l__cw_report_status_prop
+\prop_new:N \l__cw_report_severity_prop
+\keys_define:nn {cw/report}
+  {
+    author .tl_set:N = \l__cw_report_author_tl,
+    type .tl_set:N = \l__cw_report_type_tl,
+    status .tl_set:N = \l__cw_report_status_tl,
+    severity .tl_set:N = \l__cw_report_severity_tl,
+    mode .choice:,
+    mode / detailed .code:n = {\tl_set:Nn \l__cw_report_mode_tl {detailed}},
+    mode / summary .code:n = {\tl_set:Nn \l__cw_report_mode_tl {summary}},
+  }
+\prg_new_conditional:Npnn \__cw_report_match:n #1 {T,F,TF}
+  {
+    \__cw_get_field:nnN {#1}{author}\l_tmpa_tl
+    \__cw_get_field:nnN {#1}{type}\l_tmpb_tl
+    \__cw_get_field:nnN {#1}{status}\l__cw_tmpc_tl
+    \exp_args:NNn \prop_get:NnNT \g__cw_decision_prop {#1} \l__cw_tmpd_tl
+      {\tl_set:NV \l__cw_tmpc_tl \l__cw_tmpd_tl}
+    \__cw_get_field:nnN {#1}{severity}\l__cw_tmpe_tl
+    \bool_set_true:N \l_tmpa_bool
+    \clist_if_empty:NF \g__cw_author_include_clist
+      {
+        \clist_if_in:NVTF \g__cw_author_include_clist \l_tmpa_tl
+          { } {\bool_set_false:N \l_tmpa_bool}
+      }
+    \clist_if_in:NVTF \g__cw_author_exclude_clist \l_tmpa_tl
+      {\bool_set_false:N \l_tmpa_bool}{}
+    \tl_if_blank:VF \l__cw_report_author_tl
+      {\tl_if_eq:NNTF \l__cw_report_author_tl \l_tmpa_tl {}{\bool_set_false:N \l_tmpa_bool}}
+    \tl_if_blank:VF \l__cw_report_type_tl
+      {\tl_if_eq:NNTF \l__cw_report_type_tl \l_tmpb_tl {}{\bool_set_false:N \l_tmpa_bool}}
+    \tl_if_blank:VF \l__cw_report_status_tl
+      {\tl_if_eq:NNTF \l__cw_report_status_tl \l__cw_tmpc_tl {}{\bool_set_false:N \l_tmpa_bool}}
+    \tl_if_blank:VF \l__cw_report_severity_tl
+      {\tl_if_eq:NNTF \l__cw_report_severity_tl \l__cw_tmpe_tl {}{\bool_set_false:N \l_tmpa_bool}}
+    \bool_if:NTF \l_tmpa_bool {\prg_return_true:}{\prg_return_false:}
+  }
+
+\cs_new_protected:Npn \__cw_report_increment:Nn #1#2
+  {
+    \prop_get:NnNTF #1 {#2} \l_tmpa_tl
+      {\prop_put:Nnx #1 {#2}{\int_eval:n{\l_tmpa_tl+1}}}
+      {\prop_put:Nnn #1 {#2}{1}}
+  }
+\cs_new_protected:Npn \__cw_report_print_prop:nN #1#2
+  {
+    \par\noindent\textbf{#1}\par
+    \prop_map_inline:Nn #2
+      {\noindent ##1:~##2\par}
+  }
+
+\NewDocumentCommand{\cwreport}{O{}}
+  {
+    \group_begin:
+    \tl_clear:N \l__cw_report_author_tl
+    \tl_clear:N \l__cw_report_type_tl
+    \tl_clear:N \l__cw_report_status_tl
+    \tl_clear:N \l__cw_report_severity_tl
+    \tl_set:Nn \l__cw_report_mode_tl {detailed}
+    \keys_set:nn {cw/report}{#1}
+    \cw@listheading{\cwreporttitle}
+    \tl_if_eq:NnTF \l__cw_report_mode_tl {summary}
+      {
+        \int_zero:N \l_tmpa_int
+        \prop_clear:N \l__cw_report_author_prop
+        \prop_clear:N \l__cw_report_type_prop
+        \prop_clear:N \l__cw_report_status_prop
+        \prop_clear:N \l__cw_report_severity_prop
+        \seq_map_inline:Nn \g__cw_item_seq
+          {
+            \__cw_report_match:nT {##1}
+              {
+                \int_incr:N \l_tmpa_int
+                \__cw_get_field:nnN {##1}{author}\l_tmpa_tl
+                \__cw_get_field:nnN {##1}{type}\l_tmpb_tl
+                \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
+                \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
+                  {\tl_set:NV \l__cw_tmpc_tl \l__cw_tmpd_tl}
+                \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
+                \tl_if_blank:VTF \l_tmpa_tl
+                  {\__cw_report_increment:Nn \l__cw_report_author_prop {(unassigned)}}
+                  {\exp_args:NNV \__cw_report_increment:Nn \l__cw_report_author_prop \l_tmpa_tl}
+                \exp_args:NNV \__cw_report_increment:Nn \l__cw_report_type_prop \l_tmpb_tl
+                \exp_args:NNV \__cw_report_increment:Nn \l__cw_report_status_prop \l__cw_tmpc_tl
+                \exp_args:NNV \__cw_report_increment:Nn \l__cw_report_severity_prop \l__cw_tmpd_tl
+              }
+          }
+        \par\noindent\textbf{Total:}~\int_use:N \l_tmpa_int\par
+        \__cw_report_print_prop:nN {By author} \l__cw_report_author_prop
+        \__cw_report_print_prop:nN {By type} \l__cw_report_type_prop
+        \__cw_report_print_prop:nN {By severity} \l__cw_report_severity_prop
+        \__cw_report_print_prop:nN {By status} \l__cw_report_status_prop
+      }
+      {
+        \seq_map_inline:Nn \g__cw_item_seq
+          {
+            \__cw_report_match:nT {##1}
+              {
+                \__cw_get_field:nnN {##1}{type}\l_tmpa_tl
+                \__cw_get_field:nnN {##1}{author}\l_tmpb_tl
+                \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
+                \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
+                  {\tl_set:NV \l__cw_tmpc_tl \l__cw_tmpd_tl}
+                \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
+                \__cw_get_field:nnN {##1}{file}\l__cw_tmpe_tl
+                \__cw_get_field:nnN {##1}{page}\l__cw_tmpf_tl
+                \__cw_get_field:nnN {##1}{body}\l__cw_tmpg_tl
+                \par\noindent
+                \textbf{##1}~
+                [\l_tmpa_tl/\l__cw_tmpc_tl/\l__cw_tmpd_tl]
+                \tl_if_blank:VF \l_tmpb_tl {~\textit{\l_tmpb_tl}}
+                ~---~\l__cw_tmpg_tl
+                \hfill{\footnotesize \tl_use:N \l__cw_tmpe_tl :~\tl_use:N \l__cw_tmpf_tl}\par
+              }
+          }
+      }
+    \group_end:
+  }
+
+\iow_new:N \l__cw_export_iow
+\tl_new:N \l__cw_export_format_tl
+\keys_define:nn {cw/export}
+  { format .tl_set:N = \l__cw_export_format_tl }
+\NewDocumentCommand{\cwexport}{O{format=tsv} m}
+  {
+    \group_begin:
+    \tl_set:Nn \l__cw_export_format_tl {tsv}
+    \keys_set:nn {cw/export}{#1}
+    \tl_if_eq:NnTF \l__cw_export_format_tl {tsv}
+      {
+        \tl_if_eq:NnTF \g__cw_mode_tl {submit}
+          {
+            \bool_if:NTF \g__cw_export_sensitive_bool
+              {\__cw_export_tsv:n{#2}}
+              {\PackageWarning{coop-writing}{Editorial export suppressed in submit mode; set export-sensitive=true explicitly to allow it}}
+          }
+          {\__cw_export_tsv:n{#2}}
+      }
+      {\PackageError{coop-writing}{Unsupported export format '\l__cw_export_format_tl'}{Use format=tsv. tools/cw-meta-to-json.py converts TSV to JSON.}}
+    \group_end:
+  }
+
+\cs_new_protected:Npn \__cw_export_tsv:n #1
+  {
+    \iow_open:Nn \l__cw_export_iow {#1}
+    \iow_now:Nx \l__cw_export_iow
+      {\c_hash_str~coop-writing-meta-v1}
+    \iow_now:Nn \l__cw_export_iow
+      {id^^Itype^^Iauthor^^Istatus^^Iseverity^^Ifile^^Ipage^^Iparent^^Ibody^^Iold^^Inew}
+    \seq_map_inline:Nn \g__cw_item_seq
+      {
+        \__cw_get_field:nnN {##1}{type}\l_tmpa_tl
+        \__cw_get_field:nnN {##1}{author}\l_tmpb_tl
+        \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
+        \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
+          {\tl_set:NV \l__cw_tmpc_tl \l__cw_tmpd_tl}
+        \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
+        \__cw_get_field:nnN {##1}{file}\l__cw_tmpe_tl
+        \__cw_get_field:nnN {##1}{page}\l__cw_tmpf_tl
+        \__cw_get_field:nnN {##1}{parent}\l__cw_tmpg_tl
+        \__cw_get_field:nnN {##1}{body}\l__cw_tmph_tl
+        \__cw_get_field:nnN {##1}{old}\l__cw_tmpi_tl
+        \__cw_get_field:nnN {##1}{new}\l__cw_tmpj_tl
+        \iow_now:Nx \l__cw_export_iow
+          {
+            ##1^^I
+            \tl_to_str:V \l_tmpa_tl^^I
+            \tl_to_str:V \l_tmpb_tl^^I
+            \tl_to_str:V \l__cw_tmpc_tl^^I
+            \tl_to_str:V \l__cw_tmpd_tl^^I
+            \tl_to_str:V \l__cw_tmpe_tl^^I
+            \tl_to_str:V \l__cw_tmpf_tl^^I
+            \tl_to_str:V \l__cw_tmpg_tl^^I
+            \tl_to_str:V \l__cw_tmph_tl^^I
+            \tl_to_str:V \l__cw_tmpi_tl^^I
+            \tl_to_str:V \l__cw_tmpj_tl
+          }
+      }
+    \iow_close:N \l__cw_export_iow
+  }
+
+\cs_new_protected:Npn \__cw_pending_warnings:
+  {
+    \tl_if_eq:NnF \g__cw_log_policy_tl {none}
+      {
+        \int_zero:N \l_tmpa_int
+        \seq_map_inline:Nn \g__cw_item_seq
+          {
+            \__cw_get_field:nnN {##1}{status}\l_tmpa_tl
+            \prop_get:NnNT \g__cw_decision_prop {##1} \l_tmpb_tl
+              {\tl_set:NV \l_tmpa_tl \l_tmpb_tl}
+            \str_case_e:nnF {\tl_use:N \l_tmpa_tl}
+              {
+                {open}{
+                  \int_incr:N \l_tmpa_int
+                  \tl_if_eq:NnT \g__cw_log_policy_tl {each}
+                    {\PackageWarning{coop-writing}{Editorial item '##1' is still open}}
+                }
+                {pending}{
+                  \int_incr:N \l_tmpa_int
+                  \tl_if_eq:NnT \g__cw_log_policy_tl {each}
+                    {\PackageWarning{coop-writing}{Editorial change '##1' is still pending}}
+                }
+              }
+              { }
+          }
+        \tl_if_eq:NnT \g__cw_log_policy_tl {summary}
+          {
+            \int_compare:nNnT {\l_tmpa_int} > {0}
+              {\PackageWarning{coop-writing}{\int_use:N \l_tmpa_int\space editorial item(s) remain open or pending}}
+          }
+      }
+  }
+\AddToHook{enddocument/info}{\__cw_pending_warnings:}
+
+\NewDocumentCommand{\cwinline}{O{} m}
+  {\cwitem[layout=inline,#1]{#2}}
+\NewDocumentCommand{\cwneedsinfo}{O{} m}
+  {\cwitem[type=needs-info,#1]{#2}}
+\NewDocumentCommand{\cwneedsjustification}{O{} m}
+  {\cwitem[type=needs-justification,#1]{#2}}
+\NewDocumentCommand{\cwneedsexplanation}{O{} m}
+  {\cwitem[type=needs-explanation,#1]{#2}}
+\NewDocumentCommand{\cwneedsimage}{O{} m}
+  {\cwitem[type=needs-image,#1]{#2}}
+\NewDocumentCommand{\cwneedsenglish}{O{} m}
+  {\cwitem[type=needs-english,#1]{#2}}
+
+\NewDocumentCommand{\cwheadingcomment}{O{} m m}
+  {
+    \@ifpackageloaded{hyperref}
+      {\texorpdfstring{#2\textsuperscript{\textcolor{blue}{*}}}{#2}}
+      {#2\textsuperscript{\textcolor{blue}{*}}}
+    \PackageInfo{coop-writing}{Heading comment: \tl_to_str:n{#3}}
+  }
+
+\cs_new_protected:Npn \__cw_dispatch_comment:nnnnn #1#2#3#4#5
+  {
+    \tl_if_in:nnTF {#1}{=}
+      {\cwitem[author={#5},color={#3},#1]{#2}}
+      {\cw@comment[#1]{#2}{#3}{#4}}
+  }
+\cs_new_eq:NN \cwdispatchcommentaux \__cw_dispatch_comment:nnnnn
+
+\cs_new_protected:Npn \__cw_dispatch_change:nnnnnn #1#2#3#4#5#6
+  {
+    \tl_if_in:nnTF {#1}{=}
+      {\cwchange[author={#6},color={#4},#1]{#2}{#3}}
+      {\cw@gensug[#1]{#4}{#5}{#2}{#4}{#3}{#4}}
+  }
+\cs_new_eq:NN \cwdispatchchangeaux \__cw_dispatch_change:nnnnnn
+
+\ExplSyntaxOff
+
+\newcommand{\cwdispatchcomment}[5]{\cwdispatchcommentaux{#1}{#2}{#3}{#4}{#5}}%
+\newcommand{\cwdispatchchange}[6]{\cwdispatchchangeaux{#1}{#2}{#3}{#4}{#5}{#6}}%
+%    \end{macrocode}
+%
 % \subsection{Powerful command to create editors and authors}
 % This allows for many types of comments. This was the reason I started
 % using a front-end to |ed|, and later decided to use colors, that |ed| dones not support.
@@ -1995,30 +3149,37 @@
 % \begin{macro}{\cwnamedef}
 %    \begin{macrocode}
 \newcommand{\cwnamedef}[3]{%
-%% cwcomment - texto a hl, cor, comentário, indicador de pessoa
+\ifstrequal{#2}{auto}{%
+  \cwdefineauthor{#1}{#3}%
+}{%
+\cwregisterauthor{#1}{#3}{#2}%
+%% Historic comments keep their original behavior unless the optional
+%% argument contains key=value metadata, in which case they use cwitem.
 \expandafter\newcommand\csname#1\endcsname[2][]%
-{%
-\cw@comment[##1]{##2}{#2}{#3}}%
-% [texto a marcar], cor , comentário, palavra, rótulo
+{\cwdispatchcomment{##1}{##2}{#2}{#3}{#1}}%
+% Labeled/struck historic forms remain source-compatible.
 \expandafter\newcommand\csname#1r\endcsname[3][]%
 {\cw@commentLabeled[##1]{##2}{#2}{#3}{##3}}%
-%% cortados
 \expandafter\newcommand\csname#1x\endcsname[2][]%
-{%
-%% Comentários
-\cw@xcomment[##1]{##2}{#2}{#3}}%
-%% [texto a marcar], cor , comentário, palavra, rótulo
+{\cw@xcomment[##1]{##2}{#2}{#3}}%
 \expandafter\newcommand\csname#1rx\endcsname[3][]%
 {\cw@xcommentLabeled[##1]{##2}{#2}{#3}{##3}}%
-%% sugestões
+%% Suggestions/removals/swaps accept modern key=value metadata while
+%% preserving the historic optional comment syntax.
 \expandafter\newcommand\csname#1sug\endcsname[2][]%
-{\cw@gensug[##1]{#2}{#3}{}{#2}{##2}{#2}}%
+{\cwdispatchchange{##1}{}{##2}{#2}{#3}{#1}}%
 \expandafter\newcommand\csname#1rem\endcsname[2][]%
-{\cw@gensug[##1]{#2}{#3}{##2}{#2}{}{#2}}
+{\cwdispatchchange{##1}{##2}{}{#2}{#3}{#1}}%
 \expandafter\newcommand\csname#1troca\endcsname[3][]%
-{\cw@gensug[##1]{#2}{#3}{##2}{#2}{##3}{#2}}%
+{\cwdispatchchange{##1}{##2}{##3}{#2}{#3}{#1}}%
 \expandafter\newcommand\csname#1swap\endcsname[3][]%
-{\cw@gensug[##1]{#2}{#3}{##2}{#2}{##3}{#2}}%
+{\cwdispatchchange{##1}{##2}{##3}{#2}{#3}{#1}}%
+%% Author-specific TODO and reply helpers.
+\expandafter\newcommand\csname#1todo\endcsname[2][]%
+{\cwitem[type=todo,author={#1},color={#2},##1]{##2}}%
+\expandafter\newcommand\csname#1reply\endcsname[3][]%
+{\cwreply{##2}[author={#1},color={#2},##1]{##3}}%
+}%
 }%
 %    \end{macrocode}
 % \end{macro}
@@ -2042,13 +3203,22 @@
 %    \begin{macrocode}
 \newcommand{\cw@todobackgroundcolor}{orange}%
 \cwnamedef{cw@todoauthor}{orange}{To do}%
+\newcommand{\listtodo}{\cwtodostitle}%
+\cw@newlist{cwtodo}{cwt}{\listtodo}%
+\let\listoftodos=\listofcwtodo%
 \if@showtodo%
 \newcommand{\todo}[2][]{%
 \ifstrequal{#1}{inline}%
 {%
 \refstepcounter{comentario}%
+\refstepcounter{cwtodo}%
 \begin{mdframed}[backgroundcolor=\cw@todobackgroundcolor]
 #2%
+\if@cwmemoirdefense%
+\addcontentsline{cwt}{cwtodo}{\protect\numberline{\thecwtodo}#2}%
+\else%
+\addcontentsline{cwt}{cwtodo}{\protect\numberline{\thecwtodo}{#2}}%
+\fi%
 \if@cwmemoirdefense%
 \addcontentsline{ccc}{comentario}{\protect\numberline{\thecomentario}To do: #2}%
 \else%
@@ -2060,6 +3230,12 @@
 \ifstrempty{#1}{}{%
 \PackageWarning{coop-writing}{Unknown todo option '#1'; using default comment style}%
 }%
+\refstepcounter{cwtodo}%
+\if@cwmemoirdefense%
+\addcontentsline{cwt}{cwtodo}{\protect\numberline{\thecwtodo}#2}%
+\else%
+\addcontentsline{cwt}{cwtodo}{\protect\numberline{\thecwtodo}{#2}}%
+\fi%
 \cw@todoauthor{#2}%
 }%
 }%
@@ -2095,7 +3271,8 @@
 % These next lines of code made easy to convert this package to English, because it was written in Portuguese, for Brazilian researchers.
 % Some commands were rewritten in English with time, such as |rascunho|, but the Portuguese version will always be maintained, while other were translated using only his mechanism.
 %    \begin{macrocode}
-\let\rascunho=\cwdraft%
+\NewDocumentEnvironment{rascunho}{O{} +b}{%
+\begin{cwdraft}[#1]#2\end{cwdraft}}{}%
 \let\cwassunto=\cwsubject%
 \let\favorcitar=\pleasecite%
 \let\cwautor=\cwnamedef%

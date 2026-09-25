@@ -51,13 +51,34 @@ To rebuild the full manual from source, compile `coop-writing.dtx` with a curren
 
 Project sources should be UTF-8. Current LaTeX uses UTF-8 as its default input encoding. The project is being organized to test **pdfLaTeX** and **LuaLaTeX** explicitly and to avoid deprecated interfaces where current LaTeX provides a maintained alternative.
 
+## Modern workflow API
+
+The preferred interface for new documents is explicit key/value configuration:
+
+```latex
+\usepackage[mode=editing]{coop-writing}
+\cwsetup{layout=margin-footnote, log=summary, view=coauthors}
+
+\cwitem[id=method-1,type=comment,author=alice,severity=warning]
+  {Explain the sampling strategy.}
+
+\cwchange[id=method-change,author=alice]
+  {old wording}{new wording}
+\cwaccept{method-change}
+\cwresolve{method-1}
+```
+
+The v1.8 semantic layer also supports replies/threads, long revision blocks, custom editorial types and styles, author filters, document-status metadata, named views, placeholders, reviewer-response ledgers, errata, summary/detailed reports, structured metadata export, and an external source materializer. Historical commands such as `\cwnamedef`, `\alice`, `\alicesug`, `\todo`, and `cwdraft` remain supported.
+
 ## Repository layout
 
-The root contains the current development source. Historically, `dist/`, `CTAN/`, and `tests/` have also contained generated or copied package files. The project is moving toward a single canonical source and reproducible generated artifacts; see the project issues for the proposed release/test refactoring.
+`coop-writing.dtx` and `coop-writing.ins` are the canonical source. The style file, PDFs, `dist/`, and CTAN staging are generated from them. CI regenerates the style before every smoke/regression run, so stale copies cannot be used as test input. The obsolete historical `CTAN/` copy and the old `tests/coop-writing.sty` snapshot were removed.
 
 ## Development and compatibility
 
-Compatibility with document classes is a primary project requirement. The proposed test matrix covers the standard LaTeX classes, `memoir`, KOMA-Script, major publisher templates, and the UFRJ/COPPE/Poli classes maintained on GitHub.
+The regression suite uses `l3build` with pdfTeX and LuaTeX and also runs against the LaTeX development kernel. A separate compatibility workflow covers the standard classes, `memoir`, KOMA-Script, representative publisher templates when installed, and canonical UFRJ/COPPE/Poli sources fetched from GitHub.
+
+See [the compatibility policy](COMPATIBILITY.md), [dependency audit](DEPENDENCIES.md), and [issue-to-test resolution matrix](ISSUE-TEST-MATRIX.md).
 
 Please report incompatibilities with a minimal example and include:
 

@@ -1,0 +1,9 @@
+\input regression-test.tex
+\documentclass[submit]{article}
+\usepackage{coop-writing}
+\begin{document}
+\cwsetup{warnings=false}
+\START
+\TYPE{mode-with-class-submit=\cwmode}
+\END
+\end{document}
