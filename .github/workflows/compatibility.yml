@@ -1,0 +1,44 @@
+name: Compatibility matrix
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: compatibility-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compatibility:
+    name: ${{ matrix.engine }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [pdflatex, lualatex]
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch canonical UFRJ/COPPE/Poli classes
+        run: |
+          mkdir -p vendor
+          git clone --depth 1 --branch V05-unificada https://github.com/COPPE-UFRJ/CoppeTeX.git vendor/coppetex-v5
+          git clone --depth 1 --branch goufrj https://github.com/COPPE-UFRJ/CoppeTeX.git vendor/ufrj
+          git clone --depth 1 https://github.com/xexeo/PoliTeX.git vendor/politex
+          mkdir -p vendor/sbc
+          unzip -q "tests/BugSBC/SBC Conferences Template.zip" -d vendor/sbc || true
+
+      - name: Run class compatibility matrix
+        uses: xu-cheng/latex-action@v4
+        with:
+          os: debian
+          root_file: quickref-en-us.tex
+          latexmk_use_lualatex: ${{ matrix.engine == 'lualatex' }}
+          pre_compile: |
+            rm -f coop-writing.sty
+            latex -interaction=nonstopmode -halt-on-error coop-writing.ins
+            bash tools/test-compatibility.sh ${{ matrix.engine }}
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
