@@ -2140,6 +2140,7 @@
 \bool_new:N \g__cw_pending_warnings_bool
 \bool_new:N \g__cw_export_sensitive_bool
 \prop_new:N \g__cw_pdf_type_prop
+\prop_new:N \g__cw_type_color_prop
 \tl_new:N \g__cw_log_policy_tl
 \tl_new:N \g__cw_pdf_comments_tl
 \tl_new:N \g__cw_addition_color_tl
@@ -2291,6 +2292,9 @@
       { \tl_use:N \l_tmpa_tl } \l__cw_tmpc_tl
       { \keys_set:nV { cw/item } \l__cw_tmpc_tl }
       { }
+    \exp_args:NNx \prop_get:NnNT \g__cw_type_color_prop
+      { \tl_use:N \l__cw_item_type_tl } \l__cw_tmpc_tl
+      { \tl_set_eq:NN \l__cw_item_color_tl \l__cw_tmpc_tl }
     \tl_if_blank:VF \l_tmpb_tl
       {
         \exp_args:NNx \prop_get:NnNTF \g__cw_style_prop
@@ -2313,7 +2317,7 @@
         \exp_args:NNx \prop_get:NnNTF \g__cw_author_color_prop
           { \tl_use:N \l__cw_item_author_tl } \l_tmpa_tl
           {
-            \tl_if_eq:NnT \l__cw_item_color_tl { black }
+            \tl_if_in:nnF {#1}{color=}
               { \tl_set_eq:NN \l__cw_item_color_tl \l_tmpa_tl }
           }
           { }
@@ -2743,22 +2747,7 @@
 \NewDocumentCommand{\cwsetauthorcolor}{m m}
   {\prop_gput:Nnn \g__cw_author_color_prop {#1}{#2}}
 \NewDocumentCommand{\cwsettypecolor}{m m}
-  {
-    \prop_get:NnNTF \g__cw_type_prop {#1} \l_tmpa_tl
-      {
-        \keys_set:nn {cw/item}{\l_tmpa_tl}
-        \prop_gput:Nnx \g__cw_type_prop {#1}
-          {
-            label={\exp_not:V \l__cw_item_label_tl},
-            severity={\exp_not:V \l__cw_item_severity_tl},
-            status={\exp_not:V \l__cw_item_status_tl},
-            color={#2},
-            layout={\exp_not:V \l__cw_item_layout_tl},
-            pdf={\exp_not:V \l__cw_item_pdf_tl}
-          }
-      }
-      {\PackageWarning{coop-writing}{Unknown editorial type '#1'}}
-  }
+  {\prop_gput:Nnn \g__cw_type_color_prop {#1}{#2}}
 
 \cs_new_protected:Npn \__cw_register_author:nnn #1#2#3
   {
