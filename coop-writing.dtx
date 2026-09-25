@@ -2286,6 +2286,7 @@
     \keys_set:nn { cw/item } {#1}
     \tl_set_eq:NN \l_tmpa_tl \l__cw_item_type_tl
     \tl_set_eq:NN \l_tmpb_tl \l__cw_item_style_tl
+    \tl_set_eq:NN \l__cw_tmpd_tl \l__cw_item_author_tl
     \__cw_item_reset:
     \tl_set_eq:NN \l__cw_item_type_tl \l_tmpa_tl
     \exp_args:NNx \prop_get:NnNTF \g__cw_type_prop
@@ -2295,6 +2296,12 @@
     \exp_args:NNx \prop_get:NnNT \g__cw_type_color_prop
       { \tl_use:N \l__cw_item_type_tl } \l__cw_tmpc_tl
       { \tl_set_eq:NN \l__cw_item_color_tl \l__cw_tmpc_tl }
+    \tl_if_blank:VF \l__cw_tmpd_tl
+      {
+        \exp_args:NNx \prop_get:NnNT \g__cw_author_color_prop
+          { \tl_use:N \l__cw_tmpd_tl } \l__cw_tmpc_tl
+          { \tl_set_eq:NN \l__cw_item_color_tl \l__cw_tmpc_tl }
+      }
     \tl_if_blank:VF \l_tmpb_tl
       {
         \exp_args:NNx \prop_get:NnNTF \g__cw_style_prop
@@ -2314,13 +2321,6 @@
       { }
     \tl_if_blank:VF \l__cw_item_author_tl
       {
-        \exp_args:NNx \prop_get:NnNTF \g__cw_author_color_prop
-          { \tl_use:N \l__cw_item_author_tl } \l_tmpa_tl
-          {
-            \tl_if_in:nnF {#1}{color=}
-              { \tl_set_eq:NN \l__cw_item_color_tl \l_tmpa_tl }
-          }
-          { }
         \exp_args:NNx \prop_get:NnNTF \g__cw_author_policy_prop
           { \tl_use:N \l__cw_item_author_tl } \l_tmpa_tl
           {
