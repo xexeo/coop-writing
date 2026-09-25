@@ -1,0 +1,11 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage[editing,publish,bookmarks=false]{coop-writing}
+\begin{document}
+\cwsetup{warnings=false}
+\START
+\TYPE{mode=\cwmode}
+\ifcwpublish\TYPE{publish=true}\else\TYPE{publish=false}\fi
+\ifcwediting\TYPE{editing=true}\else\TYPE{editing=false}\fi
+\END
+\end{document}
