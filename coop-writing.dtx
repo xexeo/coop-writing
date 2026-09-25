@@ -1259,12 +1259,9 @@
   \ifdefined\CurrentFilePath\CurrentFilePath\else\@empty\fi}%
 %    \end{macrocode}
 % \subsection{Optional Packages}
-% Package that are required only sometimes
+% No optional package is loaded automatically. PDF integrations are enabled
+% only when the user has explicitly loaded the corresponding package.
 %    \begin{macrocode}
-\ifshowednotes%
-\else%
-\RequirePackage{verbatim}%
-\fi%
 %    \end{macrocode}
 % \subsection{CoppeTeX problems}
 % tocloft and CoppeTeX have different assumptions whether
