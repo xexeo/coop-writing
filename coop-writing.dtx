@@ -1230,6 +1230,9 @@
 \RequirePackage[normalem]{ulem}
 \RequirePackage{etoolbox}
 \RequirePackage{mdframed}
+% Beamer has no normal margin-paragraph float. Keep the comment/footnote
+% semantics but automatically disable the margin marker in that class.
+\@ifclassloaded{beamer}{\marginsfalse}{}
 %
 % Public mode predicates and current-file information.
 \newif\ifcwediting
