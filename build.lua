@@ -8,6 +8,7 @@ checkengines = {"pdftex", "luatex"}
 stdengine = "pdftex"
 checkruns = 2
 testfiledir = "testfiles"
+checksuppfiles = {"*.cwe"}
 
 typesetfiles = {"coop-writing.dtx"}
 typesetexe = "pdflatex"
@@ -19,5 +20,6 @@ textfiles = {
   "new.md",
   "LICENSE",
   "COMPATIBILITY.md",
-  "DEPENDENCIES.md"
+  "DEPENDENCIES.md",
+  "ISSUE-TEST-MATRIX.md"
 }
