@@ -1,0 +1,10 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{revision-old=old text}
+\TYPE{revision-new=new text}
+\TYPE{erratum-type=erratum}
+\TYPE{revision-ledger=ok}
+\END
+\end{document}
