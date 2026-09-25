@@ -2680,6 +2680,14 @@
     pdf-comments .choice:,
     pdf-comments / true .code:n = {\tl_gset:Nn \g__cw_pdf_comments_tl {true}},
     pdf-comments / false .code:n = {\tl_gset:Nn \g__cw_pdf_comments_tl {false}},
+    pdf-comments/comment .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {comment}{#1}},
+    pdf-comments/todo .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {todo}{#1}},
+    pdf-comments/citation .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {citation}{#1}},
+    pdf-comments/change .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {change}{#1}},
+    pdf-comments/reply .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {reply}{#1}},
+    pdf-comments/revision .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {revision}{#1}},
+    pdf-comments/placeholder .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {placeholder}{#1}},
+    pdf-comments/erratum .code:n = {\prop_gput:Nnn \g__cw_pdf_type_prop {erratum}{#1}},
     export-sensitive .choice:,
     export-sensitive / true .code:n = {\bool_gset_true:N \g__cw_export_sensitive_bool},
     export-sensitive / false .code:n = {\bool_gset_false:N \g__cw_export_sensitive_bool},
@@ -2693,7 +2701,8 @@
     colors/subject .code:n = {\cwsetsubjectcolor{#1}},
     colors/main .code:n = {\cwsetmaincolor{#1}},
     colors/draft .code:n = {\cwsetdraftcolor{#1}},
-    colors/todo .code:n = {\def\cw@todobackgroundcolor{#1}},
+    colors/todo .code:n = {\def\cw@todobackgroundcolor{#1}\prop_gput:Nnn \g__cw_type_prop {todo}{label={TODO},severity=warning,color={#1}}},
+    colors/palette .code:n = {\clist_gset:Nn \g__cw_color_palette_clist {#1}},
     colors/comment .code:n =
       {\prop_gput:Nnn \g__cw_type_prop {comment}{label={Comment},severity=info,color={#1}}},
     colors/citation .code:n =
@@ -2709,12 +2718,47 @@
   }
 \NewDocumentCommand{\cwsetup}{m}{\keys_set:nn{cw/setup}{#1}}
 
-\NewDocumentCommand{\cwdefinetype}{m m}
-  {\prop_gput:Nnn \g__cw_type_prop {#1}{#2}}
+\tl_new:N \l__cw_define_type_command_tl
+\keys_define:nn {cw/define-type}
+  { command .tl_set:N = \l__cw_define_type_command_tl }
+\NewDocumentCommand{\cwdefinetype}{O{} m m}
+  {
+    \prop_gput:Nnn \g__cw_type_prop {#2}{#3}
+    \tl_clear:N \l__cw_define_type_command_tl
+    \keys_set:nn {cw/define-type}{#1}
+    \tl_if_blank:VF \l__cw_define_type_command_tl
+      {
+        \exp_args:Nc \cs_if_exist:NTF {\l__cw_define_type_command_tl}
+          {\PackageError{coop-writing}{Command '\l__cw_define_type_command_tl' already exists}{Choose another command name.}}
+          {
+            \exp_args:Nc \cs_new_protected:Npn {\l__cw_define_type_command_tl} ##1
+              {\cwitem[type={#2}]{##1}}
+          }
+      }
+  }
 \NewDocumentCommand{\cwdefinestyle}{m m}
   {\prop_gput:Nnn \g__cw_style_prop {#1}{#2}}
 \NewDocumentCommand{\cwsettypepdf}{m m}
   {\prop_gput:Nnn \g__cw_pdf_type_prop {#1}{#2}}
+\NewDocumentCommand{\cwsetauthorcolor}{m m}
+  {\prop_gput:Nnn \g__cw_author_color_prop {#1}{#2}}
+\NewDocumentCommand{\cwsettypecolor}{m m}
+  {
+    \prop_get:NnNTF \g__cw_type_prop {#1} \l_tmpa_tl
+      {
+        \keys_set:nn {cw/item}{\l_tmpa_tl}
+        \prop_gput:Nnx \g__cw_type_prop {#1}
+          {
+            label={\exp_not:V \l__cw_item_label_tl},
+            severity={\exp_not:V \l__cw_item_severity_tl},
+            status={\exp_not:V \l__cw_item_status_tl},
+            color={#2},
+            layout={\exp_not:V \l__cw_item_layout_tl},
+            pdf={\exp_not:V \l__cw_item_pdf_tl}
+          }
+      }
+      {\PackageWarning{coop-writing}{Unknown editorial type '#1'}}
+  }
 
 \cs_new_protected:Npn \__cw_register_author:nnn #1#2#3
   {
