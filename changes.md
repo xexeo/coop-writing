@@ -4,34 +4,54 @@ This file records the functional history of `coop-writing`. The version/date ent
 
 ## v1.8 — 2026-09-23
 
-A consolidated editorial-workflow release focused on making the package easier to use, test, document, and distribute.
+A consolidated modernization of the complete editorial workflow.
 
 ### Added
-- English quick reference: `quickref-en-us.tex`.
-- Brazilian Portuguese quick reference: `quickref-pt-br.tex`.
-- Maximal English example exercising the public API: `max-example-en-us.tex`.
-- Maximal Brazilian Portuguese example: `max-exemplo-pt-br.tex`.
-- Mode-dependent example fragments used by the maximal examples.
-- Documentation smoke tests with **pdfLaTeX** and **LuaLaTeX**.
-- Reproducible CTAN staging and archive generation.
-- Explicit installation and maintainer information in the README.
-- `changes.md` with the complete release history.
-- `new.md` with only the current release notes.
+- Structured semantic editorial items with stable IDs, type, author, status, severity, source location, relationships, style/layout and backend metadata.
+- Selective accept/reject and resolve/reopen decisions, persisted by ID.
+- Author include/exclude and accept/reject/hide policies.
+- Threads/replies and long revision blocks.
+- User-defined editorial types and named reusable styles.
+- Structured placeholders with configurable final-mode policy.
+- Named views/profiles independent from the main editorial mode.
+- Document status/submission/restriction metadata.
+- Detailed and summary editorial reports with filters.
+- Pending-item logging policies.
+- Optional PDF annotation policies with global, type and item precedence.
+- Cross-document revision ledger and reviewer-response commands.
+- Persistent post-publication errata ledger and standalone errata reporting.
+- Versioned UTF-8 metadata export plus JSON conversion tool.
+- External UTF-8 source materializer with ID/author decisions and dry-run mode.
+- Automatic deterministic collaborator colors and centralized color configuration.
+- `\listoftodos`, author-specific TODOs, `\cwdrafttext`, `\cwsaveforlater`, `\cwinline`, current-file helpers, mode predicates, and safe heading comments.
+- English and Brazilian Portuguese quick references and maximal executable examples.
+- `l3build` regression suite for pdfTeX/LuaTeX plus development-kernel checks.
+- Automated compatibility matrix for standard/memoir/KOMA classes, canonical UFRJ/COPPE/Poli classes, and publisher templates when installed.
+- Reproducible `dist/` and CTAN staging generation.
+- `changes.md`, `new.md`, `DEPENDENCIES.md`, `COMPATIBILITY.md`, and issue-to-test traceability.
 
 ### Changed
-- The package is documented explicitly as an interface-independent editorial layer: editorial information remains in the LaTeX source and can be used from Overleaf, local editors, or Git-based workflows.
-- Documentation sources are UTF-8 and no longer require `inputenc` with current LaTeX.
-- CTAN packaging is generated from canonical project sources rather than maintained as an independent copy.
-- The generated `coop-writing.sty` is regenerated from `coop-writing.dtx`/`coop-writing.ins` in the release workflow.
-- Version-history entries in the documented source consistently use the `v` prefix.
+- Preferred configuration uses key/value package options and `\cwsetup`; historical options remain compatible aliases.
+- Main modes are formalized as editing, submit, publish, and acceptingpublish. Conflicting explicit modes warn; the last one wins.
+- Presentation is separated from semantic type through layout/theme/style/backend configuration.
+- Anonymization and editing-mode anonymization marking are independent controls.
+- Visible strings use dynamic symmetric EN/PT-BR localization.
+- Editorial lists are package-private and no longer modify the class's ToC/LoF/LoT machinery.
+- Generated style/distribution/CTAN artifacts derive from canonical `coop-writing.dtx` + `coop-writing.ins`.
+- Historical duplicate CTAN/source/style snapshots are removed from active development/testing.
 
 ### Fixed
-- `\todo{...}` is the compact/default TODO form.
-- `\todo[inline]{...}` is explicitly opt-in for the framed inline form.
-- Unknown TODO options produce a warning and fall back to the default comment style.
-- Corrected malformed conditional logic around automatic `hyperref` loading.
-- Corrected the `cwavoidhyperref` option implementation.
-- Removed the unnecessary `xstring` dependency from the TODO implementation path.
+- `\todo{...}` is compact by default; `\todo[inline]{...}` is explicit.
+- Unknown TODO options warn instead of silently changing layout.
+- TODOs and citation-needs participate in the appropriate editorial lists.
+- Labeled comments reference the semantic label rather than the footnote number.
+- `hyperref` is no longer auto-loaded, avoiding bibliography/template side effects.
+- Comment mathematics is not serialized into unsafe PDF bookmark strings.
+- Removed the mandatory `tocloft` dependency and its conflicts with KOMA-Script, memoir, subfig, etoc and publisher classes.
+- Removed unnecessary `iflang`, `environ`, `csquotes`, `xstring`, and dead `verbatim` dependencies.
+- Corrected `cwavoidhyperref` legacy handling and prior conditional errors.
+- Portuguese `rascunho` is a complete environment alias.
+- UTF-8 documentation and examples are tested in both supported engines.
 
 ## v1.5.5 — 2026-09-23
 
