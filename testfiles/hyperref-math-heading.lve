@@ -1,0 +1,7 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{hyperref-math-heading=ok}
+\END
+\end{document}
