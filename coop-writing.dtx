@@ -2519,8 +2519,15 @@
 \NewDocumentCommand{\cwreopen}{m}{\__cw_set_decision:nn{#1}{open}}
 
 \iow_new:N \g__cw_revision_iow
-\AtBeginDocument{\iow_open:Nn \g__cw_revision_iow {\jobname.cwr}}
-\AddToHook{enddocument/end}{\iow_close:N \g__cw_revision_iow}
+\iow_new:N \g__cw_errata_iow
+\AtBeginDocument{
+  \iow_open:Nn \g__cw_revision_iow {\jobname.cwr}
+  \iow_open:Nn \g__cw_errata_iow {\jobname.cwe}
+}
+\AddToHook{enddocument/end}{
+  \iow_close:N \g__cw_revision_iow
+  \iow_close:N \g__cw_errata_iow
+}
 
 \cs_new_protected:Npn \__cw_write_revision:nnn #1#2#3
   {
@@ -2624,8 +2631,41 @@
   {\cwitem[type=reply,parent={#1},#2]{#3}}
 \NewDocumentCommand{\cwplaceholder}{O{} m}
   {\cwitem[type=placeholder,#1]{#2}}
+\cs_new_protected:Npn \__cw_write_erratum:nn #1#2
+  {
+    \iow_now:Nx \g__cw_errata_iow
+      {
+        \token_to_str:N \cwerratarecord
+        {\jobname}
+        {\tl_use:N \l__cw_item_id_tl}
+        {\exp_not:n{#1}}
+        {\exp_not:n{#2}}
+        {\exp_not:V \l__cw_item_date_tl}
+        {\exp_not:V \l__cw_item_version_tl}
+        {\thepage}
+        {\exp_not:V \l__cw_item_file_tl}
+      }
+  }
+\cs_new_protected:Npn \__cw_erratum:nnn #1#2#3
+  {
+    \cwchange[type=erratum,status=accepted,#1]{#2}{#3}
+    \__cw_write_erratum:nn {#2}{#3}
+  }
 \NewDocumentCommand{\cwerratum}{O{} m m}
-  {\cwchange[type=erratum,status=accepted,#1]{#2}{#3}}
+  {\__cw_erratum:nnn{#1}{#2}{#3}}
+
+\cs_new_protected:Npn \__cw_errata_record:nnnnnnnn #1#2#3#4#5#6#7#8
+  {
+    \cwitem[type=erratum,id={#2},status=accepted,date={#5},version={#6},layout=none]{Erratum~from~#1}
+    \prop_gput:Nnn \g__cw_item_prop {#2/old}{#3}
+    \prop_gput:Nnn \g__cw_item_prop {#2/new}{#4}
+    \prop_gput:Nnn \g__cw_item_prop {#2/page}{#7}
+    \prop_gput:Nnn \g__cw_item_prop {#2/file}{#8}
+  }
+\NewDocumentCommand{\cwerratarecord}{m m m m m m m m}
+  {\__cw_errata_record:nnnnnnnn{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}}
+\NewDocumentCommand{\cwloaderrata}{m}
+  {\InputIfFileExists{#1.cwe}{}{\PackageWarning{coop-writing}{Errata file '#1.cwe' not found}}}
 \NewDocumentCommand{\cwerratareport}{O{}}
   {\cwreport[type=erratum,#1]}
 
