@@ -2501,6 +2501,10 @@
   }
 
 \NewDocumentCommand{\cwitem}{O{} m}{\__cw_item:nn{#1}{#2}}
+\NewExpandableDocumentCommand{\cwitemfield}{m m}
+  {\prop_item:Nn \g__cw_item_prop {#1/#2}}
+\NewExpandableDocumentCommand{\cwdecision}{m}
+  {\prop_item:Nn \g__cw_decision_prop {#1}}
 
 \cs_new_protected:Npn \__cw_decision:nn #1#2
   { \prop_gput:Nnn \g__cw_decision_prop {#1} {#2} }
@@ -2757,6 +2761,10 @@
 \cs_new_eq:NN \cwregisterauthoraux \__cw_register_author:nnn
 \NewDocumentCommand{\cwregisterauthor}{m m m}
   {\cwregisterauthoraux{#1}{#2}{#3}}
+\NewExpandableDocumentCommand{\cwauthorcolor}{m}
+  {\prop_item:Nn \g__cw_author_color_prop {#1}}
+\NewExpandableDocumentCommand{\cwauthorname}{m}
+  {\prop_item:Nn \g__cw_author_name_prop {#1}}
 
 \cs_new_protected:Npn \__cw_define_author:nnn #1#2#3
   {
