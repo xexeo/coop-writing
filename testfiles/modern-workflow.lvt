@@ -1,0 +1,41 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage[mode=editing]{coop-writing}
+\begin{document}
+\cwsetup{layout=none,warnings=false,view=advisor,colors/palette={blue,red,teal}}
+\cwdefineauthor{alice}{Alice}
+\cwdefinetype[command=clarity]{clarity}{label={Clarity},severity=warning,color=orange,pdf=false}
+\cwdefinestyle{urgent}{severity=critical,color=red,layout=none}
+\START
+\TYPE{alice-color=\cwauthorcolor{alice}}
+\ifcsname clarity\endcsname\TYPE{type-shortcut=defined}\else\TYPE{type-shortcut=missing}\fi
+\clarity{Explain this transition.}
+\cwitem[id=item-1,type=todo,author=alice,style=urgent]{Check result.}
+\TYPE{item-type=\cwitemfield{item-1}{type}}
+\TYPE{item-severity=\cwitemfield{item-1}{severity}}
+\cwchange[id=change-1,author=alice,status=accepted]{old}{new}
+\TYPE{change-status=\cwitemfield{change-1}{status}}
+\cwitem[id=thread-1,author=alice]{Question.}
+\cwreply{thread-1}[id=reply-1,author=alice]{Answer.}
+\TYPE{reply-parent=\cwitemfield{reply-1}{parent}}
+\cwresolve{thread-1}
+\TYPE{decision-1=\cwdecision{thread-1}}
+\cwreopen{thread-1}
+\TYPE{decision-2=\cwdecision{thread-1}}
+\cwplaceholder[id=missing-1,subtype=figure]{Architecture diagram}
+\TYPE{placeholder-subtype=\cwitemfield{missing-1}{subtype}}
+\begin{cwrevision}[id=block-1,author=alice]
+Paragraph one.
+
+\begin{itemize}\item list item\end{itemize}
+\[
+x^2+y^2=z^2
+\]
+\end{cwrevision}
+\cwifviewTF{advisor}{\TYPE{view=advisor}}{\TYPE{view=wrong}}
+\cwsetup{document/status=submitted,document/submitted-to={Journal},document/restricted=false}
+\TYPE{document-status=\cwdocumentstatus}
+\cwexport{modern-workflow.tsv}
+\TYPE{modern-workflow=ok}
+\END
+\end{document}
