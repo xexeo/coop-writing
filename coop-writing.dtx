@@ -2442,19 +2442,19 @@
             \str_case_e:nnF { \tl_use:N \l__cw_item_layout_tl }
               {
                 {none}{}
-                {margin}{\marginpar{\textcolor{\l_tmpb_tl}{\l_tmpa_tl:~#1}}}
-                {inline}{\textcolor{\l_tmpb_tl}{[\l_tmpa_tl/\l__cw_item_type_tl:~#1]}}
-                {compact}{\textcolor{\l_tmpb_tl}{[\l_tmpa_tl:~#1]}}
+                {margin}{\marginpar{\textcolor{\l_tmpb_tl}{\tl_use:N \l_tmpa_tl :~#1}}}
+                {inline}{\textcolor{\l_tmpb_tl}{[\tl_use:N \l_tmpa_tl /\tl_use:N \l__cw_item_type_tl :~#1]}}
+                {compact}{\textcolor{\l_tmpb_tl}{[\tl_use:N \l_tmpa_tl :~#1]}}
                 {pdf-annotation}
                   {
                     \@ifpackageloaded{pdfcomment}
                       {\pdfcomment[author={\l_tmpa_tl}]{#1}}
-                      {\textcolor{\l_tmpb_tl}{[\l_tmpa_tl:~#1]}}
+                      {\textcolor{\l_tmpb_tl}{[\tl_use:N \l_tmpa_tl :~#1]}}
                   }
                 {margin-footnote}
                   {\cw@cwnote{#1}{\l_tmpb_tl}{\l_tmpa_tl}}
               }
-              {\textcolor{\l_tmpb_tl}{[\l_tmpa_tl:~#1]}}
+              {\textcolor{\l_tmpb_tl}{[\tl_use:N \l_tmpa_tl :~#1]}}
             \tl_if_eq:NnT \g__cw_pdf_backend_tl { bookmark }
               {
                 \@ifpackageloaded{hyperref}
@@ -2992,7 +2992,7 @@
                 [\l_tmpa_tl/\l__cw_tmpc_tl/\l__cw_tmpd_tl]
                 \tl_if_blank:VF \l_tmpb_tl {~\textit{\l_tmpb_tl}}
                 ~---~\l__cw_tmpg_tl
-                \hfill{\footnotesize \l__cw_tmpe_tl:~\l__cw_tmpf_tl}\par
+                \hfill{\footnotesize \tl_use:N \l__cw_tmpe_tl :~\tl_use:N \l__cw_tmpf_tl}\par
               }
           }
       }
