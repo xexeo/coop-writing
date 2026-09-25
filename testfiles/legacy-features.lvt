@@ -1,0 +1,31 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage[mode=editing,mark-anonymized=false,bookmarks=false]{coop-writing}
+\begin{document}
+\cwsetup{layout=none,warnings=false}
+\cwnamedef{alice}{teal}{Alice}
+\START
+\TYPE{mode=\cwmode}
+\makeatletter
+\ifcw@markanonymized\TYPE{mark-anonymized=true}\else\TYPE{mark-anonymized=false}\fi
+\@ifpackageloaded{tocloft}{\TYPE{tocloft=loaded}}{\TYPE{tocloft=not-loaded}}
+\@ifpackageloaded{hyperref}{\TYPE{hyperref=loaded}}{\TYPE{hyperref=not-loaded}}
+\makeatother
+\ifcsname cwcurrentfile\endcsname\TYPE{current-file=available}\else\TYPE{current-file=missing}\fi
+\ifcwediting\TYPE{editing-if=true}\else\TYPE{editing-if=false}\fi
+\cwdrafttext{Draft text.}
+\cwsaveforlater{Later text.}
+\alicetodo{Author TODO.}
+\cwneedsinfo{Need information.}
+\cwinline{Inline editorial text.}
+\cwsetup{document/status=draft,document/submitted-to={Forum},document/restricted=true}
+\TYPE{status=\cwdocumentstatus}
+\TYPE{submitted-to=\cwdocumentsubmittedto}
+\TYPE{restricted=\cwdocumentrestricted}
+\cwauthorr{Labeled comment}{stable-id}
+\TYPE{comment-ref=\ref{cw:stable-id}}
+\pleasecite[for this claim]
+\listoftodos
+\TYPE{legacy-features=ok}
+\END
+\end{document}
