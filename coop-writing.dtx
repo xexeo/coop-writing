@@ -1014,6 +1014,7 @@
 \newif\if@modopublicaraceitando\@modopublicaraceitandofalse%
 \newif\if@cwtoclofttitles\@cwtoclofttitlesfalse
 \newif\if@changecolor\@changecolorfalse
+\newif\ifcw@markanonymized\cw@markanonymizedfalse
 %    \end{macrocode}
 % \subsubsection{Portuguese Options}
 %    \begin{macrocode}
@@ -1030,12 +1031,15 @@
 \tl_new:N \g__cw_drafts_override_tl
 \tl_new:N \g__cw_todos_override_tl
 \tl_new:N \g__cw_changecolor_override_tl
+\tl_new:N \g__cw_markanon_override_tl
+\int_new:N \g__cw_mode_option_count_int
 \tl_gset:Nn \g__cw_comments_override_tl { unset }
 \tl_gset:Nn \g__cw_suggestions_override_tl { unset }
 \tl_gset:Nn \g__cw_subjects_override_tl { unset }
 \tl_gset:Nn \g__cw_drafts_override_tl { unset }
 \tl_gset:Nn \g__cw_todos_override_tl { unset }
 \tl_gset:Nn \g__cw_changecolor_override_tl { unset }
+\tl_gset:Nn \g__cw_markanon_override_tl { unset }
 
 \cs_new_protected:Npn \__cw_set_mode:n #1
   {
@@ -1053,6 +1057,13 @@
       { \PackageError{coop-writing}{Unknown editorial mode '#1'}{Use editing, submit, publish, or acceptingpublish.} }
     \def\cw@modename{#1}
   }
+\cs_new_protected:Npn \__cw_choose_mode:n #1
+  {
+    \int_gincr:N \g__cw_mode_option_count_int
+    \int_compare:nNnT {\g__cw_mode_option_count_int} > {1}
+      {\PackageWarning{coop-writing}{More than one editorial mode was requested; the last one ('#1') takes precedence}}
+    \__cw_set_mode:n {#1}
+  }
 \__cw_set_mode:n { publish }
 
 \cs_new_protected:Npn \__cw_set_override:Nn #1#2
@@ -1061,10 +1072,10 @@
 \keys_define:nn { cw/package }
   {
     mode .choice:,
-    mode / editing .code:n = { \__cw_set_mode:n {editing} },
-    mode / submit .code:n = { \__cw_set_mode:n {submit} },
-    mode / publish .code:n = { \__cw_set_mode:n {publish} },
-    mode / acceptingpublish .code:n = { \__cw_set_mode:n {acceptingpublish} },
+    mode / editing .code:n = { \__cw_choose_mode:n {editing} },
+    mode / submit .code:n = { \__cw_choose_mode:n {submit} },
+    mode / publish .code:n = { \__cw_choose_mode:n {publish} },
+    mode / acceptingpublish .code:n = { \__cw_choose_mode:n {acceptingpublish} },
     comments .choice:,
     comments / true .code:n = { \__cw_set_override:Nn \g__cw_comments_override_tl {true} },
     comments / false .code:n = { \__cw_set_override:Nn \g__cw_comments_override_tl {false} },
@@ -1092,6 +1103,9 @@
     bookmarks / auto .code:n = { \ednotebookmarkstrue },
     bookmarks / true .code:n = { \ednotebookmarkstrue },
     bookmarks / false .code:n = { \ednotebookmarksfalse },
+    mark-anonymized .choice:,
+    mark-anonymized / true .code:n = { \__cw_set_override:Nn \g__cw_markanon_override_tl {true} },
+    mark-anonymized / false .code:n = { \__cw_set_override:Nn \g__cw_markanon_override_tl {false} },
     view .code:n = { \def\cw@initialview{#1} },
   }
 
@@ -1099,14 +1113,14 @@
   {
     \str_case:nnF {#1}
       {
-        {editing}{\__cw_set_mode:n{editing}}
-        {edicao}{\__cw_set_mode:n{editing}}
-        {submit}{\__cw_set_mode:n{submit}}
-        {submeter}{\__cw_set_mode:n{submit}}
-        {publish}{\__cw_set_mode:n{publish}}
-        {publicar}{\__cw_set_mode:n{publish}}
-        {acceptingpublish}{\__cw_set_mode:n{acceptingpublish}}
-        {publicaraceitando}{\__cw_set_mode:n{acceptingpublish}}
+        {editing}{\__cw_choose_mode:n{editing}}
+        {edicao}{\__cw_choose_mode:n{editing}}
+        {submit}{\__cw_choose_mode:n{submit}}
+        {submeter}{\__cw_choose_mode:n{submit}}
+        {publish}{\__cw_choose_mode:n{publish}}
+        {publicar}{\__cw_choose_mode:n{publish}}
+        {acceptingpublish}{\__cw_choose_mode:n{acceptingpublish}}
+        {publicaraceitando}{\__cw_choose_mode:n{acceptingpublish}}
         {comments}{\__cw_set_override:Nn \g__cw_comments_override_tl {true}}
         {comentarios}{\__cw_set_override:Nn \g__cw_comments_override_tl {true}}
         {suggestions}{\__cw_set_override:Nn \g__cw_suggestions_override_tl {true}}
@@ -1117,6 +1131,7 @@
         {rascunhos}{\__cw_set_override:Nn \g__cw_drafts_override_tl {true}}
         {todos}{\__cw_set_override:Nn \g__cw_todos_override_tl {true}}
         {changecolor}{\__cw_set_override:Nn \g__cw_changecolor_override_tl {true}}
+        {markanonymized}{\__cw_set_override:Nn \g__cw_markanon_override_tl {true}}
         {anonymize}{\@anonimizartrue\@naoanonimizarfalse}
         {anonimizar}{\@anonimizartrue\@naoanonimizarfalse}
         {noanonymize}{\@anonimizarfalse\@naoanonimizartrue}
@@ -1145,6 +1160,8 @@
     \tl_if_eq:NnT \g__cw_todos_override_tl {false} {\@showtodofalse}
     \tl_if_eq:NnT \g__cw_changecolor_override_tl {true} {\@changecolortrue}
     \tl_if_eq:NnT \g__cw_changecolor_override_tl {false} {\@changecolorfalse}
+    \tl_if_eq:NnT \g__cw_markanon_override_tl {true} {\cw@markanonymizedtrue}
+    \tl_if_eq:NnT \g__cw_markanon_override_tl {false} {\cw@markanonymizedfalse}
   }
 \cs_new_eq:NN \cwapplyfeatureoverrides \cw_apply_feature_overrides:
 \ExplSyntaxOff
@@ -1154,6 +1171,7 @@
 % \subsubsection{Fixing the Super Options}
 %    \begin{macrocode}
 \if@modoedicao
+\cw@markanonymizedtrue
 \@showsubjectstrue
 \@showdrafttrue
 \@showcomentariotrue
@@ -1163,6 +1181,7 @@
 \@changecolortrue
 \fi
 \if@modosubmeter
+\cw@markanonymizedfalse
 \@showsubjectsfalse
 \@showdraftfalse
 \@showcomentariofalse
@@ -1172,6 +1191,7 @@
 \@changecolorfalse
 \fi
 \if@modopublicar
+\cw@markanonymizedfalse
 \@showsubjectsfalse
 \@showsugestaofalse
 \@showdraftfalse
@@ -1681,6 +1701,7 @@
 \newcommand{\cwanoncitet}[2][]{\cw@anoncitettext}%
 \else% be anonymous
 \if@modoedicao%
+\ifcw@markanonymized
 \newcommand{\cwanon}[1]{\textcolor{\cw@editAnonColor}{#1}}%
 \newcommand{\cwanoncite}[2][]%
 {%
@@ -1688,6 +1709,15 @@
 {\textcolor{\cw@editAnonColor}{\cite{#2}}}%
 {\textcolor{\cw@editAnonColor}{\cite[#1]{#2}}}%
 }%
+\else
+\newcommand{\cwanon}[1]{#1}%
+\newcommand{\cwanoncite}[2][]%
+{%
+\ifstrempty{#1}%
+{\cite{#2}}%
+{\cite[#1]{#2}}%
+}%
+\fi
 \else% modo edicao
 \newcommand{\cwanon}[1]{#1}%
 \newcommand{\cwanoncite}[2][]%
@@ -1704,7 +1734,7 @@
 {% tem citep
 \newcommand{\cwanoncitep}[2][]%
 {%
-\if@modoedicao%
+\if@modoedicao%\ifcw@markanonymized
 \ifstrempty{#1}%
 {\textcolor{\cw@editAnonColor}{\citep{#2}}}%
 {\textcolor{\cw@editAnonColor}{\citep[#1]{#2}}}%
@@ -1712,7 +1742,7 @@
 \ifstrempty{#1}%
 {\citep{#2}}%
 {\citep[#1]{#2}}%
-\fi% mode edicao
+\fi\fi% mode edicao
 }%
 }%
 {% não tem citep
@@ -1727,7 +1757,7 @@
 {% tem citet
 \newcommand{\cwanoncitet}[2][]%
 {%
-\if@modoedicao%
+\if@modoedicao%\ifcw@markanonymized
 \ifstrempty{#1}%
 {\textcolor{\cw@editAnonColor}{\citet{#2}}}%
 {\textcolor{\cw@editAnonColor}{\citet[#1]{#2}}}%
@@ -1735,7 +1765,7 @@
 \ifstrempty{#1}%
 {\citet{#2}}%
 {\citet[#1]{#2}}%
-\fi% mode edicao
+\fi\fi% mode edicao
 }%
 }%
 {% não tem citet
