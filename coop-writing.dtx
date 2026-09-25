@@ -1128,7 +1128,8 @@
       }
       { \keys_set:nn { cw/package } {#1} }
   }
-\cs_new_eq:NN \cwprocesspackageoption \cw_process_package_option:n
+\cs_new_protected:Npn \cwprocesspackageoption #1
+  { \exp_args:Ne \cw_process_package_option:n {#1} }
 
 \cs_new_protected:Npn \cw_apply_feature_overrides:
   {
@@ -1147,7 +1148,7 @@
   }
 \cs_new_eq:NN \cwapplyfeatureoverrides \cw_apply_feature_overrides:
 \ExplSyntaxOff
-\DeclareOption*{\expandafter\cwprocesspackageoption\expandafter{\CurrentOption}}
+\DeclareOption*{\cwprocesspackageoption{\CurrentOption}}
 \ProcessOptions\relax
 %    \end{macrocode}
 % \subsubsection{Fixing the Super Options}
