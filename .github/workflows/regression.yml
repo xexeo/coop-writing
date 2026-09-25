@@ -22,6 +22,7 @@ jobs:
       - name: Run l3build regression suite
         uses: xu-cheng/latex-action@v4
         with:
+          os: debian
           root_file: quickref-en-us.tex
           pre_compile: |
             l3build check
