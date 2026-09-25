@@ -2267,7 +2267,7 @@
     \tl_set:Nn \l__cw_item_severity_tl { info }
     \tl_clear:N \l__cw_item_parent_tl
     \tl_clear:N \l__cw_item_style_tl
-    \tl_set_eq:NN \l__cw_item_layout_tl \g__cw_layout_tl
+    \tl_set:NV \l__cw_item_layout_tl \g__cw_layout_tl
     \tl_set:Nn \l__cw_item_color_tl { black }
     \tl_clear:N \l__cw_item_subtype_tl
     \tl_clear:N \l__cw_item_comment_tl
@@ -2281,23 +2281,23 @@
   {
     \__cw_item_reset:
     \keys_set:nn { cw/item } {#1}
-    \tl_set_eq:NN \l_tmpa_tl \l__cw_item_type_tl
-    \tl_set_eq:NN \l_tmpb_tl \l__cw_item_style_tl
-    \tl_set_eq:NN \l__cw_tmpd_tl \l__cw_item_author_tl
+    \tl_set:NV \l_tmpa_tl \l__cw_item_type_tl
+    \tl_set:NV \l_tmpb_tl \l__cw_item_style_tl
+    \tl_set:NV \l__cw_tmpd_tl \l__cw_item_author_tl
     \__cw_item_reset:
-    \tl_set_eq:NN \l__cw_item_type_tl \l_tmpa_tl
+    \tl_set:NV \l__cw_item_type_tl \l_tmpa_tl
     \exp_args:NNx \prop_get:NnNTF \g__cw_type_prop
       { \tl_use:N \l_tmpa_tl } \l__cw_tmpc_tl
       { \keys_set:nV { cw/item } \l__cw_tmpc_tl }
       { }
     \exp_args:NNx \prop_get:NnNT \g__cw_type_color_prop
       { \tl_use:N \l__cw_item_type_tl } \l__cw_tmpc_tl
-      { \tl_set_eq:NN \l__cw_item_color_tl \l__cw_tmpc_tl }
+      { \tl_set:NV \l__cw_item_color_tl \l__cw_tmpc_tl }
     \tl_if_blank:VF \l__cw_tmpd_tl
       {
         \exp_args:NNx \prop_get:NnNT \g__cw_author_color_prop
           { \tl_use:N \l__cw_tmpd_tl } \l__cw_tmpc_tl
-          { \tl_set_eq:NN \l__cw_item_color_tl \l__cw_tmpc_tl }
+          { \tl_set:NV \l__cw_item_color_tl \l__cw_tmpc_tl }
       }
     \tl_if_blank:VF \l_tmpb_tl
       {
@@ -2314,7 +2314,7 @@
       }
       { }
     \tl_if_blank:VTF \l__cw_item_label_tl
-      { \tl_set_eq:NN \l__cw_item_label_tl \l__cw_item_type_tl }
+      { \tl_set:NV \l__cw_item_label_tl \l__cw_item_type_tl }
       { }
     \tl_if_blank:VF \l__cw_item_author_tl
       {
@@ -2331,7 +2331,7 @@
       }
     \exp_args:NNx \prop_get:NnNTF \g__cw_decision_prop
       { \tl_use:N \l__cw_item_id_tl } \l_tmpa_tl
-      { \tl_set_eq:NN \l__cw_item_status_tl \l_tmpa_tl }
+      { \tl_set:NV \l__cw_item_status_tl \l_tmpa_tl }
       { }
     \clist_if_empty:NF \g__cw_author_include_clist
       {
@@ -2401,7 +2401,7 @@
       {
         \exp_args:NNx \prop_get:NnNTF \g__cw_author_name_prop
           { \tl_use:N \l__cw_item_author_tl } #1
-          { } { \tl_set_eq:NN #1 \l__cw_item_author_tl }
+          { } { \tl_set:NV #1 \l__cw_item_author_tl }
       }
   }
 
@@ -2436,7 +2436,7 @@
         \tl_if_eq:NnT \g__cw_mode_tl { editing }
           {
             \__cw_author_display:N \l_tmpa_tl
-            \tl_set_eq:NN \l_tmpb_tl \l__cw_item_color_tl
+            \tl_set:NV \l_tmpb_tl \l__cw_item_color_tl
             \tl_if_eq:NnF \g__cw_theme_tl { color }
               { \tl_set:Nn \l_tmpb_tl { black } }
             \str_case_e:nnF { \tl_use:N \l__cw_item_layout_tl }
@@ -2897,7 +2897,7 @@
     \__cw_get_field:nnN {#1}{type}\l_tmpb_tl
     \__cw_get_field:nnN {#1}{status}\l__cw_tmpc_tl
     \exp_args:NNn \prop_get:NnNT \g__cw_decision_prop {#1} \l__cw_tmpd_tl
-      {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
+      {\tl_set:NV \l__cw_tmpc_tl \l__cw_tmpd_tl}
     \__cw_get_field:nnN {#1}{severity}\l__cw_tmpe_tl
     \bool_set_true:N \l_tmpa_bool
     \clist_if_empty:NF \g__cw_author_include_clist
@@ -2957,7 +2957,7 @@
                 \__cw_get_field:nnN {##1}{type}\l_tmpb_tl
                 \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
                 \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
-                  {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
+                  {\tl_set:NV \l__cw_tmpc_tl \l__cw_tmpd_tl}
                 \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
                 \tl_if_blank:VTF \l_tmpa_tl
                   {\__cw_report_increment:Nn \l__cw_report_author_prop {(unassigned)}}
@@ -2982,7 +2982,7 @@
                 \__cw_get_field:nnN {##1}{author}\l_tmpb_tl
                 \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
                 \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
-                  {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
+                  {\tl_set:NV \l__cw_tmpc_tl \l__cw_tmpd_tl}
                 \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
                 \__cw_get_field:nnN {##1}{file}\l__cw_tmpe_tl
                 \__cw_get_field:nnN {##1}{page}\l__cw_tmpf_tl
@@ -3035,7 +3035,7 @@
         \__cw_get_field:nnN {##1}{author}\l_tmpb_tl
         \__cw_get_field:nnN {##1}{status}\l__cw_tmpc_tl
         \prop_get:NnNT \g__cw_decision_prop {##1} \l__cw_tmpd_tl
-          {\tl_set_eq:NN \l__cw_tmpc_tl \l__cw_tmpd_tl}
+          {\tl_set:NV \l__cw_tmpc_tl \l__cw_tmpd_tl}
         \__cw_get_field:nnN {##1}{severity}\l__cw_tmpd_tl
         \__cw_get_field:nnN {##1}{file}\l__cw_tmpe_tl
         \__cw_get_field:nnN {##1}{page}\l__cw_tmpf_tl
@@ -3070,7 +3070,7 @@
           {
             \__cw_get_field:nnN {##1}{status}\l_tmpa_tl
             \prop_get:NnNT \g__cw_decision_prop {##1} \l_tmpb_tl
-              {\tl_set_eq:NN \l_tmpa_tl \l_tmpb_tl}
+              {\tl_set:NV \l_tmpa_tl \l_tmpb_tl}
             \str_case_e:nnF {\tl_use:N \l_tmpa_tl}
               {
                 {open}{
