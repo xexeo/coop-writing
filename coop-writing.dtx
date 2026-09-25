@@ -2388,6 +2388,9 @@
     \__cw_store_var:nN {file} \l__cw_item_file_tl
     \__cw_store_var:nN {page} \l__cw_item_page_tl
     \__cw_store_var:nN {pdf} \l__cw_item_pdf_tl
+    \bool_if:NTF \l__cw_item_visible_bool
+      {\__cw_store_tokens:nn {visible}{true}}
+      {\__cw_store_tokens:nn {visible}{false}}
     \__cw_store_tokens:nn {body} {#1}
   }
 
@@ -2502,6 +2505,18 @@
   {\prop_item:Nn \g__cw_item_prop {#1/#2}}
 \NewExpandableDocumentCommand{\cwdecision}{m}
   {\prop_item:Nn \g__cw_decision_prop {#1}}
+\NewExpandableDocumentCommand{\cwviewname}{}
+  {\tl_use:N \g__cw_view_tl}
+\NewExpandableDocumentCommand{\cwlayoutname}{}
+  {\tl_use:N \g__cw_layout_tl}
+\NewExpandableDocumentCommand{\cwthemename}{}
+  {\tl_use:N \g__cw_theme_tl}
+\NewExpandableDocumentCommand{\cwlogpolicy}{}
+  {\tl_use:N \g__cw_log_policy_tl}
+\NewExpandableDocumentCommand{\cwpdfcomments}{}
+  {\tl_use:N \g__cw_pdf_comments_tl}
+\NewExpandableDocumentCommand{\cwtypepdfpolicy}{m}
+  {\prop_item:Nn \g__cw_pdf_type_prop {#1}}
 
 \cs_new_protected:Npn \__cw_decision:nn #1#2
   { \prop_gput:Nnn \g__cw_decision_prop {#1} {#2} }
