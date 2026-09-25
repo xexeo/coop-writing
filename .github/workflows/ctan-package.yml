@@ -19,6 +19,7 @@ on:
       - 'images/**'
       - 'example-fragments/**'
       - 'tools/build-ctan.sh'
+      - 'tools/build-dist.sh'
       - '.github/workflows/ctan-package.yml'
 
 permissions:
@@ -48,6 +49,9 @@ jobs:
             max-exemplo-pt-br.tex
           args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
 
+      - name: Build generated distribution
+        run: bash tools/build-dist.sh
+
       - name: Assemble and validate CTAN archive
         run: bash tools/build-ctan.sh
 
@@ -55,7 +59,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A ctan-submission coop-writing.sty coop-writing.pdf quickref-en-us.pdf quickref-pt-br.pdf max-example-en-us.pdf max-exemplo-pt-br.pdf
+          git add -A dist ctan-submission coop-writing.sty coop-writing.pdf quickref-en-us.pdf quickref-pt-br.pdf max-example-en-us.pdf max-exemplo-pt-br.pdf
           if git diff --cached --quiet; then
             echo "CTAN staging directory already up to date."
           else
