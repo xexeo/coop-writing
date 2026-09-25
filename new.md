@@ -2,60 +2,90 @@
 
 **Release date:** 2026-09-23
 
-Version 1.8 consolidates `coop-writing` as a LaTeX editorial-workflow layer whose source remains independent of the editing interface. A project can keep comments, proposed changes, TODOs, draft material, anonymization rules, and mode-dependent content in LaTeX while being edited in Overleaf, locally, or through Git.
+Version 1.8 is the modernization release of `coop-writing`. It keeps the historical author/comment API source-compatible while adding a semantic editorial-workflow layer, reproducible releases, and regression-tested compatibility.
 
-## Documentation and usability
+## Semantic editorial items
 
-The release adds concise quick references in English and Brazilian Portuguese and maximal examples in both languages. The maximal examples exercise the public command families and also act as smoke tests. The README now explains installation, supported workflows, maintainer information, and where to start.
-
-All documentation sources are UTF-8. The documentation is automatically compiled with both **pdfLaTeX** and **LuaLaTeX**.
-
-## TODO behavior
-
-The default TODO behavior is intentionally compact:
+New work can use stable IDs and structured metadata:
 
 ```latex
-\todo{Check this argument.}
+\cwitem[id=method-1,type=comment,author=alice,severity=warning]
+  {Explain the sampling strategy.}
+
+\cwchange[id=method-change,author=alice]
+  {old wording}{new wording}
+
+\cwaccept{method-change}
+\cwresolve{method-1}
 ```
 
-creates the ordinary editorial TODO/comment form.
+Items can carry type, author, status, severity, parent/thread, style, layout, color, subtype, comment, date/version, source file/page, and PDF-backend policy.
 
-The large framed form is explicitly requested:
+The release adds selective accept/reject, resolve/reopen, author filtering, replies/threads, custom editorial types, named styles, long revision blocks, structured placeholders, document-state metadata, and named views independent from the editorial mode.
+
+## Reports, reviewer response, errata, and tools
+
+`\cwreport` provides detailed or summarized editorial reports and can filter by author, type, severity, and status.
+
+Changes with stable IDs are written to a revision ledger for reviewer-response documents. The API includes `\cwloadrevisions`, `\cwrevisionref`, `\cwrevisionold`, `\cwrevisionnew`, and `\cwreviewresponse`.
+
+Post-publication corrections use the same change infrastructure through `\cwerratum`. Errata can be persisted and loaded into a separate report document.
+
+`\cwexport` writes versioned UTF-8 tabular metadata without requiring shell escape. `tools/cw-meta-to-json.py` converts that export to JSON. `tools/cw-materialize.py` creates a clean TeX source by accepting/rejecting semantic changes by ID, author, embedded status, or default policy; it supports dry-run diffs and never overwrites the source by default.
+
+## Modes and configuration
+
+The preferred package configuration is key/value based:
 
 ```latex
-\todo[inline]{Rewrite this paragraph.}
+\usepackage[
+  mode=editing,
+  anonymize=false,
+  comments=true,
+  bookmarks=false
+]{coop-writing}
 ```
 
-Unknown TODO options generate a package warning and fall back to the compact/default behavior.
+Historical options remain aliases. Multiple main modes produce a warning and the last explicit mode wins.
 
-## hyperref fixes
+Public predicates expose the active mode. `\cwsetup{...}` configures layout, theme, views, logging, placeholders, PDF annotation policies, author filters, document metadata, and colors.
 
-The release fixes malformed TeX conditional logic in the code that handles `hyperref` loading. It also fixes the `cwavoidhyperref` package option, whose implementation previously missed the command escape and therefore did not reliably activate the intended boolean.
+Anonymization semantics and their editing-mode visual marking are now separate; `mark-anonymized=true|false` controls only the visual indication.
 
-These are compatibility fixes; broader redesign of optional bookmark/PDF-comment behavior remains tracked separately in the project issues.
+## Compatibility cleanup
 
-## Dependency cleanup
+`coop-writing` no longer loads `tocloft` or `hyperref`.
 
-The TODO implementation no longer needs `xstring` for a simple option comparison. It now uses functionality already available through `etoolbox`, reducing unnecessary package dependencies.
+Editorial lists use package-private auxiliary files, eliminating the historical ordering/conflict problems with KOMA-Script, memoir, subfig, etoc, and publisher classes. `hyperref` integration is opportunistic when the document already loads it, and arbitrary comment mathematics is not copied into PDF bookmark strings.
 
-## Reproducible CTAN packaging
+The dependency audit also removed unnecessary `iflang`, `environ`, `csquotes`, `xstring`, and `verbatim` dependencies.
 
-The CTAN submission is generated rather than maintained as an independent source tree. The release workflow:
+## TODOs, drafts, headings, and labels
 
-- regenerates `coop-writing.sty` from `coop-writing.dtx` and `coop-writing.ins`;
-- compiles the manual and user documentation;
-- stages only the files needed for CTAN;
-- excludes easily generated `.sty` and ordinary build artifacts from the CTAN archive;
-- creates a single-top-level-directory ZIP;
-- removes stale ZIPs from previous versions.
+`\todo{...}` is the compact default; `\todo[inline]{...}` is explicitly opt-in. Both participate in editorial lists, and `\listoftodos` is available.
 
-This preserves the project rule that the documented source is authoritative.
+`\cwdrafttext` and `\cwsaveforlater` complement the `cwdraft` environment. The Brazilian Portuguese `rascunho` environment is a real environment alias.
 
-## Release documentation
+Labeled comments now reference their stable label text instead of the footnote number. `\cwheadingcomment` provides a safe heading/moving-argument form.
 
-Two release-oriented files are maintained at the repository root:
+## Internationalization and UTF-8
 
-- `new.md` — only the current release;
-- `changes.md` — the complete version history from v1.0 onward.
+Visible package strings are selected dynamically from symmetric English and Brazilian Portuguese tables. Sources are UTF-8, and both pdfLaTeX and LuaLaTeX are Tier-1 tested engines.
 
-For the full history, see [changes.md](changes.md).
+## Regression and compatibility testing
+
+The repository now uses `l3build` with pdfTeX and LuaTeX, including development-kernel checks. Tests cover modes, semantic workflow, TODO/i18n, hyperref order and PDF strings, standard/memoir/KOMA classes, lists, filters, reports, views, errata, and external tools.
+
+A separate compatibility workflow fetches the canonical UFRJ/COPPE/Poli classes on every run and probes representative publisher templates when available.
+
+See:
+
+- [Compatibility policy](COMPATIBILITY.md)
+- [Dependency audit](DEPENDENCIES.md)
+- [Issue-to-test resolution matrix](ISSUE-TEST-MATRIX.md)
+
+## Canonical source and release process
+
+`coop-writing.dtx` and `coop-writing.ins` are authoritative. CI regenerates the style from them before tests. `dist/`, PDFs, and CTAN staging are generated release artifacts. Historical duplicate source/style snapshots have been removed.
+
+The CTAN workflow builds a single-top-level-directory submission archive and excludes the easily generated `.sty` from the CTAN ZIP when the `.dtx/.ins` pair is present.
