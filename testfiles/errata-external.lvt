@@ -1,0 +1,14 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage[mode=editing]{coop-writing}
+\begin{document}
+\cwsetup{warnings=false,layout=none}
+\START
+\cwloaderrata{errata-fixture}
+\TYPE{external-type=\cwitemfield{err-external}{type}}
+\TYPE{external-old=\cwitemfield{err-external}{old}}
+\TYPE{external-new=\cwitemfield{err-external}{new}}
+\TYPE{external-file=\cwitemfield{err-external}{file}}
+\TYPE{errata-external=ok}
+\END
+\end{document}
