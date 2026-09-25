@@ -1,0 +1,18 @@
+\input regression-test.tex
+\documentclass{article}
+\begin{document}
+\START
+\TYPE{alice-color=blue}
+\TYPE{type-shortcut=defined}
+\TYPE{item-type=todo}
+\TYPE{item-severity=critical}
+\TYPE{change-status=accepted}
+\TYPE{reply-parent=thread-1}
+\TYPE{decision-1=resolved}
+\TYPE{decision-2=open}
+\TYPE{placeholder-subtype=figure}
+\TYPE{view=advisor}
+\TYPE{document-status=submitted}
+\TYPE{modern-workflow=ok}
+\END
+\end{document}
