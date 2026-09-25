@@ -28,3 +28,8 @@ jobs:
             l3build check
             l3build check --dev
           args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+
+      - name: Show l3build differences
+        if: failure()
+        run: |
+          find build/test -name '*.diff' -print -exec sh -c 'echo "===== $1 ====="; cat "$1"' _ {} \;
